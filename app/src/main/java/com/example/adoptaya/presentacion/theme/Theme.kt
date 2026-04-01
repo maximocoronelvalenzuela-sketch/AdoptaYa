@@ -1,6 +1,5 @@
-package com.example.adoptaya.ui.theme
+package com.example.adoptaya.presentacion.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

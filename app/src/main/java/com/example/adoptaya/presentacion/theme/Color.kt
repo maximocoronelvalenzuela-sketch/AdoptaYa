@@ -1,4 +1,4 @@
-package com.example.adoptaya.ui.theme
+package com.example.adoptaya.presentacion.theme
 
 import androidx.compose.ui.graphics.Color
 
