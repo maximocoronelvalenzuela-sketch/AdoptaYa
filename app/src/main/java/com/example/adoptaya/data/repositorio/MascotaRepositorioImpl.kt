@@ -11,4 +11,9 @@ class MascotaRepositorioImpl (
     override fun obtenerMascotas(): List<Mascota> {
         return servicio.obtenerMascotas()
     }
+
+    override fun obtenerMascotaPorId(id: String): Mascota? {
+        return servicio.obtenerMascotaPorId(id)
+    }
+
 }
