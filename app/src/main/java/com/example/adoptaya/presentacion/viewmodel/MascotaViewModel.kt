@@ -1,13 +1,12 @@
 package com.example.adoptaya.presentacion.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.adoptaya.data.model.Mascota
-import com.example.adoptaya.dominio.usecase.ObtenerMascotaPorIdUseCase
-import com.example.adoptaya.dominio.usecase.ObtenerMascotasUseCase
+import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
+import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotasUseCase
 
 class MascotaViewModel (
     private val obtenerMascotasUseCase: ObtenerMascotasUseCase,

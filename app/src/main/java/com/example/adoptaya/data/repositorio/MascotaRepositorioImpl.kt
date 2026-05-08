@@ -16,4 +16,11 @@ class MascotaRepositorioImpl (
         return servicio.obtenerMascotaPorId(id)
     }
 
+    override fun filtrarMascotasPorTipo(tipo: String): List<Mascota> {
+        return servicio.filtrarPorTipo(tipo)
+    }
+
+    override fun filtrarMascotasPorGenero(genero: String): List<Mascota> {
+        return servicio.filtrarPorGenero(genero)
+    }
 }

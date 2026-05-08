@@ -10,30 +10,56 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.adoptaya.data.remoto.FavoritoServicio
 import com.example.adoptaya.data.remoto.MascotaServicio
+import com.example.adoptaya.data.remoto.NotificacionServicio
+import com.example.adoptaya.data.remoto.UsuarioServicio
+import com.example.adoptaya.data.repositorio.FavoritoRepositorioImpl
 import com.example.adoptaya.data.repositorio.MascotaRepositorioImpl
-import com.example.adoptaya.dominio.usecase.ObtenerMascotaPorIdUseCase
-import com.example.adoptaya.dominio.usecase.ObtenerMascotasUseCase
+import com.example.adoptaya.data.repositorio.NotificacionRepositorioImpl
+import com.example.adoptaya.data.repositorio.UsuarioRepositorioImpl
+import com.example.adoptaya.dominio.usecase.favorito.ObtenerFavoritosPorUsuarioUseCase
+import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
+import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotasUseCase
+import com.example.adoptaya.dominio.usecase.notificacion.ObtenerNotificacionesPorUsuario
+import com.example.adoptaya.dominio.usecase.usuario.ObtenerUsuarioPorIdUseCase
 import com.example.adoptaya.presentacion.theme.AdoptaYaTheme
 import com.example.adoptaya.presentacion.theme.ui.PantallaDePrueba
+import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
+import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val servicio = MascotaServicio()
-        val repositorio = MascotaRepositorioImpl(servicio)
-        val obtenerMascotasUC = ObtenerMascotasUseCase(repositorio)
-        val obtenerPorIdUC = ObtenerMascotaPorIdUseCase(repositorio)
+        val mascotaServicio = MascotaServicio()
+        val usuarioServicio = UsuarioServicio()
+        val favoritoServicio = FavoritoServicio()
+        val notificacionServicio = NotificacionServicio()
 
-        val viewModel = MascotaViewModel(obtenerMascotasUC, obtenerPorIdUC)
+        val mascotaRepositorio = MascotaRepositorioImpl(mascotaServicio)
+        val usuarioRepositorio = UsuarioRepositorioImpl(usuarioServicio)
+        val favoritoRepositorio = FavoritoRepositorioImpl(favoritoServicio)
+        val notificacionRepositorio = NotificacionRepositorioImpl(notificacionServicio)
+
+        val obtenerMascotasUC = ObtenerMascotasUseCase(mascotaRepositorio)
+        val obtenerPorIdUC = ObtenerMascotaPorIdUseCase(mascotaRepositorio)
+        val obtenerUsuarioPorIdUC = ObtenerUsuarioPorIdUseCase(usuarioRepositorio)
+        val obtenerFavoritosPorUsuarioUC = ObtenerFavoritosPorUsuarioUseCase(favoritoRepositorio, mascotaRepositorio)
+        val obtenerNotificacionesPorUsuarioUC = ObtenerNotificacionesPorUsuario(notificacionRepositorio)
+
+        val mascotaViewModel = MascotaViewModel(obtenerMascotasUC, obtenerPorIdUC)
+        val usuarioViewModel = UsuarioViewModel(obtenerUsuarioPorIdUC)
+        val favoritoViewModel = FavoritoViewModel(obtenerFavoritosPorUsuarioUC)
+        val notificacionViewModel = NotificacionViewModel(obtenerNotificacionesPorUsuarioUC)
 
         enableEdgeToEdge()
         setContent {
             AdoptaYaTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    PantallaDePrueba(viewModel)
+                    PantallaDePrueba(mascotaViewModel, usuarioViewModel, favoritoViewModel, notificacionViewModel)
                 }
             }
         }

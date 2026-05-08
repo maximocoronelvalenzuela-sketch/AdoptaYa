@@ -47,4 +47,12 @@ class MascotaServicio {
     fun obtenerMascotaPorId(id: String): Mascota? {
         return obtenerMascotas().find { it.id == id }
     }
+
+    fun filtrarPorTipo(tipo: String): List<Mascota> {
+        return obtenerMascotas().filter { it.tipo == tipo }
+    }
+
+    fun filtrarPorGenero(genero: String): List<Mascota> {
+        return obtenerMascotas().filter { it.genero == genero }
+    }
 }
