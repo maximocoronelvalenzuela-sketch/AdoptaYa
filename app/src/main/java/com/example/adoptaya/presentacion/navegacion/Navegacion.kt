@@ -1,0 +1,49 @@
+package com.example.adoptaya.presentacion.navegacion
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.adoptaya.presentacion.theme.ui.PantallaDetalleMascota
+import com.example.adoptaya.presentacion.theme.ui.PantallaMascotas
+import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+
+@Composable
+fun Navegacion(
+    mascotaViewModel: MascotaViewModel
+) {
+
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = Pantallas.Mascotas.ruta
+    ) {
+
+        composable(Pantallas.Mascotas.ruta) {
+
+            PantallaMascotas(
+                mascotaViewModel = mascotaViewModel,
+                alClickearMascota = { mascotaId ->
+
+                    navController.navigate(
+                        Pantallas.DetalleMascota.crearRuta(mascotaId)
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = Pantallas.DetalleMascota.ruta
+        ) { backStackEntry ->
+
+            val mascotaId =
+                backStackEntry.arguments?.getString("mascotaId")
+
+            PantallaDetalleMascota(
+                mascotaId = mascotaId ?: "",
+                mascotaViewModel = mascotaViewModel
+            )
+        }
+    }
+}

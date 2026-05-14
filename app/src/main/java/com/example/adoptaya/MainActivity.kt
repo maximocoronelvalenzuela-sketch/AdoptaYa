@@ -23,6 +23,7 @@ import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotasUseCase
 import com.example.adoptaya.dominio.usecase.notificacion.ObtenerNotificacionesPorUsuario
 import com.example.adoptaya.dominio.usecase.usuario.ObtenerUsuarioPorIdUseCase
+import com.example.adoptaya.presentacion.navegacion.Navegacion
 import com.example.adoptaya.presentacion.theme.AdoptaYaTheme
 import com.example.adoptaya.presentacion.theme.ui.PantallaDePrueba
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
@@ -57,11 +58,15 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            AdoptaYaTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    PantallaDePrueba(mascotaViewModel, usuarioViewModel, favoritoViewModel, notificacionViewModel)
-                }
-            }
+            Navegacion(
+                mascotaViewModel = mascotaViewModel
+            )
+
+//            AdoptaYaTheme {
+//                Surface(modifier = Modifier.fillMaxSize()) {
+//                    PantallaDePrueba(mascotaViewModel, usuarioViewModel, favoritoViewModel, notificacionViewModel)
+//                }
+//            }
         }
     }
 }
