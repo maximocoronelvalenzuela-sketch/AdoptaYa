@@ -5,12 +5,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.adoptaya.presentacion.theme.ui.PantallaDetalleMascota
+import com.example.adoptaya.presentacion.theme.ui.PantallaFavoritos
 import com.example.adoptaya.presentacion.theme.ui.PantallaMascotas
+import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 
 @Composable
 fun Navegacion(
-    mascotaViewModel: MascotaViewModel
+    mascotaViewModel: MascotaViewModel,
+    favoritoViewModel: FavoritoViewModel
 ) {
 
     val navController = rememberNavController()
@@ -29,13 +32,14 @@ fun Navegacion(
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
                     )
+                },
+                alClickearFavorito = {
+                    navController.navigate(Pantallas.Favoritos.ruta)
                 }
             )
         }
 
-        composable(
-            route = Pantallas.DetalleMascota.ruta
-        ) { backStackEntry ->
+        composable(Pantallas.DetalleMascota.ruta) { backStackEntry ->
 
             val mascotaId =
                 backStackEntry.arguments?.getString("mascotaId")
@@ -43,6 +47,20 @@ fun Navegacion(
             PantallaDetalleMascota(
                 mascotaId = mascotaId ?: "",
                 mascotaViewModel = mascotaViewModel
+            )
+        }
+
+        composable(Pantallas.Favoritos.ruta) {
+
+            PantallaFavoritos(
+                favoritoViewModel = favoritoViewModel,
+                alClickearMascota = { mascotaId ->
+
+                    navController.navigate(
+                        Pantallas.DetalleMascota
+                            .crearRuta(mascotaId)
+                    )
+                }
             )
         }
     }

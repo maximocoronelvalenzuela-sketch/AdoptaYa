@@ -10,4 +10,6 @@ sealed class Pantallas(val ruta: String) {
             return "detalle_mascota/$mascotaId"
         }
     }
+
+    object Favoritos : Pantallas("favoritos")
 }

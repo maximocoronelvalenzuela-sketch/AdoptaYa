@@ -59,7 +59,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Navegacion(
-                mascotaViewModel = mascotaViewModel
+                mascotaViewModel = mascotaViewModel,
+                favoritoViewModel = favoritoViewModel
             )
 
 //            AdoptaYaTheme {
