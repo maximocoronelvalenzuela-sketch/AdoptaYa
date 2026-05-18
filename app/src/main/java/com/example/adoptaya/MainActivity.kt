@@ -63,12 +63,6 @@ class MainActivity : ComponentActivity() {
                 favoritoViewModel = favoritoViewModel,
                 usuarioViewModel = usuarioViewModel
             )
-
-//            AdoptaYaTheme {
-//                Surface(modifier = Modifier.fillMaxSize()) {
-//                    PantallaDePrueba(mascotaViewModel, usuarioViewModel, favoritoViewModel, notificacionViewModel)
-//                }
-//            }
         }
     }
 }

@@ -34,17 +34,10 @@ fun PantallaPerfil(
                 .safeDrawingPadding()
                 .padding(16.dp)
         ) {
-
-            Text(
-                text = it.nombre
-            )
-
+            Text(it.nombre)
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = it.email
-            )
-
+            Text(it.email)
             Spacer(modifier = Modifier.height(8.dp))
         }
     }

@@ -20,7 +20,6 @@ fun PantallaDetalleMascota(
     val mascota = mascotaViewModel.mascotaSeleccionada
 
     LaunchedEffect(Unit) {
-
         mascotaViewModel.cargarMascotaPorId(mascotaId)
     }
 
@@ -32,12 +31,11 @@ fun PantallaDetalleMascota(
                 .safeDrawingPadding()
                 .padding(16.dp)
         ) {
-
-            Text(text = it.nombre)
-            Text(text = it.tipo)
-            Text(text = it.descripcionPersonalidad)
-            Text(text = it.descripcionAdicional)
-            Text(text = "Edad: " + it.edad)
+            Text(it.nombre)
+            Text(it.tipo)
+            Text(it.descripcionPersonalidad)
+            Text(it.descripcionAdicional)
+            Text("Edad: " + it.edad)
         }
     }
 }

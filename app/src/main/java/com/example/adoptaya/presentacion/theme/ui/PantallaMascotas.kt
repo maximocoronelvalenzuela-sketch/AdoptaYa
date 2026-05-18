@@ -22,7 +22,8 @@ fun PantallaMascotas(
     mascotaViewModel: MascotaViewModel,
     alClickearMascota: (String) -> Unit,
     alClickearFavorito: () -> Unit,
-    alClickearPerfil: () -> Unit
+    alClickearPerfil: () -> Unit,
+    alClickearMapa: () -> Unit
 ) {
 
     val mascotas = mascotaViewModel.mascotas
@@ -47,13 +48,12 @@ fun PantallaMascotas(
                         alClickearMascota(mascota.id)
                     }
             ) {
-
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Text(text = mascota.nombre)
-                    Text(text = mascota.tipo)
-                    Text(text = mascota.descripcionPersonalidad)
+                    Text(mascota.nombre)
+                    Text(mascota.tipo)
+                    Text(mascota.descripcionPersonalidad)
                 }
             }
         }
@@ -77,6 +77,17 @@ fun PantallaMascotas(
                     .padding(16.dp)
             ) {
                 Text("Ir al Perfil")
+            }
+        }
+
+        item {
+            Button(
+                onClick = {alClickearMapa()},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Ir al Mapa")
             }
         }
     }

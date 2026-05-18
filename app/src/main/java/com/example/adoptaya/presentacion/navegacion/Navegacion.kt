@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.adoptaya.presentacion.theme.ui.PantallaDetalleMascota
 import com.example.adoptaya.presentacion.theme.ui.PantallaFavoritos
+import com.example.adoptaya.presentacion.theme.ui.PantallaMapa
 import com.example.adoptaya.presentacion.theme.ui.PantallaMascotas
 import com.example.adoptaya.presentacion.theme.ui.PantallaPerfil
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
@@ -41,6 +42,9 @@ fun Navegacion(
                 },
                 alClickearPerfil = {
                     navController.navigate(Pantallas.Perfil.ruta)
+                },
+                alClickearMapa = {
+                    navController.navigate(Pantallas.Mapa.ruta)
                 }
             )
         }
@@ -61,10 +65,8 @@ fun Navegacion(
             PantallaFavoritos(
                 favoritoViewModel = favoritoViewModel,
                 alClickearMascota = { mascotaId ->
-
                     navController.navigate(
-                        Pantallas.DetalleMascota
-                            .crearRuta(mascotaId)
+                        Pantallas.DetalleMascota.crearRuta(mascotaId)
                     )
                 }
             )
@@ -73,6 +75,16 @@ fun Navegacion(
         composable(Pantallas.Perfil.ruta) {
             PantallaPerfil(
                 usuarioViewModel = usuarioViewModel
+            )
+        }
+
+        composable(Pantallas.Mapa.ruta) {
+            PantallaMapa(
+                mascotaViewModel = mascotaViewModel,
+                alClickearMascota = { mascotaId ->
+                    navController.navigate(Pantallas.DetalleMascota.crearRuta(mascotaId)
+                    )
+                }
             )
         }
     }

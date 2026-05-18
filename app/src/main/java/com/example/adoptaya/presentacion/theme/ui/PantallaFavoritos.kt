@@ -42,15 +42,12 @@ fun PantallaFavoritos(
                     .fillMaxWidth()
                     .padding(8.dp)
                     .clickable {
-
                         alClickearMascota(mascota.id)
                     }
             ) {
-
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
-
                     Text(mascota.nombre)
                     Text(mascota.tipo)
                     Text(mascota.descripcionPersonalidad)

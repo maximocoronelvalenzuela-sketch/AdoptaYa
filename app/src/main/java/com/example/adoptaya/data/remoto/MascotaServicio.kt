@@ -17,8 +17,8 @@ class MascotaServicio {
                 descripcionPersonalidad = "Activo y sociable",
                 descripcionAdicional = "Ideal para familias",
                 estado = "Disponible",
-                latitud = 40.7128,
-                longitud = -74.0060,
+                latitud = -27.80799,
+                longitud = -64.24882,
                 imagenes = listOf("imagen1.jpg", "imagen2.jpg"),
                 idUsuario = "usuario123",
                 fechaHoraAlta = "2023-07-15T12:00:00"
@@ -35,8 +35,8 @@ class MascotaServicio {
                 descripcionPersonalidad = "Tranquila y mimosa",
                 descripcionAdicional = "Busca un hogar sin otros gatos",
                 estado = "Disponible",
-                latitud = -34.6037,
-                longitud = -58.3816,
+                latitud = -27.80922,
+                longitud = -64.24835,
                 imagenes = listOf("luna1.jpg"),
                 idUsuario = "usuario456",
                 fechaHoraAlta = "2024-01-10T10:30:00"
