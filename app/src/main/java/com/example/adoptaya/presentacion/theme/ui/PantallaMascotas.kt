@@ -21,7 +21,8 @@ import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 fun PantallaMascotas(
     mascotaViewModel: MascotaViewModel,
     alClickearMascota: (String) -> Unit,
-    alClickearFavorito: () -> Unit
+    alClickearFavorito: () -> Unit,
+    alClickearPerfil: () -> Unit
 ) {
 
     val mascotas = mascotaViewModel.mascotas
@@ -65,6 +66,17 @@ fun PantallaMascotas(
                     .padding(16.dp)
             ) {
                 Text("Ir a Favoritos")
+            }
+        }
+
+        item {
+            Button(
+                onClick = {alClickearPerfil()},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Ir al Perfil")
             }
         }
     }

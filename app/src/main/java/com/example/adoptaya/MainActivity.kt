@@ -60,7 +60,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             Navegacion(
                 mascotaViewModel = mascotaViewModel,
-                favoritoViewModel = favoritoViewModel
+                favoritoViewModel = favoritoViewModel,
+                usuarioViewModel = usuarioViewModel
             )
 
 //            AdoptaYaTheme {

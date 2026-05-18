@@ -12,4 +12,6 @@ sealed class Pantallas(val ruta: String) {
     }
 
     object Favoritos : Pantallas("favoritos")
+
+    object Perfil : Pantallas("perfil")
 }

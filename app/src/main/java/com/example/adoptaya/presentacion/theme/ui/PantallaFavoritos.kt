@@ -25,7 +25,7 @@ fun PantallaFavoritos(
         favoritoViewModel.favoritosDeUsuario
 
     LaunchedEffect(Unit) {
-        // Hardcodeado porque todavia no hay sesion
+        // Hardcodeado temporalmente porque todavia no hay sesion
         favoritoViewModel.cargarFavoritosDeUsuario("1")
     }
 

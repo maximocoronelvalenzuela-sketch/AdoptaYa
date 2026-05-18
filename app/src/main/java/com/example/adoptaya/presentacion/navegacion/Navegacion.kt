@@ -7,13 +7,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.adoptaya.presentacion.theme.ui.PantallaDetalleMascota
 import com.example.adoptaya.presentacion.theme.ui.PantallaFavoritos
 import com.example.adoptaya.presentacion.theme.ui.PantallaMascotas
+import com.example.adoptaya.presentacion.theme.ui.PantallaPerfil
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 @Composable
 fun Navegacion(
     mascotaViewModel: MascotaViewModel,
-    favoritoViewModel: FavoritoViewModel
+    favoritoViewModel: FavoritoViewModel,
+    usuarioViewModel: UsuarioViewModel
 ) {
 
     val navController = rememberNavController()
@@ -35,6 +38,9 @@ fun Navegacion(
                 },
                 alClickearFavorito = {
                     navController.navigate(Pantallas.Favoritos.ruta)
+                },
+                alClickearPerfil = {
+                    navController.navigate(Pantallas.Perfil.ruta)
                 }
             )
         }
@@ -61,6 +67,12 @@ fun Navegacion(
                             .crearRuta(mascotaId)
                     )
                 }
+            )
+        }
+
+        composable(Pantallas.Perfil.ruta) {
+            PantallaPerfil(
+                usuarioViewModel = usuarioViewModel
             )
         }
     }
