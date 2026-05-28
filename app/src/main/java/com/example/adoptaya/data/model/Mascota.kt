@@ -5,7 +5,7 @@ data class Mascota(
     val nombre: String,
     val tipo: String,
     val edad: String,
-    val genero: String,
+    val sexo: String,
     val esterilizado: Boolean,
     val vacunado: Boolean,
     val desparasitado: Boolean,

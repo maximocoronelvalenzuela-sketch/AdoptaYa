@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.adoptaya.presentacion.componentes.MascotaCard
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 
 @Composable
@@ -37,22 +38,12 @@ fun PantallaFavoritos(
 
         items(mascotas) { mascota ->
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .clickable {
-                        alClickearMascota(mascota.id)
-                    }
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(mascota.nombre)
-                    Text(mascota.tipo)
-                    Text(mascota.descripcionPersonalidad)
+            MascotaCard(
+                mascota = mascota,
+                alClickear = {
+                    alClickearMascota(mascota.id)
                 }
-            }
+            )
         }
     }
 }

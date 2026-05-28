@@ -20,7 +20,7 @@ class MascotaRepositorioImpl (
         return servicio.filtrarPorTipo(tipo)
     }
 
-    override fun filtrarMascotasPorGenero(genero: String): List<Mascota> {
-        return servicio.filtrarPorGenero(genero)
+    override fun filtrarMascotasPorSexo(sexo: String): List<Mascota> {
+        return servicio.filtrarPorSexo(sexo)
     }
 }

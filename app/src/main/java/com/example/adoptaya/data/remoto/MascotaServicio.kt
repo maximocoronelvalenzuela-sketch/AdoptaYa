@@ -10,7 +10,7 @@ class MascotaServicio {
                 nombre = "Max",
                 tipo = "Perro",
                 edad = "3 años",
-                genero = "Macho",
+                sexo = "Macho",
                 esterilizado = true,
                 vacunado = true,
                 desparasitado = true,
@@ -28,7 +28,7 @@ class MascotaServicio {
                 nombre = "Luna",
                 tipo = "Gato",
                 edad = "1 año",
-                genero = "Hembra",
+                sexo = "Hembra",
                 esterilizado = true,
                 vacunado = true,
                 desparasitado = true,
@@ -52,7 +52,7 @@ class MascotaServicio {
         return obtenerMascotas().filter { it.tipo == tipo }
     }
 
-    fun filtrarPorGenero(genero: String): List<Mascota> {
-        return obtenerMascotas().filter { it.genero == genero }
+    fun filtrarPorSexo(sexo: String): List<Mascota> {
+        return obtenerMascotas().filter { it.sexo == sexo }
     }
 }

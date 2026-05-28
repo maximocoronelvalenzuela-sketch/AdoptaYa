@@ -9,5 +9,5 @@ interface MascotaRepositorio {
 
     fun filtrarMascotasPorTipo(tipo: String): List<Mascota>
 
-    fun filtrarMascotasPorGenero(genero: String): List<Mascota>
+    fun filtrarMascotasPorSexo(sexo: String): List<Mascota>
 }
