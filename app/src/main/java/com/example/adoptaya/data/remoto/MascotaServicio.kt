@@ -19,7 +19,7 @@ class MascotaServicio {
                 estado = "Disponible",
                 latitud = -27.80799,
                 longitud = -64.24882,
-                imagenes = listOf("imagen1.jpg", "imagen2.jpg"),
+                imagenes = listOf("https://images.unsplash.com/photo-1543466835-00a7907e9de1"),
                 idUsuario = "usuario123",
                 fechaHoraAlta = "2023-07-15T12:00:00"
             ),
@@ -37,7 +37,7 @@ class MascotaServicio {
                 estado = "Disponible",
                 latitud = -27.80922,
                 longitud = -64.24835,
-                imagenes = listOf("luna1.jpg"),
+                imagenes = listOf("https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba"),
                 idUsuario = "usuario456",
                 fechaHoraAlta = "2024-01-10T10:30:00"
             )
