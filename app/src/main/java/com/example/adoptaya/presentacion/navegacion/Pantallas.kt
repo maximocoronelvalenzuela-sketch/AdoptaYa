@@ -16,4 +16,6 @@ sealed class Pantallas(val ruta: String) {
     object Perfil : Pantallas("perfil")
 
     object Mapa : Pantallas("mapa")
+
+    object Publicar : Pantallas("publicar")
 }

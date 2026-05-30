@@ -1,23 +1,17 @@
 package com.example.adoptaya.presentacion.theme.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.MascotaCard
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
@@ -29,7 +23,8 @@ fun PantallaMascotas(
     alClickearMascota: (String) -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearPerfil: () -> Unit,
-    alClickearMapa: () -> Unit
+    alClickearMapa: () -> Unit,
+    alClickearPublicar: () -> Unit
 ) {
 
     val mascotas = mascotaViewModel.mascotas
@@ -44,6 +39,18 @@ fun PantallaMascotas(
                 titulo = "AdoptaYa",
                 color = Color(0xFFE85A13),
                 tamañoFuente = 28.sp
+            )
+        },
+        bottomBar = {
+            BarraNavegacion(
+                rutaActual = Pantallas.Mascotas.ruta,
+                alNavegar = { ruta ->
+                    when (ruta) {
+                        Pantallas.Favoritos.ruta -> alClickearFavorito()
+                        Pantallas.Perfil.ruta -> alClickearPerfil()
+                        Pantallas.Mapa.ruta -> alClickearMapa()
+                    }
+                }
             )
         }
     ) { paddingValues ->

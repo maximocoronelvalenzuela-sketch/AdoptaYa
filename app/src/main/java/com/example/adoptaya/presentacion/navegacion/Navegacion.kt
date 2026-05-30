@@ -38,13 +38,17 @@ fun Navegacion(
                     )
                 },
                 alClickearFavorito = {
-                    navController.navigate(Pantallas.Favoritos.ruta)
+                    navController.navigate(Pantallas.Favoritos.ruta) { launchSingleTop = true }
                 },
                 alClickearPerfil = {
-                    navController.navigate(Pantallas.Perfil.ruta)
+                    navController.navigate(Pantallas.Perfil.ruta) { launchSingleTop = true }
                 },
                 alClickearMapa = {
-                    navController.navigate(Pantallas.Mapa.ruta)
+                    navController.navigate(Pantallas.Mapa.ruta) { launchSingleTop = true }
+                },
+                alClickearPublicar = {
+                    // Por ahora no hace nada como pediste, o puedes navegar a la pantalla si existe
+                    navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
                 }
             )
         }
@@ -69,13 +73,37 @@ fun Navegacion(
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
                     )
+                },
+                alClickearInicio = {
+                    navController.navigate(Pantallas.Mascotas.ruta) { launchSingleTop = true }
+                },
+                alClickearMapa = {
+                    navController.navigate(Pantallas.Mapa.ruta) { launchSingleTop = true }
+                },
+                alClickearPerfil = {
+                    navController.navigate(Pantallas.Perfil.ruta) { launchSingleTop = true }
+                },
+                alClickearPublicar = {
+                    navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
                 }
             )
         }
 
         composable(Pantallas.Perfil.ruta) {
             PantallaPerfil(
-                usuarioViewModel = usuarioViewModel
+                usuarioViewModel = usuarioViewModel,
+                alClickearInicio = {
+                    navController.navigate(Pantallas.Mascotas.ruta) { launchSingleTop = true }
+                },
+                alClickearFavorito = {
+                    navController.navigate(Pantallas.Favoritos.ruta) { launchSingleTop = true }
+                },
+                alClickearMapa = {
+                    navController.navigate(Pantallas.Mapa.ruta) { launchSingleTop = true }
+                },
+                alClickearPublicar = {
+                    navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
+                }
             )
         }
 
@@ -85,6 +113,18 @@ fun Navegacion(
                 alClickearMascota = { mascotaId ->
                     navController.navigate(Pantallas.DetalleMascota.crearRuta(mascotaId)
                     )
+                },
+                alClickearInicio = {
+                    navController.navigate(Pantallas.Mascotas.ruta) { launchSingleTop = true }
+                },
+                alClickearFavorito = {
+                    navController.navigate(Pantallas.Favoritos.ruta) { launchSingleTop = true }
+                },
+                alClickearPerfil = {
+                    navController.navigate(Pantallas.Perfil.ruta) { launchSingleTop = true }
+                },
+                alClickearPublicar = {
+                    navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
                 }
             )
         }
