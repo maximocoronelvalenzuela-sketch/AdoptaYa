@@ -1,41 +1,390 @@
 package com.example.adoptaya.presentacion.theme.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Female
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Male
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.SentimentSatisfied
+import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 
 @Composable
 fun PantallaDetalleMascota(
     mascotaId: String,
-    mascotaViewModel: MascotaViewModel
+    mascotaViewModel: MascotaViewModel,
+    alVolver: () -> Unit
 ) {
+    val mascota = mascotaViewModel.mascotas.find { it.id == mascotaId }
+    val scrollState = rememberScrollState()
 
-    val mascota = mascotaViewModel.mascotaSeleccionada
-
-    LaunchedEffect(Unit) {
-        mascotaViewModel.cargarMascotaPorId(mascotaId)
+    if (mascota == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Mascota no encontrada")
+        }
+        return
     }
 
-    mascota?.let {
+    Scaffold(
+        bottomBar = { BarraContactoInferior() },    // Botón de WhatsApp fijo abajo
+        containerColor = Color(0xFFF8F9FA)          // Fondo general clarito
+    ) { paddingValues ->
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .safeDrawingPadding()
-                .padding(16.dp)
+                .padding(paddingValues)
         ) {
-            Text(it.nombre)
-            Text(it.tipo)
-            Text(it.descripcionPersonalidad)
-            Text(it.descripcionAdicional)
-            Text("Edad: " + it.edad)
+            // Imagen de fondo fija arriba
+            AsyncImage(
+                model = mascota.imagenes.firstOrNull() ?: "https://images.unsplash.com/photo-1543466835-00a7907e9de1",
+                contentDescription = "Foto de ${mascota.nombre}",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(350.dp) // Altura de la imagen antes de que empiece la tarjeta
+            )
+
+
+            // Contenido scrolleable que se superpone
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+            ) {
+                // Espaciador grande para empujar la tarjeta hacia abajo y dejar ver la foto
+                Spacer(modifier = Modifier.height(300.dp))
+
+                // Tarjeta principal blanca
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+                    color = Color.White
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 32.dp)
+                    ) {
+                        // Nombre, Raza (Tipo, por ahora), Genero
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = mascota.nombre,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 32.sp,
+                                    color = Color.Black
+                                )
+                                Text(
+                                    text = mascota.tipo, // Ej: "Golden Retriever"
+                                    color = Color.Gray,
+                                    fontSize = 16.sp
+                                )
+                            }
+
+                            // Tag de Género (Naranja)
+                            Surface(
+                                color = Color(0xFFFFF3E0),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val iconoSexo = if (mascota.sexo == "Macho") Icons.Default.Male else Icons.Default.Female
+                                    Icon(iconoSexo, contentDescription = null, tint = Color(0xFFE85A13), modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(mascota.sexo, color = Color(0xFFE85A13), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+
+                        // Informacion basica
+                        TituloSeccion("Información Básica")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.CalendarToday, titulo = "EDAD", valor = mascota.edad + " Años")
+                            CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.Straighten, titulo = "TAMAÑO", valor = mascota.tamaño)
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+
+                        // Salud
+                        TituloSeccion("Salud")
+                        if (mascota.vacunado) ItemSalud("Vacunado")
+                        Spacer(modifier = Modifier.height(12.dp))
+                        if (mascota.esterilizado) ItemSalud("Esterilizado/a / Castrado/a")
+                        Spacer(modifier = Modifier.height(12.dp))
+                        if (mascota.desparasitado) ItemSalud("Desparasitado")
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+
+                        // Personalidad
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TituloSeccion("Personalidad")
+                            Text("RASGOS", color = Color(0xFFE85A13), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        mascota.descripcionPersonalidad.chunked(2).forEach { fila ->    // chunked(2) agrupa los elementos en una sublista de a 2
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                fila.forEach { rasgo ->
+                                    ChipPersonalidad(rasgo)
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+
+                        // Sobre la mascota
+                        Surface(
+                            color = Color(0xFFFFF6ED), // Naranja muy tenue
+                            shape = RoundedCornerShape(24.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(20.dp)) {
+                                Text("Sobre ${mascota.nombre}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = mascota.descripcionAdicional,
+                                    color = Color(0xFF666666),
+                                    lineHeight = 24.sp,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+
+                        // Ubicacion aproximada
+                        TituloSeccion("Ubicacion aproximada")
+                        Box(    // Falso mapa
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color(0xFFA3C9A8)), // Color verde agua simulando el mapa
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Surface(
+                                color = Color.White,
+                                shape = RoundedCornerShape(12.dp),
+                                shadowElevation = 4.dp
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Default.Pets, contentDescription = null, tint = Color(0xFFE85A13))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Column {
+                                        Text("BARRIO", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                        Text("Palermo, CABA", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                        }
+
+//                        Spacer(modifier = Modifier.height(40.dp)) // Espacio final para que el scroll no choque con el botón de WhatsApp
+                    }
+                }
+            }
+
+
+            // Botones: Atras y Favorito
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .statusBarsPadding(),   // Para que no esté bajo la barra de estado
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButtonFlotante(icono = Icons.Default.ArrowBackIosNew, onClick = alVolver)
+                IconButtonFlotante(icono = Icons.Default.FavoriteBorder, onClick = { /* TODO: Agregar a favoritos */ })
+            }
+        }
+    }
+}
+
+// Componentes de la misma pantalla (modularidad)
+
+@Composable
+fun IconButtonFlotante(icono: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+    Surface(
+        shape = CircleShape,
+        color = Color.Black.copy(alpha = 0.3f), // Fondo semitransparente
+        modifier = Modifier.size(44.dp),
+        onClick = onClick
+    ) {
+        Icon(icono, contentDescription = null, tint = Color.White, modifier = Modifier.padding(10.dp))
+    }
+}
+
+@Composable
+fun TituloSeccion(texto: String) {
+    Text(
+        text = texto,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        color = Color.Black,
+        modifier = Modifier.padding(bottom = 16.dp)
+    )
+}
+
+@Composable
+fun CardInfoBasica(modifier: Modifier = Modifier, icono: androidx.compose.ui.graphics.vector.ImageVector, titulo: String, valor: String) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = Color(0xFFE5E8E8) // Fondo gris claro
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icono, contentDescription = null, tint = Color(0xFFE85A13), modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column {
+                Text(titulo, color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                Text(valor, color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun ItemSalud(texto: String) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEEEEEE)),
+        color = Color.White
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF4CAF50))
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(texto, color = Color.DarkGray, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+}
+
+@Composable
+fun ChipPersonalidad(texto: String) {
+    Surface(
+        shape = RoundedCornerShape(50),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEEEEEE)),
+        color = Color.White
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Default.Favorite, contentDescription = null, tint = Color(0xFFE85A13), modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(texto, color = Color.DarkGray, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+}
+
+@Composable
+fun BarraContactoInferior() {
+    Surface(
+        color = Color.White,
+        shadowElevation = 16.dp, // Sombra para separarlo del contenido
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Botón Naranja de WhatsApp
+            Button (
+                onClick = { /* TODO: Abrir WhatsApp */ },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE85A13)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(Icons.Default.ChatBubbleOutline, contentDescription = null, tint = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Contactar por WhatsApp", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }

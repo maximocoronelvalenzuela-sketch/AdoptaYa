@@ -56,7 +56,8 @@ fun Navegacion(
 
             PantallaDetalleMascota(
                 mascotaId = mascotaId ?: "",
-                mascotaViewModel = mascotaViewModel
+                mascotaViewModel = mascotaViewModel,
+                alVolver = { navController.popBackStack() }
             )
         }
 

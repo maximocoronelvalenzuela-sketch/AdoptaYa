@@ -124,14 +124,14 @@ fun MascotaCard(
 
                     // Botón de Favoritos (Corazón)
                     IconButton(
-                        onClick = { /* TODO: Lógica para agregar a favoritos */ },
+                        onClick = { /* TODO: Agregar a favoritos */ },
                         modifier = Modifier.size(32.dp),
-                        colors = IconButtonDefaults.iconButtonColors(Color(0xFFF3F3F3))
+                        colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
                     ) {
                         Icon(
                             imageVector = Icons.Default.FavoriteBorder, // Usar Icons.Default.Favorite para el corazón lleno
                             contentDescription = "Agregar a favoritos",
-                            tint = Color.Gray
+                            tint = Color.White
                         )
                     }
                 }
