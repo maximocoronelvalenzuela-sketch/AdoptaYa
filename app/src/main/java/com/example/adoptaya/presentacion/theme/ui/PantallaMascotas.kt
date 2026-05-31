@@ -49,6 +49,7 @@ fun PantallaMascotas(
                         Pantallas.Favoritos.ruta -> alClickearFavorito()
                         Pantallas.Perfil.ruta -> alClickearPerfil()
                         Pantallas.Mapa.ruta -> alClickearMapa()
+                        Pantallas.Publicar.ruta -> alClickearPublicar()
                     }
                 }
             )

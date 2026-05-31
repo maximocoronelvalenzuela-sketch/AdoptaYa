@@ -28,11 +28,9 @@ fun Navegacion(
     ) {
 
         composable(Pantallas.Mascotas.ruta) {
-
             PantallaMascotas(
                 mascotaViewModel = mascotaViewModel,
                 alClickearMascota = { mascotaId ->
-
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
                     )
@@ -47,14 +45,12 @@ fun Navegacion(
                     navController.navigate(Pantallas.Mapa.ruta) { launchSingleTop = true }
                 },
                 alClickearPublicar = {
-                    // Por ahora no hace nada como pediste, o puedes navegar a la pantalla si existe
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
                 }
             )
         }
 
         composable(Pantallas.DetalleMascota.ruta) { backStackEntry ->
-
             val mascotaId =
                 backStackEntry.arguments?.getString("mascotaId")
 
@@ -66,7 +62,6 @@ fun Navegacion(
         }
 
         composable(Pantallas.Favoritos.ruta) {
-
             PantallaFavoritos(
                 favoritoViewModel = favoritoViewModel,
                 alClickearMascota = { mascotaId ->

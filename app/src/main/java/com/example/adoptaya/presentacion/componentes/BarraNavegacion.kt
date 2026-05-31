@@ -35,7 +35,7 @@ fun BarraNavegacion(
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = Color(0xFFE85A13),  // Naranja de la app
                 selectedTextColor = Color(0xFFE85A13),
-                indicatorColor = Color(0xFFFFF3E0) // Fondo naranja al seleccionar
+                indicatorColor = Color(0xFFFFF3E0)  // Fondo naranja al seleccionar
             )
         )
 
@@ -58,7 +58,7 @@ fun BarraNavegacion(
             )
         )
 
-        // Publicar (Botón Central)
+        // Publicar (Boton Central)
         NavigationBarItem(
             selected = rutaActual == Pantallas.Publicar.ruta,
             onClick = {/* TODO: Ir a Publicar */},
@@ -66,7 +66,7 @@ fun BarraNavegacion(
                 Icon(
                     imageVector = Icons.Filled.AddCircle,
                     contentDescription = "Publicar",
-                    modifier = Modifier.size(32.dp), // Un poco más grande para destacar
+                    modifier = Modifier.size(32.dp),    // Mas grande para destacar
                     tint = Color(0xFFE85A13)
                 )
             },
