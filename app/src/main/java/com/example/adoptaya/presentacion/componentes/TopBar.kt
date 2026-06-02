@@ -1,6 +1,10 @@
 package com.example.adoptaya.presentacion.componentes
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -13,7 +17,8 @@ import androidx.compose.ui.unit.sp
 fun TopBar(
     titulo: String,
     color: Color = Color.Unspecified,
-    tamañoFuente: TextUnit = 22.sp
+    tamañoFuente: TextUnit = 22.sp,
+    alClickearNotificaciones: () -> Unit,
 ) {
 
     TopAppBar(
@@ -23,6 +28,15 @@ fun TopBar(
                 color = color,
                 fontSize = tamañoFuente
             )
+        },
+        actions = {
+            IconButton(onClick = alClickearNotificaciones) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Notificaciones",
+                    tint = Color.Black
+                )
+            }
         }
     )
 }

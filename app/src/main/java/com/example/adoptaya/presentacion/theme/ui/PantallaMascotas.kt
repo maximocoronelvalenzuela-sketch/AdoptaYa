@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.MascotaCard
@@ -24,7 +23,8 @@ fun PantallaMascotas(
     alClickearFavorito: () -> Unit,
     alClickearPerfil: () -> Unit,
     alClickearMapa: () -> Unit,
-    alClickearPublicar: () -> Unit
+    alClickearPublicar: () -> Unit,
+    alClickearNotificaciones: () -> Unit
 ) {
 
     val mascotas = mascotaViewModel.mascotas
@@ -38,7 +38,8 @@ fun PantallaMascotas(
             TopBar(
                 titulo = "AdoptaYa",
                 color = Color(0xFFE85A13),
-                tamañoFuente = 28.sp
+                tamañoFuente = 28.sp,
+                alClickearNotificaciones = { alClickearNotificaciones() }
             )
         },
         bottomBar = {
@@ -68,39 +69,6 @@ fun PantallaMascotas(
                         alClickearMascota(mascota.id)
                     }
                 )
-            }
-
-            item {
-                Button(
-                    onClick = {alClickearFavorito()},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text("Ir a Favoritos")
-                }
-            }
-
-            item {
-                Button(
-                    onClick = {alClickearPerfil()},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text("Ir al Perfil")
-                }
-            }
-
-            item {
-                Button(
-                    onClick = {alClickearMapa()},
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text("Ir al Mapa")
-                }
             }
         }
     }

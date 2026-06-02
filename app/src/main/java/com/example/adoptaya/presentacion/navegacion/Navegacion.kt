@@ -8,16 +8,19 @@ import com.example.adoptaya.presentacion.theme.ui.PantallaDetalleMascota
 import com.example.adoptaya.presentacion.theme.ui.PantallaFavoritos
 import com.example.adoptaya.presentacion.theme.ui.PantallaMapa
 import com.example.adoptaya.presentacion.theme.ui.PantallaMascotas
+import com.example.adoptaya.presentacion.theme.ui.PantallaNotificaciones
 import com.example.adoptaya.presentacion.theme.ui.PantallaPerfil
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 @Composable
 fun Navegacion(
     mascotaViewModel: MascotaViewModel,
     favoritoViewModel: FavoritoViewModel,
-    usuarioViewModel: UsuarioViewModel
+    usuarioViewModel: UsuarioViewModel,
+    notificacionViewModel: NotificacionViewModel
 ) {
 
     val navController = rememberNavController()
@@ -39,20 +42,24 @@ fun Navegacion(
                     navController.navigate(Pantallas.Favoritos.ruta) { launchSingleTop = true }
                 },
                 alClickearPerfil = {
-                    navController.navigate(Pantallas.Perfil.ruta) { launchSingleTop = true }
+                    navController.navigate(
+                        Pantallas.Perfil.crearRuta("1")
+                    )
                 },
                 alClickearMapa = {
                     navController.navigate(Pantallas.Mapa.ruta) { launchSingleTop = true }
                 },
                 alClickearPublicar = {
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
+                },
+                alClickearNotificaciones = {
+                    navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
                 }
             )
         }
 
         composable(Pantallas.DetalleMascota.ruta) { backStackEntry ->
-            val mascotaId =
-                backStackEntry.arguments?.getString("mascotaId")
+            val mascotaId = backStackEntry.arguments?.getString("mascotaId")
 
             PantallaDetalleMascota(
                 mascotaId = mascotaId ?: "",
@@ -76,7 +83,9 @@ fun Navegacion(
                     navController.navigate(Pantallas.Mapa.ruta) { launchSingleTop = true }
                 },
                 alClickearPerfil = {
-                    navController.navigate(Pantallas.Perfil.ruta) { launchSingleTop = true }
+                    navController.navigate(
+                        Pantallas.Perfil.crearRuta("1")
+                    )
                 },
                 alClickearPublicar = {
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
@@ -84,8 +93,10 @@ fun Navegacion(
             )
         }
 
-        composable(Pantallas.Perfil.ruta) {
+        composable(Pantallas.Perfil.ruta) { backStackEntry ->
+            val usuarioId = backStackEntry.arguments?.getString("usuarioId") ?: "1"
             PantallaPerfil(
+                usuarioId = usuarioId,
                 usuarioViewModel = usuarioViewModel,
                 alClickearInicio = {
                     navController.navigate(Pantallas.Mascotas.ruta) { launchSingleTop = true }
@@ -116,10 +127,29 @@ fun Navegacion(
                     navController.navigate(Pantallas.Favoritos.ruta) { launchSingleTop = true }
                 },
                 alClickearPerfil = {
-                    navController.navigate(Pantallas.Perfil.ruta) { launchSingleTop = true }
+                    navController.navigate(
+                        Pantallas.Perfil.crearRuta("1")
+                    )
                 },
                 alClickearPublicar = {
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
+                }
+            )
+        }
+
+        composable(Pantallas.Notificaciones.ruta) {
+            PantallaNotificaciones(
+                notificacionViewModel = notificacionViewModel,
+                alVolver = { navController.popBackStack() },
+                alClickearMascota = { mascotaId ->
+                    navController.navigate(
+                        Pantallas.DetalleMascota.crearRuta(mascotaId)
+                    )
+                },
+                alClickearPerfil = { usuarioId ->
+                    navController.navigate(
+                        Pantallas.Perfil.crearRuta(usuarioId)
+                    )
                 }
             )
         }

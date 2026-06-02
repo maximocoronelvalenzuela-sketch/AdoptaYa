@@ -18,7 +18,7 @@ fun BarraNavegacion(
 ) {
     NavigationBar(
         containerColor = Color.White,
-        tonalElevation = 8.dp // Sombra
+        tonalElevation = 12.dp // Sombra
     ) {
         // Home
         NavigationBarItem(
@@ -48,7 +48,7 @@ fun BarraNavegacion(
                     modifier = Modifier.size(26.dp)
                 )
             },
-            label = { Text("Guardados") },
+            label = { Text("Favoritos") },
             selected = rutaActual == Pantallas.Favoritos.ruta,
             onClick = { alNavegar(Pantallas.Favoritos.ruta) },
             colors = NavigationBarItemDefaults.colors(

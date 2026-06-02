@@ -7,21 +7,33 @@ class NotificacionServicio {
         return listOf(
             Notificacion(
                 id = "1",
-                titulo = "Nueva mascota en adopción",
-                mensaje = "Una nueva mascota en adopción ha sido publicada",
-                idUsuario = "1"
+                titulo = "¡Alguien se interesó!",
+                mensaje = "A Juan Perez le gustó tu mascota Max.",
+                leida = false,
+                idUsuario = "1",
+                tipo = "FAVORITO",
+                idMascota = "1", // Max
+                idUsuarioEmisor = "2"
             ),
             Notificacion(
                 id = "2",
-                titulo = "Recordatorio",
-                mensaje = "No olvides completar tu perfil",
-                idUsuario = "1"
+                titulo = "Nueva mascota cerca",
+                mensaje = "Se ha publicado a Luna cerca de tu ubicación.",
+                leida = true,
+                idUsuario = "1",
+                tipo = "NUEVA_MASCOTA",
+                idMascota = "2", // Luna
+                idUsuarioEmisor = "2"
             ),
             Notificacion(
                 id = "3",
-                titulo = "Nueva mascota en adopción",
-                mensaje = "Una nueva mascota en adopción ha sido publicada",
-                idUsuario = "2"
+                titulo = "Solicitud de contacto",
+                mensaje = "Maria quiere contactarte por Max.",
+                leida = false,
+                idUsuario = "1",
+                tipo = "CONTACTO",
+                idMascota = "1", // Max
+                idUsuarioEmisor = "2"
             )
         )
     }

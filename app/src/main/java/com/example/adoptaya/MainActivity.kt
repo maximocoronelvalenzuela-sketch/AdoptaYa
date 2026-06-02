@@ -61,7 +61,8 @@ class MainActivity : ComponentActivity() {
             Navegacion(
                 mascotaViewModel = mascotaViewModel,
                 favoritoViewModel = favoritoViewModel,
-                usuarioViewModel = usuarioViewModel
+                usuarioViewModel = usuarioViewModel,
+                notificacionViewModel = notificacionViewModel
             )
         }
     }

@@ -13,6 +13,7 @@ import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 @Composable
 fun PantallaPerfil(
+    usuarioId: String,
     usuarioViewModel: UsuarioViewModel,
     alClickearInicio: () -> Unit,
     alClickearFavorito: () -> Unit,
@@ -22,10 +23,8 @@ fun PantallaPerfil(
 
     val usuario = usuarioViewModel.usuarioSeleccionado
 
-    LaunchedEffect(Unit) {
-
-        // Hardcodeado temporalmente porque todavia no hay sesion
-        usuarioViewModel.cargarUsuarioPorId("1")
+    LaunchedEffect(usuarioId) {
+        usuarioViewModel.cargarUsuarioPorId(usuarioId)
     }
 
     Scaffold(
