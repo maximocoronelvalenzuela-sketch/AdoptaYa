@@ -1,13 +1,16 @@
 package com.example.adoptaya.presentacion.theme.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
+import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
@@ -18,7 +21,8 @@ fun PantallaPerfil(
     alClickearInicio: () -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearMapa: () -> Unit,
-    alClickearPublicar: () -> Unit
+    alClickearPublicar: () -> Unit,
+    alClickearNotificaciones: () -> Unit
 ) {
 
     val usuario = usuarioViewModel.usuarioSeleccionado
@@ -28,6 +32,13 @@ fun PantallaPerfil(
     }
 
     Scaffold(
+        topBar = {
+            TopBar(
+                titulo = "Perfil",
+                mostrarBotonNotificaciones = true,
+                alClickearNotificaciones = { alClickearNotificaciones() }
+            )
+        },
         bottomBar = {
             BarraNavegacion(
                 rutaActual = Pantallas.Perfil.ruta,
@@ -49,6 +60,7 @@ fun PantallaPerfil(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(16.dp)
+                    .background(Color(0xFFF3F3F3))
             ) {
                 Text(it.nombre)
                 Spacer(modifier = Modifier.height(8.dp))

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
+import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import com.google.android.gms.maps.model.CameraPosition
@@ -23,7 +24,8 @@ fun PantallaMapa(
     alClickearInicio: () -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearPerfil: () -> Unit,
-    alClickearPublicar: () -> Unit
+    alClickearPublicar: () -> Unit,
+    alClickearNotificaciones: () -> Unit
 ) {
 
     val mascotas = mascotaViewModel.mascotas
@@ -46,6 +48,13 @@ fun PantallaMapa(
         }
 
     Scaffold(
+        topBar = {
+            TopBar(
+                titulo = "Mapa",
+                mostrarBotonNotificaciones = true,
+                alClickearNotificaciones = { alClickearNotificaciones() }
+            )
+        },
         bottomBar = {
             BarraNavegacion(
                 rutaActual = Pantallas.Mapa.ruta,

@@ -39,6 +39,7 @@ fun PantallaMascotas(
                 titulo = "AdoptaYa",
                 color = Color(0xFFE85A13),
                 tamañoFuente = 28.sp,
+                mostrarBotonNotificaciones = true,
                 alClickearNotificaciones = { alClickearNotificaciones() }
             )
         },

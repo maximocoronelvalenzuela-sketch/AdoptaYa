@@ -89,6 +89,9 @@ fun Navegacion(
                 },
                 alClickearPublicar = {
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
+                },
+                alClickearNotificaciones = {
+                    navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
                 }
             )
         }
@@ -109,6 +112,9 @@ fun Navegacion(
                 },
                 alClickearPublicar = {
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
+                },
+                alClickearNotificaciones = {
+                    navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
                 }
             )
         }
@@ -133,6 +139,9 @@ fun Navegacion(
                 },
                 alClickearPublicar = {
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
+                },
+                alClickearNotificaciones = {
+                    navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
                 }
             )
         }

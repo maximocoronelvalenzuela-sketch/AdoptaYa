@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 
 @Composable
@@ -38,8 +39,7 @@ fun PantallaDetalleMascota(
     }
 
     Scaffold(
-        bottomBar = { BarraContactoInferior() },    // Botón de WhatsApp fijo abajo
-        containerColor = Color(0xFFF8F9FA)          // Fondo general clarito
+        bottomBar = { BarraContactoInferior() }    // Botón de WhatsApp fijo abajo
     ) { paddingValues ->
 
         Box(
@@ -50,7 +50,7 @@ fun PantallaDetalleMascota(
             // Imagen de fondo fija arriba
             AsyncImage(
                 model = mascota.imagenes.firstOrNull() ?: "https://images.unsplash.com/photo-1543466835-00a7907e9de1",
-                contentDescription = "Foto de ${mascota.nombre}",
+                contentDescription = "Foto de "+mascota.nombre,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -71,7 +71,7 @@ fun PantallaDetalleMascota(
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                    color = Color.White
+                    color = Color(0xFFF3F3F3)
                 ) {
                     Column(
                         modifier = Modifier
@@ -175,7 +175,7 @@ fun PantallaDetalleMascota(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(modifier = Modifier.padding(20.dp)) {
-                                Text("Sobre ${mascota.nombre}", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
+                                Text("Sobre "+mascota.nombre, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = mascota.descripcionAdicional,
@@ -217,8 +217,6 @@ fun PantallaDetalleMascota(
                                 }
                             }
                         }
-
-//                        Spacer(modifier = Modifier.height(40.dp)) // Espacio final para que el scroll no choque con el botón de WhatsApp
                     }
                 }
             }

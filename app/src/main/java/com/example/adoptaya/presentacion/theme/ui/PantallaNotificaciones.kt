@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.adoptaya.data.model.Notificacion
+import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,19 +43,18 @@ fun PantallaNotificaciones(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Notificaciones", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = alVolver) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
-                    }
-                }
+            TopBar(
+                titulo = "Notificaciones",
+                mostrarBotonVolver = true,
+                alVolver = { alVolver() }
             )
-        },
-        containerColor = Color(0xFFF3F3F3)
+        }
     ) { paddingValues ->
 
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(modifier = Modifier
+            .padding(paddingValues)
+            .background(Color(0xFFF3F3F3))
+        ) {
 
             // Filtros rapidos
             Row(
