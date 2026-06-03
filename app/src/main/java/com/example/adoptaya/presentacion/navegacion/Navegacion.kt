@@ -115,7 +115,8 @@ fun Navegacion(
                 },
                 alClickearNotificaciones = {
                     navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
-                }
+                },
+                alVolver = { navController.popBackStack() }
             )
         }
 
