@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Notificacion
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
@@ -171,7 +172,7 @@ fun ItemNotificacion(notificacion: Notificacion, alClickear: () -> Unit) {
                     color = Color(0xFF1A1A1A)
                 )
                 Text(
-                    text = notificacion.mensaje,
+                    text = notificacion.descripcion,
                     fontSize = 14.sp,
                     color = Color.Gray,
                     maxLines = 2,
@@ -245,7 +246,7 @@ fun DialogoDetalleNotificacion(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = notificacion.mensaje,
+                        text = notificacion.descripcion,
                         modifier = Modifier.padding(16.dp),
                         color = Color.Gray
                     )
@@ -255,7 +256,7 @@ fun DialogoDetalleNotificacion(
 
                 // Logica de botones segun el tipo
                 when (notificacion.tipo) {
-                    "FAVORITO" -> {
+                    Enums.TipoNotificacion.FAVORITO -> {
                         BotonPrimario(texto = "Ver mi Mascota", icono = Icons.Default.Pets) {
                             notificacion.idMascota?.let { onNavegarAMascota(it) }
                         }
@@ -264,7 +265,7 @@ fun DialogoDetalleNotificacion(
                             notificacion.idUsuarioEmisor.let { onNavegarAPerfil(it) }
                         }
                     }
-                    "NUEVA_MASCOTA" -> {
+                    Enums.TipoNotificacion.NUEVA_MASCOTA -> {
                         BotonPrimario(texto = "Ver nueva Mascota", icono = Icons.Default.Search) {
                             notificacion.idMascota?.let { onNavegarAMascota(it) }
                         }
@@ -273,7 +274,7 @@ fun DialogoDetalleNotificacion(
                             notificacion.idUsuarioEmisor.let { onNavegarAPerfil(it) }
                         }
                     }
-                    "CONTACTO" -> {
+                    Enums.TipoNotificacion.CONTACTO -> {
                         BotonPrimario(texto = "WhatsApp de contacto", icono = Icons.AutoMirrored.Default.Chat) {
                             /* TODO: Logica WhatsApp */
                         }

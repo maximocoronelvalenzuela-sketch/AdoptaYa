@@ -6,16 +6,20 @@ data class Mascota(
     val tipo: String,
     val edad: String,
     val sexo: String,
+    val raza: String? = null,
     val tamaño: String,
     val esterilizado: Boolean,
     val vacunado: Boolean,
     val desparasitado: Boolean,
     val descripcionPersonalidad: List<String>,
     val descripcionAdicional: String,
-    val estado: String,
+    val estado: Enums.EstadoMascota,
     val latitud: Double,
     val longitud: Double,
-    val imagenes: List<String>,
-    val idUsuario: String,
-    val fechaHoraAlta: String
+    val provincia: String,
+    val ciudad: String,
+    val barrio: String,
+    val imagenes: List<String>, // Lista de links
+    val fechaHoraAlta: String,
+    val idUsuario: String
 )

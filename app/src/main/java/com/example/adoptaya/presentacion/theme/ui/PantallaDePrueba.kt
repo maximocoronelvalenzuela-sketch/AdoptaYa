@@ -150,7 +150,7 @@ fun PantallaDePrueba(
             notificacionesDeUsuario.forEach {
                 Text("----------------------------")
                 Text("Notificacion: " + it.titulo)
-                Text("Notificacion: " + it.mensaje)
+                Text("Notificacion: " + it.descripcion)
             }
         }
     }

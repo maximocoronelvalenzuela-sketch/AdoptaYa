@@ -211,8 +211,8 @@ fun PantallaDetalleMascota(
                                     Icon(Icons.Default.Pets, contentDescription = null, tint = Color(0xFFE85A13))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
-                                        Text("BARRIO", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                        Text("Palermo, CABA", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                        Text(mascota.barrio, fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                        Text(mascota.ciudad + ", " + mascota.provincia, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }

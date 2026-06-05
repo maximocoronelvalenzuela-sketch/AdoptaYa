@@ -181,9 +181,9 @@ fun MascotaCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Formato "Raza (tipo por ahora) • Edad • Barrio"
+                // Formato "Raza • Edad • Barrio"
                 Text(
-                    text = mascota.tipo + " • " + mascota.edad + " años • Cabildo",
+                    text = if (mascota.raza != null) mascota.raza + " • " + mascota.edad + " años • " + mascota.barrio else mascota.edad + " años • " + mascota.barrio,
                     color = Color(0xFF666666),  // Gris mas claro que el nombre
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,

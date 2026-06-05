@@ -112,7 +112,7 @@ fun PantallaPerfil(
                 )
 
                 Text(
-                    text = "Barrio",    // TODO: Barrio y Provincia
+                    text = usuario.ciudad + ", " + usuario.provincia,
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
