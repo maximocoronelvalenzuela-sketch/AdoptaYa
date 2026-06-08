@@ -7,7 +7,7 @@ class ObtenerMascotaPorIdUseCase (
     private val repositorio: MascotaRepositorio
 ) {
 
-    operator fun invoke(id: String): Mascota? {
+    operator suspend fun invoke(id: String): Mascota? {
         return repositorio.obtenerMascotaPorId(id)
     }
 }

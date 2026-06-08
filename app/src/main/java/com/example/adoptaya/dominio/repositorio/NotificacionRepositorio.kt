@@ -3,7 +3,7 @@ package com.example.adoptaya.dominio.repositorio
 import com.example.adoptaya.data.model.Notificacion
 
 interface NotificacionRepositorio {
-    fun obtenerNotificaciones(): List<Notificacion>
+    suspend fun obtenerNotificacionesPorUsuario(idUsuario: String): List<Notificacion>
 
-    fun obtenerNotificacionesPorUsuario(idUsuario: String): List<Notificacion>
+    suspend fun guardarNotificacion(notificacion: Notificacion)
 }

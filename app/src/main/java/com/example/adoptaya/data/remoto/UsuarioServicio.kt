@@ -9,7 +9,7 @@ class UsuarioServicio {
             Usuario (
                 id = "1",
                 email = "juan@gmail.com",
-                contraseña = "123",
+                password = "123",
                 nombre = "Juan",
                 telefono = "123456789",
                 latitud = -27.7834,
@@ -23,7 +23,7 @@ class UsuarioServicio {
             Usuario(
                 id = "2",
                 email = "maria@gmail.com",
-                contraseña = "123",
+                password = "123",
                 nombre = "Maria",
                 telefono = "987654321",
                 latitud = -27.7850,

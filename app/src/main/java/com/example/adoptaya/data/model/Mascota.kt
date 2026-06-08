@@ -1,25 +1,29 @@
 package com.example.adoptaya.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "mascotas")
 data class Mascota(
-    val id: String,
+    @PrimaryKey val id: String,
     val nombre: String,
     val tipo: String,
     val edad: String,
     val sexo: String,
     val raza: String? = null,
-    val tamaño: String,
+    val tamano: String,
     val esterilizado: Boolean,
     val vacunado: Boolean,
     val desparasitado: Boolean,
-    val descripcionPersonalidad: List<String>,
+    val descripcionPersonalidad: List<String>,  // Requiere Converter
     val descripcionAdicional: String,
-    val estado: Enums.EstadoMascota,
+    val estado: EstadoMascota,            // Requiere Converter
     val latitud: Double,
     val longitud: Double,
     val provincia: String,
     val ciudad: String,
     val barrio: String,
-    val imagenes: List<String>, // Lista de links
+    val imagenes: List<String>, // Lista de links. Requiere Converter
     val fechaHoraAlta: String,
     val idUsuario: String
 )

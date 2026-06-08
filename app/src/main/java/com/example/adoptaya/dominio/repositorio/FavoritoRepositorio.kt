@@ -3,8 +3,9 @@ package com.example.adoptaya.dominio.repositorio
 import com.example.adoptaya.data.model.Favorito
 
 interface FavoritoRepositorio {
-    fun obtenerFavoritos(): List<Favorito>
+    suspend fun obtenerFavoritosPorUsuario(idUsuario: String): List<String>
 
-    fun obtenerFavoritosPorUsuario(idUsuario: String): List<Favorito>
+    suspend fun agregar(idUsuario: String, idMascota: String)
 
+    suspend fun eliminar(idUsuario: String, idMascota: String)
 }

@@ -125,7 +125,7 @@ fun PantallaDetalleMascota(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.CalendarToday, titulo = "EDAD", valor = mascota.edad + " Años")
-                            CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.Straighten, titulo = "TAMAÑO", valor = mascota.tamaño)
+                            CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.Straighten, titulo = "TAMAÑO", valor = mascota.tamano)
                         }
 
                         Spacer(modifier = Modifier.height(32.dp))

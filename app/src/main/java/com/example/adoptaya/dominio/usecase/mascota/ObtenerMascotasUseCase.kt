@@ -7,7 +7,7 @@ class ObtenerMascotasUseCase (
     private val repository: MascotaRepositorio
 ) {
 
-    operator fun invoke(): List<Mascota> {
+    operator suspend fun invoke(): List<Mascota> {
         return repository.obtenerMascotas()
     }
 }

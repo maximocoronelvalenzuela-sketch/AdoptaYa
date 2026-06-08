@@ -1,26 +1,30 @@
 package com.example.adoptaya.data.repositorio
 
+import com.example.adoptaya.data.local.dao.MascotaDao
 import com.example.adoptaya.data.model.Mascota
-import com.example.adoptaya.data.remoto.MascotaServicio
 import com.example.adoptaya.dominio.repositorio.MascotaRepositorio
 
-class MascotaRepositorioImpl (
-    private val servicio: MascotaServicio
+class MascotaRepositorioImpl(
+    private val mascotaDao: MascotaDao
 ) : MascotaRepositorio {
 
-    override fun obtenerMascotas(): List<Mascota> {
-        return servicio.obtenerMascotas()
+    override suspend fun obtenerMascotas(): List<Mascota> {
+        return mascotaDao.obtenerTodas()
     }
 
-    override fun obtenerMascotaPorId(id: String): Mascota? {
-        return servicio.obtenerMascotaPorId(id)
+    override suspend fun obtenerMascotaPorId(id: String): Mascota? {
+        return mascotaDao.obtenerPorId(id)
     }
 
-    override fun filtrarMascotasPorTipo(tipo: String): List<Mascota> {
-        return servicio.filtrarPorTipo(tipo)
+    override suspend fun filtrarMascotasPorTipo(tipo: String): List<Mascota> {
+        return mascotaDao.filtrarPorTipo(tipo)
     }
 
-    override fun filtrarMascotasPorSexo(sexo: String): List<Mascota> {
-        return servicio.filtrarPorSexo(sexo)
+    override suspend fun filtrarMascotasPorSexo(sexo: String): List<Mascota> {
+        return mascotaDao.filtrarPorSexo(sexo)
+    }
+
+    override suspend fun guardarMascota(mascota: Mascota) {
+        mascotaDao.insertarMascota(mascota)
     }
 }

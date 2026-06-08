@@ -4,8 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.adoptaya.data.model.Usuario
 import com.example.adoptaya.dominio.usecase.usuario.ObtenerUsuarioPorIdUseCase
+import kotlinx.coroutines.launch
 
 class UsuarioViewModel (
     private val obtenerUsuarioPorIdUseCase: ObtenerUsuarioPorIdUseCase
@@ -14,6 +16,8 @@ class UsuarioViewModel (
         private set
 
     fun cargarUsuarioPorId(id: String) {
-        usuarioSeleccionado = obtenerUsuarioPorIdUseCase(id)
+        viewModelScope.launch {
+            usuarioSeleccionado = obtenerUsuarioPorIdUseCase(id)
+        }
     }
 }

@@ -10,11 +10,11 @@ class ObtenerFavoritosPorUsuarioUseCase (
     private val mascotaRepositorio: MascotaRepositorio
 ) {
 
-    operator fun invoke(idUsuario: String): List<Mascota> {
+    operator suspend fun invoke(idUsuario: String): List<Mascota> {
         val favoritos = favoritoRepositorio.obtenerFavoritosPorUsuario(idUsuario)
 
-        val mascotas = favoritos.mapNotNull { favorito ->
-            mascotaRepositorio.obtenerMascotaPorId(favorito.idMascota)
+        val mascotas = favoritos.mapNotNull { idMascota ->
+            mascotaRepositorio.obtenerMascotaPorId(idMascota)
         }
 
         return mascotas

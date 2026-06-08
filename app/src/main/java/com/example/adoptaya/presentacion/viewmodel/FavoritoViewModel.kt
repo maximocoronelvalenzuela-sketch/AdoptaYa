@@ -4,8 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.adoptaya.data.model.Mascota
 import com.example.adoptaya.dominio.usecase.favorito.ObtenerFavoritosPorUsuarioUseCase
+import kotlinx.coroutines.launch
 
 class FavoritoViewModel (
     private val obtenerFavoritoPorUsuarioUseCase: ObtenerFavoritosPorUsuarioUseCase
@@ -14,6 +16,8 @@ class FavoritoViewModel (
         private set
 
     fun cargarFavoritosDeUsuario(idUsuario: String) {
-        favoritosDeUsuario = obtenerFavoritoPorUsuarioUseCase(idUsuario)
+        viewModelScope.launch {
+            favoritosDeUsuario = obtenerFavoritoPorUsuarioUseCase(idUsuario)
+        }
     }
 }

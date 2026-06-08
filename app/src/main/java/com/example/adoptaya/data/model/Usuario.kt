@@ -1,9 +1,13 @@
 package com.example.adoptaya.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "usuarios")
 data class Usuario(
-    val id: String,
+    @PrimaryKey val id: String,
     val email: String,
-    val contraseña: String,
+    val password: String,
     val nombre: String,
     val telefono: String,
     val latitud: Double,
@@ -11,6 +15,6 @@ data class Usuario(
     val provincia: String,
     val ciudad: String,
     val barrio: String,
-    val imagen: String,
+    val imagen: String?,
     val fechaHoraAlta: String
 )

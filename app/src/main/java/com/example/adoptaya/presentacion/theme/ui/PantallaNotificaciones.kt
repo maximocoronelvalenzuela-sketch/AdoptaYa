@@ -20,8 +20,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Notificacion
+import com.example.adoptaya.data.model.TipoNotificacion
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 
@@ -256,7 +256,7 @@ fun DialogoDetalleNotificacion(
 
                 // Logica de botones segun el tipo
                 when (notificacion.tipo) {
-                    Enums.TipoNotificacion.FAVORITO -> {
+                    TipoNotificacion.FAVORITO -> {
                         BotonPrimario(texto = "Ver mi Mascota", icono = Icons.Default.Pets) {
                             notificacion.idMascota?.let { onNavegarAMascota(it) }
                         }
@@ -265,7 +265,7 @@ fun DialogoDetalleNotificacion(
                             notificacion.idUsuarioEmisor.let { onNavegarAPerfil(it) }
                         }
                     }
-                    Enums.TipoNotificacion.NUEVA_MASCOTA -> {
+                    TipoNotificacion.NUEVA_MASCOTA -> {
                         BotonPrimario(texto = "Ver nueva Mascota", icono = Icons.Default.Search) {
                             notificacion.idMascota?.let { onNavegarAMascota(it) }
                         }
@@ -274,7 +274,7 @@ fun DialogoDetalleNotificacion(
                             notificacion.idUsuarioEmisor.let { onNavegarAPerfil(it) }
                         }
                     }
-                    Enums.TipoNotificacion.CONTACTO -> {
+                    TipoNotificacion.CONTACTO -> {
                         BotonPrimario(texto = "WhatsApp de contacto", icono = Icons.AutoMirrored.Default.Chat) {
                             /* TODO: Logica WhatsApp */
                         }

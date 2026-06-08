@@ -7,7 +7,7 @@ class ObtenerNotificacionesPorUsuario (
     private val repositorio: NotificacionRepositorioImpl
 ) {
 
-    operator fun invoke(idUsuario: String): List<Notificacion> {
+    operator suspend fun invoke(idUsuario: String): List<Notificacion> {
         return repositorio.obtenerNotificacionesPorUsuario(idUsuario)
     }
 }

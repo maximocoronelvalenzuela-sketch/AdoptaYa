@@ -1,7 +1,7 @@
 package com.example.adoptaya.data.remoto
 
-import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Notificacion
+import com.example.adoptaya.data.model.TipoNotificacion
 
 class NotificacionServicio {
     fun obtenerNotificaciones(): List<Notificacion> {
@@ -11,7 +11,7 @@ class NotificacionServicio {
                 titulo = "¡Alguien se interesó!",
                 descripcion = "A Juan Perez le gustó tu mascota Max.",
                 imagen = null,
-                tipo = Enums.TipoNotificacion.FAVORITO,
+                tipo = TipoNotificacion.FAVORITO,
                 leida = false,
                 fechaHora = "2023-07-15 12:00:00",
                 idUsuario = "1",
@@ -23,7 +23,7 @@ class NotificacionServicio {
                 titulo = "Nueva mascota cerca",
                 descripcion = "Se ha publicado a Luna cerca de tu ubicación.",
                 imagen = null,
-                tipo = Enums.TipoNotificacion.NUEVA_MASCOTA,
+                tipo = TipoNotificacion.NUEVA_MASCOTA,
                 leida = true,
                 fechaHora = "2023-07-15 12:00:00",
                 idUsuario = "1",
@@ -35,7 +35,7 @@ class NotificacionServicio {
                 titulo = "Solicitud de contacto",
                 descripcion = "Maria quiere contactarte por Max.",
                 imagen = null,
-                tipo = Enums.TipoNotificacion.CONTACTO,
+                tipo = TipoNotificacion.CONTACTO,
                 leida = false,
                 fechaHora = "2023-07-15 12:00:00",
                 idUsuario = "1",

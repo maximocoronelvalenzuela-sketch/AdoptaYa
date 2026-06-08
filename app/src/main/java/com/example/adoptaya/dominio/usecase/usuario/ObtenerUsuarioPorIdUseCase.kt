@@ -7,7 +7,7 @@ class ObtenerUsuarioPorIdUseCase (
     private val repositorio: UsuarioRepositorio
 ) {
 
-    operator fun invoke(id: String): Usuario? {
+    operator suspend fun invoke(id: String): Usuario? {
         return repositorio.obtenerUsuarioPorId(id)
     }
 }
