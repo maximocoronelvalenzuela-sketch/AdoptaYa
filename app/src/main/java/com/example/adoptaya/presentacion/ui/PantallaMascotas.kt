@@ -1,56 +1,56 @@
-package com.example.adoptaya.presentacion.theme.ui
+package com.example.adoptaya.presentacion.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.MascotaCard
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
-import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
+import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 
 @Composable
-fun PantallaFavoritos(
-    favoritoViewModel: FavoritoViewModel,
+fun PantallaMascotas(
+    mascotaViewModel: MascotaViewModel,
     alClickearMascota: (String) -> Unit,
-    alClickearInicio: () -> Unit,
-    alClickearMapa: () -> Unit,
+    alClickearFavorito: () -> Unit,
     alClickearPerfil: () -> Unit,
+    alClickearMapa: () -> Unit,
     alClickearPublicar: () -> Unit,
     alClickearNotificaciones: () -> Unit
 ) {
 
-    val mascotas =
-        favoritoViewModel.favoritosDeUsuario
+    val mascotas = mascotaViewModel.mascotas
 
     LaunchedEffect(Unit) {
-        // Hardcodeado temporalmente porque todavia no hay sesion
-        favoritoViewModel.cargarFavoritosDeUsuario("1")
+        mascotaViewModel.cargarMascotas()
     }
 
     Scaffold(
         topBar = {
             TopBar(
-                titulo = "Favoritos",
+                titulo = "AdoptaYa",
+                color = Color(0xFFE85A13),
+                tamañoFuente = 28.sp,
                 mostrarBotonNotificaciones = true,
                 alClickearNotificaciones = { alClickearNotificaciones() }
             )
         },
         bottomBar = {
             BarraNavegacion(
-                rutaActual = Pantallas.Favoritos.ruta,
+                rutaActual = Pantallas.Mascotas.ruta,
                 alNavegar = { ruta ->
                     when (ruta) {
-                        Pantallas.Mascotas.ruta -> alClickearInicio()
-                        Pantallas.Mapa.ruta -> alClickearMapa()
+                        Pantallas.Favoritos.ruta -> alClickearFavorito()
                         Pantallas.Perfil.ruta -> alClickearPerfil()
+                        Pantallas.Mapa.ruta -> alClickearMapa()
                         Pantallas.Publicar.ruta -> alClickearPublicar()
                     }
                 }
@@ -62,10 +62,8 @@ fun PantallaFavoritos(
                 .fillMaxWidth()
                 .padding(paddingValues)
                 .background(Color(0xFFF3F3F3))
-        ){
-
+        ) {
             items(mascotas) { mascota ->
-
                 MascotaCard(
                     mascota = mascota,
                     alClickear = {
@@ -75,5 +73,4 @@ fun PantallaFavoritos(
             }
         }
     }
-
 }

@@ -4,15 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.adoptaya.presentacion.theme.ui.PantallaDetalleMascota
-import com.example.adoptaya.presentacion.theme.ui.PantallaFavoritos
-import com.example.adoptaya.presentacion.theme.ui.PantallaMapa
-import com.example.adoptaya.presentacion.theme.ui.PantallaMascotas
-import com.example.adoptaya.presentacion.theme.ui.PantallaNotificaciones
-import com.example.adoptaya.presentacion.theme.ui.PantallaPerfil
+import com.example.adoptaya.presentacion.ui.PantallaDetalleMascota
+import com.example.adoptaya.presentacion.ui.PantallaFavoritos
+import com.example.adoptaya.presentacion.ui.PantallaMapa
+import com.example.adoptaya.presentacion.ui.PantallaMascotas
+import com.example.adoptaya.presentacion.ui.PantallaNotificaciones
+import com.example.adoptaya.presentacion.ui.PantallaPerfil
+import com.example.adoptaya.presentacion.ui.PantallaPublicarMascota
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
+import com.example.adoptaya.presentacion.viewmodel.PublicarMascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 @Composable
@@ -20,7 +22,8 @@ fun Navegacion(
     mascotaViewModel: MascotaViewModel,
     favoritoViewModel: FavoritoViewModel,
     usuarioViewModel: UsuarioViewModel,
-    notificacionViewModel: NotificacionViewModel
+    notificacionViewModel: NotificacionViewModel,
+    publicarMascotaViewModel: PublicarMascotaViewModel
 ) {
 
     val navController = rememberNavController()
@@ -161,6 +164,13 @@ fun Navegacion(
                         Pantallas.Perfil.crearRuta(usuarioId)
                     )
                 }
+            )
+        }
+
+        composable(Pantallas.Publicar.ruta) {
+            PantallaPublicarMascota(
+                publicarMascotaViewModel = publicarMascotaViewModel,
+                onVolver = { navController.popBackStack() }
             )
         }
     }

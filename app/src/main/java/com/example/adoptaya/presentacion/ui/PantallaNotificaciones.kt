@@ -1,5 +1,6 @@
-package com.example.adoptaya.presentacion.theme.ui
+package com.example.adoptaya.presentacion.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -122,7 +124,7 @@ fun ChipFiltro(texto: String, seleccionado: Boolean) {
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = if (seleccionado) Color(0xFFE85A13) else Color.White,
-        border = if (!seleccionado) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEEEEEE)) else null
+        border = if (!seleccionado) BorderStroke(1.dp, Color(0xFFEEEEEE)) else null
     ) {
         Text(
             text = texto,
@@ -138,7 +140,7 @@ fun ChipFiltro(texto: String, seleccionado: Boolean) {
 fun ItemNotificacion(notificacion: Notificacion, alClickear: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray),
+        border = BorderStroke(1.dp, Color.LightGray),
         color = Color.White,
         modifier = Modifier
             .fillMaxWidth()
@@ -300,7 +302,7 @@ fun DialogoDetalleNotificacion(
 
 // Estilos de botones
 @Composable
-fun BotonPrimario(texto: String, icono: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+fun BotonPrimario(texto: String, icono: ImageVector, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -313,13 +315,13 @@ fun BotonPrimario(texto: String, icono: androidx.compose.ui.graphics.vector.Imag
 }
 
 @Composable
-fun BotonSecundario(texto: String, icono: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+fun BotonSecundario(texto: String, icono: ImageVector, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(50.dp),
         shape = RoundedCornerShape(25.dp),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFE85A13)),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE85A13))
+        border = BorderStroke(1.dp, Color(0xFFE85A13))
     ) {
         Icon(icono, contentDescription = null); Spacer(modifier = Modifier.width(8.dp))
         Text(texto, fontWeight = FontWeight.Bold)

@@ -61,7 +61,7 @@ fun BarraNavegacion(
         // Publicar (Boton Central)
         NavigationBarItem(
             selected = rutaActual == Pantallas.Publicar.ruta,
-            onClick = {/* TODO: Ir a Publicar */},
+            onClick = { alNavegar(Pantallas.Publicar.ruta) },
             icon = {
                 Icon(
                     imageVector = Icons.Filled.AddCircle,

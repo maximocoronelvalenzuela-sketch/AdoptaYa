@@ -1,5 +1,6 @@
-package com.example.adoptaya.presentacion.theme.ui
+package com.example.adoptaya.presentacion.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,12 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 
 @Composable
@@ -211,8 +212,8 @@ fun PantallaDetalleMascota(
                                     Icon(Icons.Default.Pets, contentDescription = null, tint = Color(0xFFE85A13))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
-                                        Text(mascota.barrio, fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                        Text(mascota.ciudad + ", " + mascota.provincia, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                        Text(mascota.barrio ?: "...", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                        Text(mascota.ciudad ?: "..."+ ", " + (mascota.provincia ?: "..."), fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -240,7 +241,7 @@ fun PantallaDetalleMascota(
 // Componentes de la misma pantalla (modularidad)
 
 @Composable
-fun IconButtonFlotante(icono: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit) {
+fun IconButtonFlotante(icono: ImageVector, onClick: () -> Unit) {
     Surface(
         shape = CircleShape,
         color = Color.Black.copy(alpha = 0.3f), // Fondo semitransparente
@@ -263,7 +264,7 @@ fun TituloSeccion(texto: String) {
 }
 
 @Composable
-fun CardInfoBasica(modifier: Modifier = Modifier, icono: androidx.compose.ui.graphics.vector.ImageVector, titulo: String, valor: String) {
+fun CardInfoBasica(modifier: Modifier = Modifier, icono: ImageVector, titulo: String, valor: String) {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
@@ -289,7 +290,7 @@ fun ItemSalud(texto: String) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEEEEEE)),
+        border = BorderStroke(1.dp, Color(0xFFEEEEEE)),
         color = Color.White
     ) {
         Row(
@@ -307,7 +308,7 @@ fun ItemSalud(texto: String) {
 fun ChipPersonalidad(texto: String) {
     Surface(
         shape = RoundedCornerShape(50),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFEEEEEE)),
+        border = BorderStroke(1.dp, Color(0xFFEEEEEE)),
         color = Color.White
     ) {
         Row(

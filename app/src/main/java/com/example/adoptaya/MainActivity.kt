@@ -15,6 +15,7 @@ import com.example.adoptaya.data.repositorio.NotificacionRepositorioImpl
 import com.example.adoptaya.data.repositorio.UsuarioRepositorioImpl
 import com.example.adoptaya.dominio.usecase.InicializarDatosPruebaUseCase
 import com.example.adoptaya.dominio.usecase.favorito.ObtenerFavoritosPorUsuarioUseCase
+import com.example.adoptaya.dominio.usecase.mascota.GuardarMascotaUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotasUseCase
 import com.example.adoptaya.dominio.usecase.notificacion.ObtenerNotificacionesPorUsuario
@@ -24,6 +25,7 @@ import com.example.adoptaya.presentacion.theme.AdoptaYaTheme
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
+import com.example.adoptaya.presentacion.viewmodel.PublicarMascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 import kotlinx.coroutines.launch
 
@@ -45,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
         val obtenerMascotasUC = ObtenerMascotasUseCase(mascotaRepositorio)
         val obtenerPorIdUC = ObtenerMascotaPorIdUseCase(mascotaRepositorio)
+        val guardarMascotaUC = GuardarMascotaUseCase(mascotaRepositorio)
         val obtenerUsuarioPorIdUC = ObtenerUsuarioPorIdUseCase(usuarioRepositorio)
         val obtenerFavoritosPorUsuarioUC = ObtenerFavoritosPorUsuarioUseCase(favoritoRepositorio, mascotaRepositorio)
         val obtenerNotificacionesPorUsuarioUC = ObtenerNotificacionesPorUsuario(notificacionRepositorio)
@@ -53,6 +56,7 @@ class MainActivity : ComponentActivity() {
         val usuarioViewModel = UsuarioViewModel(obtenerUsuarioPorIdUC)
         val favoritoViewModel = FavoritoViewModel(obtenerFavoritosPorUsuarioUC)
         val notificacionViewModel = NotificacionViewModel(obtenerNotificacionesPorUsuarioUC)
+        val publicarMascotaViewModel = PublicarMascotaViewModel(guardarMascotaUC)
 
         val inicializarDatosPruebaUC = InicializarDatosPruebaUseCase(mascotaRepositorio, usuarioRepositorio)
 
@@ -66,7 +70,8 @@ class MainActivity : ComponentActivity() {
                 mascotaViewModel = mascotaViewModel,
                 favoritoViewModel = favoritoViewModel,
                 usuarioViewModel = usuarioViewModel,
-                notificacionViewModel = notificacionViewModel
+                notificacionViewModel = notificacionViewModel,
+                publicarMascotaViewModel = publicarMascotaViewModel
             )
         }
     }

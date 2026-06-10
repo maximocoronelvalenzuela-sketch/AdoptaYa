@@ -20,9 +20,9 @@ data class Mascota(
     val estado: EstadoMascota,            // Requiere Converter
     val latitud: Double,
     val longitud: Double,
-    val provincia: String,
-    val ciudad: String,
-    val barrio: String,
+    val provincia: String?,
+    val ciudad: String?,
+    val barrio: String?,
     val imagenes: List<String>, // Lista de links. Requiere Converter
     val fechaHoraAlta: String,
     val idUsuario: String

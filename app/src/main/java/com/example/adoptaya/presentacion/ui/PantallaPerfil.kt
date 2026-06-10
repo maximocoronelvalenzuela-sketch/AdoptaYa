@@ -1,5 +1,6 @@
-package com.example.adoptaya.presentacion.theme.ui
+package com.example.adoptaya.presentacion.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -141,7 +142,7 @@ fun PantallaPerfil(
                             modifier = Modifier.weight(1f).height(48.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color.Red)
+                            border = BorderStroke(1.dp, Color.Red)
                         ) {
                             Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))

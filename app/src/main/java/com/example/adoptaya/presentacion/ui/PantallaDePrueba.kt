@@ -1,4 +1,4 @@
-package com.example.adoptaya.presentacion.theme.ui
+package com.example.adoptaya.presentacion.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
