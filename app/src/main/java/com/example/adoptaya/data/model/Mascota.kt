@@ -7,17 +7,18 @@ import androidx.room.PrimaryKey
 data class Mascota(
     @PrimaryKey val id: String,
     val nombre: String,
-    val tipo: String,
+    val tipo: Enums.TipoMascota,
     val edad: String,
-    val sexo: String,
+    val tiempo: Enums.TiempoEdad,
+    val sexo: Enums.SexoMascota,
     val raza: String? = null,
-    val tamano: String,
+    val tamaño: Enums.TamañoMascota,
     val esterilizado: Boolean,
     val vacunado: Boolean,
     val desparasitado: Boolean,
     val descripcionPersonalidad: List<String>,  // Requiere Converter
     val descripcionAdicional: String,
-    val estado: EstadoMascota,            // Requiere Converter
+    val estado: Enums.EstadoMascota,            // Requiere Converter
     val latitud: Double,
     val longitud: Double,
     val provincia: String?,

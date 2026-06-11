@@ -1,6 +1,6 @@
 package com.example.adoptaya.dominio.usecase
 
-import com.example.adoptaya.data.model.EstadoMascota
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Mascota
 import com.example.adoptaya.data.model.Usuario
 import com.example.adoptaya.dominio.repositorio.MascotaRepositorio
@@ -37,19 +37,19 @@ class InicializarDatosPruebaUseCase(
 
         // Mascotas de prueba
         val mascota1 = Mascota(
-            id = "1", nombre = "Max", tipo = "Perro", edad = "3", sexo = "Macho",
-            raza = "Beagle", tamano = "Mediano", esterilizado = true, vacunado = true, desparasitado = true,
+            id = "1", nombre = "Max", tipo = Enums.TipoMascota.PERRO, edad = "3", tiempo = Enums.TiempoEdad.AÑOS, sexo = Enums.SexoMascota.MACHO,
+            raza = "Beagle", tamaño = Enums.TamañoMascota.MEDIANO, esterilizado = true, vacunado = true, desparasitado = true,
             descripcionPersonalidad = listOf("Activo", "Sociable", "Cariñoso"),
-            descripcionAdicional = "Ideal para familias con patio.", estado = EstadoMascota.DISPONIBLE,
+            descripcionAdicional = "Ideal para familias con patio.", estado = Enums.EstadoMascota.DISPONIBLE,
             latitud = -27.7833, longitud = -64.2667, provincia = "Santiago del Estero", ciudad = "Santiago del Estero",
             barrio = "Centro", imagenes = listOf("https://images.unsplash.com/photo-1543466835-00a7907e9de1"),
             idUsuario = "1", fechaHoraAlta = "2024-06-01T12:00:00"
         )
         val mascota2 = Mascota(
-            id = "2", nombre = "Luna", tipo = "Gato", edad = "1", sexo = "Hembra",
-            raza = null, tamano = "Chico", esterilizado = true, vacunado = true, desparasitado = true,
+            id = "2", nombre = "Luna", tipo = Enums.TipoMascota.GATO, edad = "1", tiempo = Enums.TiempoEdad.AÑOS, sexo = Enums.SexoMascota.HEMBRA,
+            raza = null, tamaño = Enums.TamañoMascota.CHICO, esterilizado = true, vacunado = true, desparasitado = true,
             descripcionPersonalidad = listOf("Tranquilo", "Independiente"),
-            descripcionAdicional = "Busca un hogar sin otros animales.", estado = EstadoMascota.DISPONIBLE,
+            descripcionAdicional = "Busca un hogar sin otros animales.", estado = Enums.EstadoMascota.DISPONIBLE,
             latitud = -27.8000, longitud = -64.2500, provincia = "Santiago del Estero", ciudad = "Santiago del Estero",
             barrio = "Belgrano", imagenes = listOf("https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba"),
             idUsuario = "2", fechaHoraAlta = "2024-06-02T10:30:00"

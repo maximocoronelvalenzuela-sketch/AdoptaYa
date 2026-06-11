@@ -2,7 +2,6 @@ package com.example.adoptaya.data.repositorio
 
 import com.example.adoptaya.data.local.dao.FavoritoDao
 import com.example.adoptaya.data.model.Favorito
-import com.example.adoptaya.data.remoto.FavoritoServicio
 import com.example.adoptaya.dominio.repositorio.FavoritoRepositorio
 
 class FavoritoRepositorioImpl(

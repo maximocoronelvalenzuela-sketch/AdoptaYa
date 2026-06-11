@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddPhotoAlternate
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
@@ -21,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.presentacion.viewmodel.PublicarMascotaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -85,14 +85,18 @@ fun PantallaPublicarMascota(
                     Box(
                         modifier = Modifier.fillMaxWidth().height(71.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFEFE4D9)),
                         contentAlignment = Alignment.Center
-                    ) { Text("+", fontSize = 24.sp, color = Color.Gray) }
+                    ) {
+                        Text("+", fontSize = 24.sp, color = Color.Gray)
+                    }
                     Box(
                         modifier = Modifier.fillMaxWidth().height(71.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFEFE4D9)),
                         contentAlignment = Alignment.Center
-                    ) { Text("+", fontSize = 24.sp, color = Color.Gray) }
+                    ) {
+                        Text("+", fontSize = 24.sp, color = Color.Gray)
+                    }
                 }
             }
-            Text("Agregá hasta 3 fotos claras de tu mascota.", fontSize = 12.sp, color = Color.Gray)
+            Text("Agregá hasta 3 fotos claras de tu mascota.", fontSize = 12.sp, color = Color.DarkGray)
 
 
             // Informacion basica
@@ -106,23 +110,56 @@ fun PantallaPublicarMascota(
 
                     OutlinedTextField(
                         value = publicarMascotaViewModel.nombre,
-                        onValueChange = { publicarMascotaViewModel.nombre = it },
+                        onValueChange = {
+                            publicarMascotaViewModel.nombre = it
+                            publicarMascotaViewModel.nombreError = null
+                        },
                         label = { Text("Nombre de la mascota") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = colorFondoPantalla, focusedContainerColor = colorFondoPantalla)
+                        singleLine = true,
+                        isError = publicarMascotaViewModel.nombreError != null,
+                        supportingText = {
+                            if(publicarMascotaViewModel.nombreError != null) {
+                                publicarMascotaViewModel.nombreError?.let { Text(it) }
+                            }
+                        }
                     )
 
+                    // Categoria y Raza
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        // TODO: Lista Tipo
-                        OutlinedTextField(
-                            value = publicarMascotaViewModel.tipo,
-                            onValueChange = {}, readOnly = true,
-                            label = { Text("Categoría") },
-                            trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
+                        var expandidoTipo by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(
+                            expanded = expandidoTipo,
+                            onExpandedChange = { expandidoTipo = it },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            OutlinedTextField(
+                                value = publicarMascotaViewModel.tipo.name.lowercase().replaceFirstChar { it.uppercase() },
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Categoría") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandidoTipo) },
+                                modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandidoTipo,
+                                onDismissRequest = { expandidoTipo = false }
+                            ) {
+                                Enums.TipoMascota.entries.forEach { valorEnum ->
+                                    val opcionTexto = valorEnum.name.lowercase().replaceFirstChar { it.uppercase() }
+                                    DropdownMenuItem(
+                                        text = { Text(opcionTexto) },
+                                        onClick = {
+                                            publicarMascotaViewModel.tipo = valorEnum
+                                            expandidoTipo = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
                         OutlinedTextField(
                             value = publicarMascotaViewModel.raza,
                             onValueChange = { publicarMascotaViewModel.raza = it },
@@ -132,31 +169,119 @@ fun PantallaPublicarMascota(
                         )
                     }
 
+                    // Edad y Años/Meses
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
-                            value = publicarMascotaViewModel.edadNumero,
-                            onValueChange = { publicarMascotaViewModel.edadNumero = it },
+                            value = publicarMascotaViewModel.edad,
+                            onValueChange = {
+                                val inputFiltrado = it.filter{ char -> char.isDigit() }
+                                publicarMascotaViewModel.edad = it
+                                publicarMascotaViewModel.edadError = null
+                            },
                             label = { Text("Edad") },
                             modifier = Modifier.weight(0.5f),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            isError = publicarMascotaViewModel.edadError != null,
+                            supportingText = {
+                                if(publicarMascotaViewModel.edadError != null)
+                                    publicarMascotaViewModel.edadError?.let { Text(it) }
+                            }
                         )
-                        OutlinedTextField(
-                            // TODO: Lista Tiempos
-                            value = publicarMascotaViewModel.edadTiempo,
-                            onValueChange = {}, readOnly = true,
-                            trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
-                            modifier = Modifier.weight(0.8f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        OutlinedTextField(
-                            // TODO: Lista Tamaño
-                            value = publicarMascotaViewModel.tamano,
-                            onValueChange = {}, readOnly = true,
-                            label = { Text("Tamaño") },
-                            trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
+
+                        var expandidoTiempo by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(
+                            expanded = expandidoTiempo,
+                            onExpandedChange = { expandidoTiempo = it },
+                            modifier = Modifier.weight(0.8f)
+                        ) {
+                            OutlinedTextField(
+                                value = publicarMascotaViewModel.tiempo.name.lowercase().replaceFirstChar { it.uppercase() },
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Tiempo") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandidoTiempo) },
+                                modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = expandidoTiempo,
+                                onDismissRequest = { expandidoTiempo = false }) {
+                                Enums.TiempoEdad.entries.forEach { valorEnum ->
+                                    val opcionTexto = valorEnum.name.lowercase().replaceFirstChar { it.uppercase() }
+                                    DropdownMenuItem(
+                                        text = { Text(opcionTexto) },
+                                        onClick = {
+                                            publicarMascotaViewModel.tiempo = valorEnum
+                                            expandidoTiempo = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Sexo y Tamaño
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        var expandidoSexo by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(
+                            expanded = expandidoSexo,
+                            onExpandedChange = { expandidoSexo = it },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            OutlinedTextField(
+                                value = publicarMascotaViewModel.sexo.name.lowercase().replaceFirstChar { it.uppercase() },
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Sexo") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandidoSexo) },
+                                modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                singleLine = true
+                            )
+                            ExposedDropdownMenu(expanded = expandidoSexo, onDismissRequest = { expandidoSexo = false }) {
+                                Enums.SexoMascota.entries.forEach { valorEnum ->
+                                    val opcionTexto = valorEnum.name.lowercase().replaceFirstChar { it.uppercase() }
+                                    DropdownMenuItem(
+                                        text = { Text(opcionTexto) },
+                                        onClick = {
+                                            publicarMascotaViewModel.sexo = valorEnum
+                                            expandidoSexo = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        var expandidoTamano by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(
+                            expanded = expandidoTamano,
+                            onExpandedChange = { expandidoTamano = it },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            OutlinedTextField(
+                                value = publicarMascotaViewModel.tamaño.name.lowercase().replaceFirstChar { it.uppercase() },
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Tamaño") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandidoTamano) },
+                                modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                singleLine = true
+                            )
+                            ExposedDropdownMenu(expanded = expandidoTamano, onDismissRequest = { expandidoTamano = false }) {
+                                Enums.TamañoMascota.entries.forEach { valorEnum ->
+                                    val opcionTexto = valorEnum.name.lowercase().replaceFirstChar { it.uppercase() }
+                                    DropdownMenuItem(
+                                        text = { Text(opcionTexto) },
+                                        onClick = {
+                                            publicarMascotaViewModel.tamaño = valorEnum
+                                            expandidoTamano = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -172,12 +297,28 @@ fun PantallaPublicarMascota(
                     Text("Estado de Salud", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(checked = publicarMascotaViewModel.vacunado, onCheckedChange = { publicarMascotaViewModel.vacunado = it }, colors = CheckboxDefaults.colors(checkedColor = colorNaranja))
+                        Checkbox(
+                            checked = publicarMascotaViewModel.vacunado,
+                            onCheckedChange = { publicarMascotaViewModel.vacunado = it },
+                            colors = CheckboxDefaults.colors(checkedColor = colorNaranja)
+                        )
                         Text("Vacunado")
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Checkbox(
+                            checked = publicarMascotaViewModel.esterilizado,
+                            onCheckedChange = { publicarMascotaViewModel.esterilizado = it },
+                            colors = CheckboxDefaults.colors(checkedColor = colorNaranja)
+                        )
+                        Text("Esterilizado")
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(checked = publicarMascotaViewModel.esterilizado, onCheckedChange = { publicarMascotaViewModel.esterilizado = it }, colors = CheckboxDefaults.colors(checkedColor = colorNaranja))
-                        Text("Esterilizado")
+                        Checkbox(
+                            checked = publicarMascotaViewModel.desparasitado,
+                            onCheckedChange = { publicarMascotaViewModel.desparasitado = it },
+                            colors = CheckboxDefaults.colors(checkedColor = colorNaranja)
+                        )
+                        Text("Desparasitado")
                     }
                 }
             }
@@ -192,22 +333,55 @@ fun PantallaPublicarMascota(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Rasgos", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(8.dp))
+
+                    // Input de texto y Boton Agregar
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = publicarMascotaViewModel.rasgoInput,
+                            onValueChange = { publicarMascotaViewModel.rasgoInput = it },
+                            placeholder = { Text("Ej: Cariñoso") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            onClick = { publicarMascotaViewModel.agregarRasgo() },
+                            colors = ButtonDefaults.buttonColors(containerColor = colorNaranja),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.height(56.dp)
+                        ) {
+                            Text("Agregar")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // FlowRow para mostrar los chips como etiquetas
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        publicarMascotaViewModel.rasgosDisponibles.forEach { rasgo ->
-                            val seleccionado = publicarMascotaViewModel.rasgosSeleccionados.contains(rasgo)
+                        publicarMascotaViewModel.rasgosSeleccionados.forEach { rasgo ->
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(16.dp))
-                                    .border(1.dp, if (seleccionado) colorNaranja else Color.LightGray, RoundedCornerShape(16.dp))
-                                    .background(if (seleccionado) colorNaranja.copy(alpha = 0.1f) else Color.Transparent)
-                                    .clickable { publicarMascotaViewModel.toggleRasgo(rasgo) }
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .background(colorFondoPantalla)
+                                    .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp))
+                                    .clickable { publicarMascotaViewModel.eliminarRasgo(rasgo) }
+                                    .padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
-                                Text(text = rasgo, color = if (seleccionado) colorNaranja else Color.DarkGray)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(text = rasgo, color = Color.DarkGray, fontSize = 14.sp)
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Borrar",
+                                        modifier = Modifier.size(14.dp),
+                                        tint = Color.Gray
+                                    )
+                                }
                             }
                         }
                     }
@@ -231,7 +405,7 @@ fun PantallaPublicarMascota(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     )
-                    // Placeholder del Mapa
+
                     Box(
                         modifier = Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(12.dp)).background(colorNaranja.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center

@@ -1,12 +1,11 @@
 package com.example.adoptaya.data.local
 
 import androidx.room.TypeConverter
-import com.example.adoptaya.data.model.EstadoMascota
-import com.example.adoptaya.data.model.TipoNotificacion
+import com.example.adoptaya.data.model.Enums
 
 class Converters {
 
-    // CONVERTERS PARA LIST<STRING>
+    // Para List<String>
     @TypeConverter
     fun fromStringList(lista: List<String>?): String? {
         // Convierte ["perro.jpg", "gato.jpg"] -> "perro.jpg,gato.jpg"
@@ -20,35 +19,95 @@ class Converters {
         return texto.split(",")
     }
 
-    // CONVERTERS PARA ESTADO MASCOTA
+    // Estado de Mascota
     @TypeConverter
-    fun fromEstadoMascota(estado: EstadoMascota?): String? {
+    fun fromEstadoMascota(estado: Enums.EstadoMascota?): String? {
         return estado?.name // Guarda "DISPONIBLE" o "ADOPTADO" como texto
     }
 
     @TypeConverter
-    fun toEstadoMascota(estadoString: String?): EstadoMascota? {
+    fun toEstadoMascota(estadoString: String?): Enums.EstadoMascota? {
         if (estadoString == null) return null
         return try {
-            EstadoMascota.valueOf(estadoString)
+            Enums.EstadoMascota.valueOf(estadoString)
         } catch (e: Exception) {
-            EstadoMascota.DISPONIBLE // Valor por defecto si hay un error
+            Enums.EstadoMascota.DISPONIBLE // Valor por defecto si hay un error
         }
     }
 
-    // CONVERTERS PARA TIPO NOTIFICACION
+    // Tipo
     @TypeConverter
-    fun fromTipoNotificacion(tipo: TipoNotificacion?): String? {
+    fun fromTipoMascota(tipo: Enums.TipoMascota): String {
+        return tipo.name
+    }
+
+    @TypeConverter
+    fun toTipoMascota(valor: String): Enums.TipoMascota {
+        return try {
+            Enums.TipoMascota.valueOf(valor)
+        } catch (e: Exception) {
+            Enums.TipoMascota.PERRO
+        }
+    }
+
+    // Tiempo
+    @TypeConverter
+    fun fromTiempo(tiempo: Enums.TiempoEdad): String {
+        return tiempo.name
+    }
+
+    @TypeConverter
+    fun toTiempo(valor: String): Enums.TiempoEdad {
+        return try {
+            Enums.TiempoEdad.valueOf(valor)
+        } catch (e: Exception) {
+            Enums.TiempoEdad.AÑOS
+        }
+    }
+
+    // Sexo
+    @TypeConverter
+    fun fromSexo(sexo: Enums.SexoMascota): String {
+        return sexo.name
+    }
+
+    @TypeConverter
+    fun toSexo(valor: String): Enums.SexoMascota {
+        return try {
+            Enums.SexoMascota.valueOf(valor)
+        } catch (e: Exception) {
+            Enums.SexoMascota.MACHO
+        }
+    }
+
+    // Tamaño
+    @TypeConverter
+    fun fromTamaño(tamaño: Enums.TamañoMascota): String {
+        return tamaño.name
+    }
+
+    @TypeConverter
+    fun toTamaño(valor: String): Enums.TamañoMascota {
+        return try {
+            Enums.TamañoMascota.valueOf(valor)
+        } catch (e: Exception) {
+            Enums.TamañoMascota.CHICO
+        }
+    }
+
+    // Para Tipo de Notificacion
+    @TypeConverter
+    fun fromTipoNotificacion(tipo: Enums.TipoNotificacion?): String? {
         return tipo?.name
     }
 
     @TypeConverter
-    fun toTipoNotificacion(tipoString: String?): TipoNotificacion? {
+    fun toTipoNotificacion(tipoString: String?): Enums.TipoNotificacion? {
         if (tipoString == null) return null
         return try {
-            TipoNotificacion.valueOf(tipoString)
+            Enums.TipoNotificacion.valueOf(tipoString)
         } catch (e: Exception) {
-            TipoNotificacion.CONTACTO
+            Enums.TipoNotificacion.CONTACTO
         }
     }
 }

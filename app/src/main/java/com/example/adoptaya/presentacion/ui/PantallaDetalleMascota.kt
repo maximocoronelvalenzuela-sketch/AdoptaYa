@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 
 @Composable
@@ -80,6 +81,8 @@ fun PantallaDetalleMascota(
                             .padding(horizontal = 24.dp, vertical = 32.dp)
                     ) {
                         // Nombre, Raza (Tipo, por ahora), Genero
+                        val tipoFormateado = mascota.tipo.name.lowercase().replaceFirstChar { it.uppercase() }
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -93,13 +96,15 @@ fun PantallaDetalleMascota(
                                     color = Color.Black
                                 )
                                 Text(
-                                    text = mascota.tipo, // Ej: "Golden Retriever"
+                                    text = mascota.raza ?: tipoFormateado,
                                     color = Color.Gray,
                                     fontSize = 16.sp
                                 )
                             }
 
                             // Tag de Género (Naranja)
+                            val sexoFormateado = mascota.sexo.name.lowercase().replaceFirstChar { it.uppercase() }
+
                             Surface(
                                 color = Color(0xFFFFF3E0),
                                 shape = RoundedCornerShape(16.dp)
@@ -108,10 +113,10 @@ fun PantallaDetalleMascota(
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    val iconoSexo = if (mascota.sexo == "Macho") Icons.Default.Male else Icons.Default.Female
+                                    val iconoSexo = if (mascota.sexo == Enums.SexoMascota.MACHO) Icons.Default.Male else Icons.Default.Female
                                     Icon(iconoSexo, contentDescription = null, tint = Color(0xFFE85A13), modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text(mascota.sexo, color = Color(0xFFE85A13), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                    Text(sexoFormateado, color = Color(0xFFE85A13), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                                 }
                             }
                         }
@@ -120,13 +125,16 @@ fun PantallaDetalleMascota(
 
 
                         // Informacion basica
+                        val tiempoFormateado = mascota.tiempo.name.lowercase().replaceFirstChar { it.uppercase() }
+                        val tamanoFormateado = mascota.tamaño.name.lowercase().replaceFirstChar { it.uppercase() }
+
                         TituloSeccion("Información Básica")
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.CalendarToday, titulo = "EDAD", valor = mascota.edad + " Años")
-                            CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.Straighten, titulo = "TAMAÑO", valor = mascota.tamano)
+                            CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.CalendarToday, titulo = "EDAD", valor = mascota.edad + " " + tiempoFormateado)
+                            CardInfoBasica(modifier = Modifier.weight(1f), icono = Icons.Default.Straighten, titulo = "TAMAÑO", valor = tamanoFormateado)
                         }
 
                         Spacer(modifier = Modifier.height(32.dp))
@@ -134,11 +142,11 @@ fun PantallaDetalleMascota(
 
                         // Salud
                         TituloSeccion("Salud")
-                        if (mascota.vacunado) ItemSalud("Vacunado")
+                        ItemSalud("Vacunado", estado = mascota.vacunado)
                         Spacer(modifier = Modifier.height(12.dp))
-                        if (mascota.esterilizado) ItemSalud("Esterilizado/a / Castrado/a")
+                        ItemSalud("Esterilizado/a / Castrado/a", estado = mascota.esterilizado)
                         Spacer(modifier = Modifier.height(12.dp))
-                        if (mascota.desparasitado) ItemSalud("Desparasitado")
+                        ItemSalud("Desparasitado", estado = mascota.desparasitado)
 
                         Spacer(modifier = Modifier.height(32.dp))
 
@@ -286,7 +294,7 @@ fun CardInfoBasica(modifier: Modifier = Modifier, icono: ImageVector, titulo: St
 }
 
 @Composable
-fun ItemSalud(texto: String) {
+fun ItemSalud(texto: String, estado: Boolean) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -297,9 +305,14 @@ fun ItemSalud(texto: String) {
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF4CAF50))
+            Icon(
+                imageVector = if (estado) Icons.Default.CheckCircle else Icons.Default.Cancel,
+                contentDescription = null,
+                tint = if (estado) Color(0xFF4CAF50) else Color(0xFFF44336),
+                modifier = Modifier.size(24.dp)
+            )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(texto, color = Color.DarkGray, fontSize = 15.sp, fontWeight = FontWeight.Medium)
+            Text(texto, color = Color.DarkGray, fontSize = 16.sp, fontWeight = FontWeight.Medium)
         }
     }
 }

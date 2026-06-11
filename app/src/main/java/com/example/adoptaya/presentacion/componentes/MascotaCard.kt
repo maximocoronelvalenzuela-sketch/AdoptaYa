@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Mascota
 
 @Composable
@@ -158,7 +159,7 @@ fun MascotaCard(
                     )
 
                     // Lógica para elegir el ícono según el sexo
-                    val iconoSexo = if (mascota.sexo == "Macho" || mascota.sexo == "Masculino") {
+                    val iconoSexo = if (mascota.sexo == Enums.SexoMascota.MACHO) {
                         Icons.Default.Male
                     } else {
                         Icons.Default.Female

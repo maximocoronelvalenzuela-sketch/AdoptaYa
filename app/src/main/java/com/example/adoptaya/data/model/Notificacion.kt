@@ -9,7 +9,7 @@ data class Notificacion(
     val titulo: String,
     val descripcion: String,
     val imagen: String?,
-    val tipo: TipoNotificacion, // "FAVORITO", "NUEVA_MASCOTA", "CONTACTO". Requiere Converter
+    val tipo: Enums.TipoNotificacion, // "FAVORITO", "NUEVA_MASCOTA", "CONTACTO". Requiere Converter
     val leida: Boolean,
     val fechaHora: String,
     val idUsuario: String,

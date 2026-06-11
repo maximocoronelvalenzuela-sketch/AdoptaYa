@@ -2,7 +2,6 @@ package com.example.adoptaya.data.repositorio
 
 import com.example.adoptaya.data.local.dao.NotificacionDao
 import com.example.adoptaya.data.model.Notificacion
-import com.example.adoptaya.data.remoto.NotificacionServicio
 import com.example.adoptaya.dominio.repositorio.NotificacionRepositorio
 
 class NotificacionRepositorioImpl(
