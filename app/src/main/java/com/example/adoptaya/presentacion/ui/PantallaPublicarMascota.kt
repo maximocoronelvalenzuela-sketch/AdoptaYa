@@ -6,22 +6,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.presentacion.viewmodel.PublicarMascotaViewModel
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -397,20 +402,175 @@ fun PantallaPublicarMascota(
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("Ubicación", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
+                    // Provincia
+                    var expandidoProvincia by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(
+                        expanded = expandidoProvincia,
+                        onExpandedChange = { expandidoProvincia = it }
+                    ) {
+                        OutlinedTextField(
+                            value = publicarMascotaViewModel.provinciaSeleccionada?.nombre ?: "Seleccionar Provincia",
+                            onValueChange = {}, readOnly = true,
+                            label = { Text("Provincia") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandidoProvincia) },
+                            modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        ExposedDropdownMenu(expanded = expandidoProvincia, onDismissRequest = { expandidoProvincia = false }) {
+                            publicarMascotaViewModel.listaProvincias.forEach { provincia ->
+                                DropdownMenuItem(
+                                    text = { Text(provincia.nombre) },
+                                    onClick = {
+                                        publicarMascotaViewModel.provinciaSeleccionada = provincia
+                                        publicarMascotaViewModel.cargarLocalidadesPorProvincia(provincia) // Carga las ciudades!
+                                        expandidoProvincia = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    // Ciudad
+                    var expandidoCiudad by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(
+                        expanded = expandidoCiudad,
+                        onExpandedChange = { expandidoCiudad = it }
+                    ) {
+                        OutlinedTextField(
+                            value = publicarMascotaViewModel.localidadSeleccionada?.nombre ?: "Seleccionar Ciudad",
+                            onValueChange = {}, readOnly = true,
+                            label = { Text("Ciudad / Municipio") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandidoCiudad) },
+                            modifier = Modifier.menuAnchor(type = MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = publicarMascotaViewModel.provinciaSeleccionada != null // Bloqueado si no hay provincia
+                        )
+                        ExposedDropdownMenu(expanded = expandidoCiudad, onDismissRequest = { expandidoCiudad = false }) {
+                            publicarMascotaViewModel.listaLocalidades.forEach { localidad ->
+                                DropdownMenuItem(
+                                    text = { Text(localidad.nombre) },
+                                    onClick = {
+                                        publicarMascotaViewModel.localidadSeleccionada = localidad
+                                        expandidoCiudad = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    // Barrio, Calle y Numero
                     OutlinedTextField(
                         value = publicarMascotaViewModel.barrio,
-                        onValueChange = { publicarMascotaViewModel.barrio = it },
-                        label = { Text("Barrio o Código Postal") },
-                        leadingIcon = { Icon(Icons.Default.LocationOn, tint = colorNaranja, contentDescription = null) },
+                        onValueChange = {
+                            publicarMascotaViewModel.barrio = it
+                            publicarMascotaViewModel.barrioError = null
+                        },
+                        label = { Text("Barrio") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        isError = publicarMascotaViewModel.barrioError != null,
+                        supportingText = {
+                            if(publicarMascotaViewModel.barrioError != null)
+                                publicarMascotaViewModel.barrioError?.let { Text(it) }
+                        }
                     )
 
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(12.dp)).background(colorNaranja.copy(alpha = 0.2f)),
-                        contentAlignment = Alignment.Center
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = publicarMascotaViewModel.calle,
+                            onValueChange = {
+                                publicarMascotaViewModel.calle = it
+                                publicarMascotaViewModel.calleError = null
+                            },
+                            label = { Text("Calle") },
+                            modifier = Modifier.weight(2f),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            isError = publicarMascotaViewModel.calleError != null,
+                            supportingText = {
+                                if(publicarMascotaViewModel.calleError != null)
+                                    publicarMascotaViewModel.calleError?.let { Text(it) }
+                            }
+                        )
+                        OutlinedTextField(
+                            value = publicarMascotaViewModel.numero,
+                            onValueChange = {
+                                publicarMascotaViewModel.numero = it.filter { char -> char.isDigit() }
+                                publicarMascotaViewModel.numeroError = null
+                            },
+                            label = { Text("Número") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            isError = publicarMascotaViewModel.numeroError != null,
+                            supportingText = {
+                                if(publicarMascotaViewModel.numeroError != null)
+                                    publicarMascotaViewModel.numeroError?.let { Text(it) }
+                            }
+                        )
+                    }
+
+                    // Mapa
+                    val contexto = LocalContext.current
+
+                    // Boton para generar el mapa
+                    Button(
+                        onClick = { publicarMascotaViewModel.generarCoordenadasDesdeDireccion(contexto) },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorNaranja),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("TOCAR PARA AJUSTAR MAPA", color = colorNaranja, fontWeight = FontWeight.Bold)
+                        Text("GENERAR UBICACIÓN EN EL MAPA", fontWeight = FontWeight.Bold)
+                    }
+
+                    // Mensaje de error de ubicacion (si falla el Geocoder o se olvida de mapear)
+                    if (publicarMascotaViewModel.ubicacionError != null) {
+                        Text(
+                            text = publicarMascotaViewModel.ubicacionError!!,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+
+                    // Mapa (Solo se muestra si la latitud y longitud existen)
+                    if (publicarMascotaViewModel.latitud != null && publicarMascotaViewModel.longitud != null) {
+                        val posicionMascota = LatLng(
+                            publicarMascotaViewModel.latitud!!,
+                            publicarMascotaViewModel.longitud!!
+                        )
+
+                        // Controla la camara del mapa
+                        val cameraPositionState = rememberCameraPositionState {
+                            position = CameraPosition.fromLatLngZoom(posicionMascota, 15f)
+                        }
+
+                        // Si la posicion cambia, movemos la camara automáticamente
+                        LaunchedEffect(posicionMascota) {
+                            cameraPositionState.position = CameraPosition.fromLatLngZoom(posicionMascota, 15f)
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .border(2.dp, colorNaranja, RoundedCornerShape(16.dp))
+                        ) {
+                            GoogleMap(
+                                modifier = Modifier.fillMaxSize(),
+                                cameraPositionState = cameraPositionState,
+                                //uiSettings = MapUiSettings(zoomControlsEnabled = false) // Mapa mas limpio
+                            ) {
+                                Marker(
+                                    state = MarkerState(position = posicionMascota),
+                                    title = "Ubicación de la mascota"
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -425,13 +585,21 @@ fun PantallaPublicarMascota(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Acerca de la Mascota", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(8.dp))
+
                     OutlinedTextField(
                         value = publicarMascotaViewModel.descripcionAdicional,
-                        onValueChange = { publicarMascotaViewModel.descripcionAdicional = it },
+                        onValueChange = {
+                            publicarMascotaViewModel.descripcionAdicional = it
+                            publicarMascotaViewModel.descripcionError = null
+                        },
                         placeholder = { Text("Contanos su historia, personalidad y por qué necesita un nuevo hogar...") },
                         modifier = Modifier.fillMaxWidth().height(120.dp),
                         shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.colors(unfocusedContainerColor = colorFondoPantalla, focusedContainerColor = colorFondoPantalla)
+                        isError = publicarMascotaViewModel.descripcionError != null,
+                        supportingText = {
+                            if(publicarMascotaViewModel.descripcionError != null)
+                                publicarMascotaViewModel.descripcionError?.let { Text(it) }
+                        }
                     )
                 }
             }

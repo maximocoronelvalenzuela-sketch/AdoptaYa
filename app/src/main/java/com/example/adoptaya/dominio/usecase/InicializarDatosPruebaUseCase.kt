@@ -42,7 +42,7 @@ class InicializarDatosPruebaUseCase(
             descripcionPersonalidad = listOf("Activo", "Sociable", "Cariñoso"),
             descripcionAdicional = "Ideal para familias con patio.", estado = Enums.EstadoMascota.DISPONIBLE,
             latitud = -27.7833, longitud = -64.2667, provincia = "Santiago del Estero", ciudad = "Santiago del Estero",
-            barrio = "Centro", imagenes = listOf("https://images.unsplash.com/photo-1543466835-00a7907e9de1"),
+            barrio = "Centro", calle = "Mitre", numero = "123", imagenes = listOf("https://images.unsplash.com/photo-1543466835-00a7907e9de1"),
             idUsuario = "1", fechaHoraAlta = "2024-06-01T12:00:00"
         )
         val mascota2 = Mascota(
@@ -51,7 +51,7 @@ class InicializarDatosPruebaUseCase(
             descripcionPersonalidad = listOf("Tranquilo", "Independiente"),
             descripcionAdicional = "Busca un hogar sin otros animales.", estado = Enums.EstadoMascota.DISPONIBLE,
             latitud = -27.8000, longitud = -64.2500, provincia = "Santiago del Estero", ciudad = "Santiago del Estero",
-            barrio = "Belgrano", imagenes = listOf("https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba"),
+            barrio = "Belgrano", calle = "Av. Libertador", numero = "456", imagenes = listOf("https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba"),
             idUsuario = "2", fechaHoraAlta = "2024-06-02T10:30:00"
         )
 
