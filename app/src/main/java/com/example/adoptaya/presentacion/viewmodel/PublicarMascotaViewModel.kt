@@ -24,6 +24,9 @@ class PublicarMascotaViewModel(
 ) : ViewModel() {
     private val apiGeoref = GeorefApi.crear()
 
+    // Imagenes
+    var imagenesSeleccionadas by mutableStateOf<List<String>>(emptyList())
+
     // Informacion Básica
     var nombre by mutableStateOf("")
     var tipo by mutableStateOf(Enums.TipoMascota.PERRO)
@@ -160,6 +163,20 @@ class PublicarMascotaViewModel(
         return esValido
     }
 
+    fun guardarImagenEnLocal(context: android.content.Context, uri: android.net.Uri): String {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        // Se crea un nombre unico para el archivo
+        val archivoLocal = java.io.File(context.filesDir, "mascota_${UUID.randomUUID()}.jpg")
+        val outputStream = java.io.FileOutputStream(archivoLocal)
+
+        inputStream?.copyTo(outputStream)
+
+        inputStream?.close()
+        outputStream.close()
+
+        return archivoLocal.absolutePath
+    }
+
     fun cargarLocalidadesPorProvincia(provincia: ProvinciaGeoref) {
         viewModelScope.launch {
             try {
@@ -228,7 +245,7 @@ class PublicarMascotaViewModel(
             barrio = barrio,
             calle = calle,
             numero = numero,
-            imagenes = emptyList(), // Hardcodeado
+            imagenes = imagenesSeleccionadas,
             fechaHoraAlta = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
             idUsuario = "1" // Hardcodeado
         )
@@ -263,6 +280,7 @@ class PublicarMascotaViewModel(
         provinciaSeleccionada = null
         localidadSeleccionada = null
         descripcionAdicional = ""
+        imagenesSeleccionadas = emptyList()
         nombreError = null
         edadError = null
         ubicacionError = null

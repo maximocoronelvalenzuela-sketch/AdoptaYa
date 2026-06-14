@@ -1,5 +1,8 @@
 package com.example.adoptaya.presentacion.ui
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,11 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.presentacion.viewmodel.PublicarMascotaViewModel
 import com.google.android.gms.maps.model.CameraPosition
@@ -64,44 +69,109 @@ fun PantallaPublicarMascota(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // TODO: Fotos (Placeholder)
+            // Fotos
+            Text("Fotos", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
+            val contexto = LocalContext.current
+
+            // Selector de Fotos (Maximo 3 imagenes)
+            val photoPickerLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 3)
+            ) { uris ->
+                if (uris.isNotEmpty()) {
+                    // Copiamos las imagenes seleccionadas a la memoria interna de la app
+                    val rutasLocales = uris.map { uri ->
+                        publicarMascotaViewModel.guardarImagenEnLocal(contexto, uri)
+                    }
+                    publicarMascotaViewModel.imagenesSeleccionadas = rutasLocales
+                }
+            }
+
             Text("Fotos", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Foto principal
                 Box(
                     modifier = Modifier
                         .weight(2f)
                         .height(150.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFFEFE4D9)),
+                        .background(Color(0xFFEFE4D9))
+                        .clickable {
+                            // Abrir galeria pidiendo solo imagenes
+                            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        },
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(Icons.Default.AddPhotoAlternate, contentDescription = null, tint = Color.Gray)
-                        Text("FOTO PRINCIPAL", fontSize = 12.sp, color = Color.Gray)
+                    if (publicarMascotaViewModel.imagenesSeleccionadas.isNotEmpty()) {
+                        AsyncImage(
+                            model = publicarMascotaViewModel.imagenesSeleccionadas[0],
+                            contentDescription = "Foto principal",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(Icons.Default.AddPhotoAlternate, contentDescription = null, tint = Color.Gray)
+                            Text("FOTO PRINCIPAL", fontSize = 12.sp, color = Color.Gray)
+                        }
                     }
                 }
+
+                // Fotos secundarias
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Foto 2
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(71.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFEFE4D9)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(71.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFEFE4D9))
+                            .clickable { photoPickerLauncher.launch(PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("+", fontSize = 24.sp, color = Color.Gray)
+                        if (publicarMascotaViewModel.imagenesSeleccionadas.size > 1) {
+                            AsyncImage(
+                                model = publicarMascotaViewModel.imagenesSeleccionadas[1],
+                                contentDescription = "Foto 2",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Text("+", fontSize = 24.sp, color = Color.Gray)
+                        }
                     }
+
+                    // Foto 3
                     Box(
-                        modifier = Modifier.fillMaxWidth().height(71.dp).clip(RoundedCornerShape(12.dp)).background(Color(0xFFEFE4D9)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(71.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFEFE4D9))
+                            .clickable { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("+", fontSize = 24.sp, color = Color.Gray)
+                        if (publicarMascotaViewModel.imagenesSeleccionadas.size > 2) {
+                            AsyncImage(
+                                model = publicarMascotaViewModel.imagenesSeleccionadas[2],
+                                contentDescription = "Foto 3",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Text("+", fontSize = 24.sp, color = Color.Gray)
+                        }
                     }
                 }
             }
-            Text("Agregá hasta 3 fotos claras de tu mascota.", fontSize = 12.sp, color = Color.DarkGray)
+            Text("Agregue hasta 3 fotos claras de tu mascota.", fontSize = 12.sp, color = Color.DarkGray)
 
 
             // Informacion basica

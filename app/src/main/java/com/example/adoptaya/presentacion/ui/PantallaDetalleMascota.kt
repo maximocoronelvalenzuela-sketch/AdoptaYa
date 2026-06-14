@@ -3,6 +3,8 @@ package com.example.adoptaya.presentacion.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun PantallaDetalleMascota(
@@ -41,7 +45,7 @@ fun PantallaDetalleMascota(
     }
 
     Scaffold(
-        bottomBar = { BarraContactoInferior() }    // Botón de WhatsApp fijo abajo
+        bottomBar = { BarraContactoInferior() }    // Boton de WhatsApp fijo abajo
     ) { paddingValues ->
 
         Box(
@@ -49,29 +53,20 @@ fun PantallaDetalleMascota(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Imagen de fondo fija arriba
-            AsyncImage(
-                model = mascota.imagenes.firstOrNull() ?: "https://images.unsplash.com/photo-1543466835-00a7907e9de1",
-                contentDescription = "Foto de "+mascota.nombre,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(350.dp) // Altura de la imagen antes de que empiece la tarjeta
-            )
-
-
-            // Contenido scrolleable que se superpone
+            // Contenido scrolleable
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
             ) {
-                // Espaciador grande para empujar la tarjeta hacia abajo y dejar ver la foto
-                Spacer(modifier = Modifier.height(300.dp))
+                // Carrusel
+                CarruselImagenesMascota(imagenes = mascota.imagenes)
 
-                // Tarjeta principal blanca
+                // Tarjeta blanca principal
                 Surface(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(y = (-32).dp), // Para superponerse a la foto
                     shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                     color = Color(0xFFF3F3F3)
                 ) {
@@ -102,7 +97,7 @@ fun PantallaDetalleMascota(
                                 )
                             }
 
-                            // Tag de Género (Naranja)
+                            // Tag de Genero (Naranja)
                             val sexoFormateado = mascota.sexo.name.lowercase().replaceFirstChar { it.uppercase() }
 
                             Surface(
@@ -123,7 +118,6 @@ fun PantallaDetalleMascota(
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-
                         // Informacion basica
                         val tiempoFormateado = mascota.tiempo.name.lowercase().replaceFirstChar { it.uppercase() }
                         val tamanoFormateado = mascota.tamaño.name.lowercase().replaceFirstChar { it.uppercase() }
@@ -139,7 +133,6 @@ fun PantallaDetalleMascota(
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-
                         // Salud
                         TituloSeccion("Salud")
                         ItemSalud("Vacunado", estado = mascota.vacunado)
@@ -149,7 +142,6 @@ fun PantallaDetalleMascota(
                         ItemSalud("Desparasitado", estado = mascota.desparasitado)
 
                         Spacer(modifier = Modifier.height(32.dp))
-
 
                         // Personalidad
                         Row(
@@ -176,19 +168,18 @@ fun PantallaDetalleMascota(
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-
                         // Sobre la mascota
                         Surface(
-                            color = Color(0xFFFFF6ED), // Naranja muy tenue
+                            color = Color(0xFFFCEADE), // Naranja muy tenue
                             shape = RoundedCornerShape(24.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(modifier = Modifier.padding(20.dp)) {
-                                Text("Sobre "+mascota.nombre, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A1A1A))
+                                Text("Sobre "+mascota.nombre, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = mascota.descripcionAdicional,
-                                    color = Color(0xFF666666),
+                                    color = Color.DarkGray,
                                     lineHeight = 24.sp,
                                     fontSize = 15.sp
                                 )
@@ -197,9 +188,8 @@ fun PantallaDetalleMascota(
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-
                         // Ubicacion aproximada
-                        TituloSeccion("Ubicacion aproximada")
+                        TituloSeccion("Ubicación aproximada")
                         Box(    // Falso mapa
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -220,8 +210,8 @@ fun PantallaDetalleMascota(
                                     Icon(Icons.Default.Pets, contentDescription = null, tint = Color(0xFFE85A13))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
-                                        Text(mascota.barrio ?: "...", fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                        Text(mascota.ciudad ?: "..."+ ", " + (mascota.provincia ?: "..."), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                        Text(mascota.barrio, fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                        Text(mascota.ciudad, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -229,7 +219,6 @@ fun PantallaDetalleMascota(
                     }
                 }
             }
-
 
             // Botones: Atras y Favorito
             Row(
@@ -350,7 +339,7 @@ fun BarraContactoInferior() {
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Botón Naranja de WhatsApp
+            // Boton Naranja de WhatsApp
             Button (
                 onClick = { /* TODO: Abrir WhatsApp */ },
                 modifier = Modifier
@@ -362,6 +351,91 @@ fun BarraContactoInferior() {
                 Icon(Icons.Default.ChatBubbleOutline, contentDescription = null, tint = Color.White)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Contactar por WhatsApp", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+fun CarruselImagenesMascota(imagenes: List<String>) {
+    // Si por algun error la mascota no tiene imagenes, se muestra un fondo gris liso
+    if (imagenes.isEmpty()) {
+        Box(modifier = Modifier.fillMaxWidth().height(350.dp).background(Color.LightGray))
+        return
+    }
+
+    // El estado del carrusel (cuantas paginas hay y cual se muestra)
+    val pagerState = rememberPagerState(pageCount = { imagenes.size })
+    val coroutineScope = rememberCoroutineScope()
+
+    Box(modifier = Modifier.fillMaxWidth().height(350.dp)) {
+
+        // Carrusel
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { pagina ->
+            AsyncImage(
+                model = imagenes[pagina],
+                contentDescription = "Foto "+(pagina + 1)+" de la mascota",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        // Botones
+        if (imagenes.size > 1) {
+
+            // Boton Atras
+            if (pagerState.currentPage > 0) {
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(8.dp)
+                        .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)
+                ) {
+                    Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "Anterior", tint = Color.White)
+                }
+            }
+
+            // Boton Adelante
+            if (pagerState.currentPage < imagenes.size - 1) {
+                IconButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(8.dp)
+                        .background(Color.Black.copy(alpha = 0.4f), shape = CircleShape)
+                ) {
+                    Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Siguiente", tint = Color.White)
+                }
+            }
+
+            // Los puntos indicadores en la parte de abajo
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                repeat(imagenes.size) { iteracion ->
+                    val colorPunto = if (pagerState.currentPage == iteracion) Color.White else Color.White.copy(alpha = 0.5f)
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(colorPunto)
+                    )
+                }
             }
         }
     }
