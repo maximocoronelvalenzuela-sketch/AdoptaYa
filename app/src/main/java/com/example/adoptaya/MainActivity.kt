@@ -14,6 +14,8 @@ import com.example.adoptaya.data.repositorio.MascotaRepositorioImpl
 import com.example.adoptaya.data.repositorio.NotificacionRepositorioImpl
 import com.example.adoptaya.data.repositorio.UsuarioRepositorioImpl
 import com.example.adoptaya.dominio.usecase.InicializarDatosPruebaUseCase
+import com.example.adoptaya.dominio.usecase.favorito.AgregarFavoritoUseCase
+import com.example.adoptaya.dominio.usecase.favorito.EliminarFavoritoUseCase
 import com.example.adoptaya.dominio.usecase.favorito.ObtenerFavoritosPorUsuarioUseCase
 import com.example.adoptaya.dominio.usecase.mascota.GuardarMascotaUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
@@ -50,11 +52,13 @@ class MainActivity : ComponentActivity() {
         val guardarMascotaUC = GuardarMascotaUseCase(mascotaRepositorio)
         val obtenerUsuarioPorIdUC = ObtenerUsuarioPorIdUseCase(usuarioRepositorio)
         val obtenerFavoritosPorUsuarioUC = ObtenerFavoritosPorUsuarioUseCase(favoritoRepositorio, mascotaRepositorio)
+        val agregarFavoritoUseCase = AgregarFavoritoUseCase(favoritoRepositorio)
+        val eliminarFavoritoUseCase = EliminarFavoritoUseCase(favoritoRepositorio)
         val obtenerNotificacionesPorUsuarioUC = ObtenerNotificacionesPorUsuario(notificacionRepositorio)
 
         val mascotaViewModel = MascotaViewModel(obtenerMascotasUC, obtenerPorIdUC)
         val usuarioViewModel = UsuarioViewModel(obtenerUsuarioPorIdUC)
-        val favoritoViewModel = FavoritoViewModel(obtenerFavoritosPorUsuarioUC)
+        val favoritoViewModel = FavoritoViewModel(obtenerFavoritosPorUsuarioUC, agregarFavoritoUseCase, eliminarFavoritoUseCase)
         val notificacionViewModel = NotificacionViewModel(obtenerNotificacionesPorUsuarioUC)
         val publicarMascotaViewModel = PublicarMascotaViewModel(guardarMascotaUC)
 

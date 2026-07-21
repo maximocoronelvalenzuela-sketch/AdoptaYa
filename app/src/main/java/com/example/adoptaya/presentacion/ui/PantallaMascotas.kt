@@ -14,11 +14,13 @@ import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.MascotaCard
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
+import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 
 @Composable
 fun PantallaMascotas(
     mascotaViewModel: MascotaViewModel,
+    favoritoViewModel: FavoritoViewModel,
     alClickearMascota: (String) -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearPerfil: () -> Unit,
@@ -64,11 +66,18 @@ fun PantallaMascotas(
                 .background(Color(0xFFF3F3F3))
         ) {
             items(mascotas) { mascota ->
+                val esFav = favoritoViewModel.esFavorito(mascota.id)
+
                 MascotaCard(
                     mascota = mascota,
                     alClickear = {
                         alClickearMascota(mascota.id)
-                    }
+                    },
+                    alClickearFavorito = {
+                        // Hardcodeado temporalmente
+                        favoritoViewModel.toggleFavorito("1", mascota)
+                    },
+                    esFavorito = esFav
                 )
             }
         }

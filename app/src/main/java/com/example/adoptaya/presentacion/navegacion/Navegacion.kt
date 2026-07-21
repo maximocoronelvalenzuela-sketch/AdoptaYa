@@ -36,6 +36,7 @@ fun Navegacion(
         composable(Pantallas.Mascotas.ruta) {
             PantallaMascotas(
                 mascotaViewModel = mascotaViewModel,
+                favoritoViewModel = favoritoViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
@@ -67,6 +68,7 @@ fun Navegacion(
             PantallaDetalleMascota(
                 mascotaId = mascotaId ?: "",
                 mascotaViewModel = mascotaViewModel,
+                favoritoViewModel = favoritoViewModel,
                 alVolver = { navController.popBackStack() }
             )
         }

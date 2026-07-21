@@ -70,7 +70,12 @@ fun PantallaFavoritos(
                     mascota = mascota,
                     alClickear = {
                         alClickearMascota(mascota.id)
-                    }
+                    },
+                    alClickearFavorito = {
+                        // "1" hardcodeado temporalmente
+                        favoritoViewModel.toggleFavorito("1", mascota)
+                    },
+                    esFavorito = favoritoViewModel.esFavorito(mascota.id)
                 )
             }
         }

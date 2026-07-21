@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Male
@@ -46,7 +47,9 @@ import com.example.adoptaya.data.model.Mascota
 @Composable
 fun MascotaCard(
     mascota: Mascota,
-    alClickear: () -> Unit
+    alClickear: () -> Unit,
+    alClickearFavorito: () -> Unit = {},
+    esFavorito: Boolean = false
 ) {
 
     ElevatedCard(
@@ -125,12 +128,12 @@ fun MascotaCard(
 
                     // Botón de Favoritos (Corazón)
                     IconButton(
-                        onClick = { /* TODO: Agregar a favoritos */ },
+                        onClick = { alClickearFavorito() },
                         modifier = Modifier.size(32.dp),
                         colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
                     ) {
                         Icon(
-                            imageVector = Icons.Default.FavoriteBorder, // Usar Icons.Default.Favorite para el corazón lleno
+                            imageVector = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Agregar a favoritos",
                             tint = Color.White
                         )

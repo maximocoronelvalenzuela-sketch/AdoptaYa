@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.adoptaya.data.model.Enums
+import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import kotlinx.coroutines.launch
 
@@ -32,6 +33,7 @@ import kotlinx.coroutines.launch
 fun PantallaDetalleMascota(
     mascotaId: String,
     mascotaViewModel: MascotaViewModel,
+    favoritoViewModel: FavoritoViewModel,
     alVolver: () -> Unit
 ) {
     val mascota = mascotaViewModel.mascotas.find { it.id == mascotaId }
@@ -229,7 +231,13 @@ fun PantallaDetalleMascota(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButtonFlotante(icono = Icons.Default.ArrowBackIosNew, onClick = alVolver)
-                IconButtonFlotante(icono = Icons.Default.FavoriteBorder, onClick = { /* TODO: Agregar a favoritos */ })
+
+                val esFavorito = favoritoViewModel.esFavorito(mascota.id)
+
+                IconButtonFlotante(
+                    icono = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    onClick = { favoritoViewModel.toggleFavorito("1", mascota) }
+                )
             }
         }
     }
