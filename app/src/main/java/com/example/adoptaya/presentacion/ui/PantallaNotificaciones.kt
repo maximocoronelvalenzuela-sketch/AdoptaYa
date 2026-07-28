@@ -1,5 +1,8 @@
 package com.example.adoptaya.presentacion.ui
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -26,6 +30,7 @@ import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Notificacion
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
+import java.net.URLEncoder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -209,6 +214,8 @@ fun DialogoDetalleNotificacion(
     onNavegarAMascota: (String) -> Unit,
     onNavegarAPerfil: (String) -> Unit
 ) {
+    val contexto = LocalContext.current
+
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
             shape = RoundedCornerShape(24.dp),
@@ -278,7 +285,24 @@ fun DialogoDetalleNotificacion(
                     }
                     Enums.TipoNotificacion.CONTACTO -> {
                         BotonPrimario(texto = "WhatsApp de contacto", icono = Icons.AutoMirrored.Default.Chat) {
-                            /* TODO: Logica WhatsApp */
+                            try {
+                                // Numero de prueba. A futuro, buscar el teléfono real del 'notificacion.idUsuarioEmisor'
+                                val numeroTelefono = "5493813558837"
+
+                                // El mensaje precargado que verá el dueño en su caja de texto
+                                val mensajeBase = "Hola, vi tu solicitud en AdoptaYa. ¿Sigues interesado/a en la adopción?"
+
+                                // Se codifica el texto para que los espacios y signos pasen bien por la URL
+                                val mensajeCodificado = URLEncoder.encode(mensajeBase, "UTF-8")
+
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    data = Uri.parse("https://wa.me/$numeroTelefono?text=$mensajeCodificado")
+                                }
+                                contexto.startActivity(intent)
+                            } catch (e: Exception) {
+                                // Por si el dispositivo no tiene un navegador o no tiene una forma de resolver el enlace
+                                Toast.makeText(contexto, "No se pudo abrir el enlace", Toast.LENGTH_SHORT).show()
+                            }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
                         BotonSecundario(texto = "Ver Mascota", icono = Icons.Default.Pets) {

@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +28,7 @@ import coil.compose.AsyncImage
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -34,10 +36,12 @@ fun PantallaDetalleMascota(
     mascotaId: String,
     mascotaViewModel: MascotaViewModel,
     favoritoViewModel: FavoritoViewModel,
+    notificacionViewModel: NotificacionViewModel,
     alVolver: () -> Unit
 ) {
     val mascota = mascotaViewModel.mascotas.find { it.id == mascotaId }
     val scrollState = rememberScrollState()
+    val contexto = LocalContext.current
 
     if (mascota == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -47,7 +51,21 @@ fun PantallaDetalleMascota(
     }
 
     Scaffold(
-        bottomBar = { BarraContactoInferior() }    // Boton de WhatsApp fijo abajo
+        bottomBar = {
+            BarraContactoInferior(
+                alClickearContactar = {
+                    notificacionViewModel.enviarSolicitudDeContacto(
+                        idEmisor = "1", // U1 (TODO: Hardcodeado temporalmente)
+                        idReceptor = mascota.idUsuario, // U2
+                        idMascota = mascota.id,
+                        nombreMascota = mascota.nombre,
+                        onSuccess = {
+                            android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    )
+                }
+            )
+        }    // Boton de WhatsApp fijo abajo
     ) { paddingValues ->
 
         Box(
@@ -333,7 +351,9 @@ fun ChipPersonalidad(texto: String) {
 }
 
 @Composable
-fun BarraContactoInferior() {
+fun BarraContactoInferior(
+    alClickearContactar: () -> Unit
+) {
     Surface(
         color = Color.White,
         shadowElevation = 16.dp, // Sombra para separarlo del contenido
@@ -349,7 +369,7 @@ fun BarraContactoInferior() {
         ) {
             // Boton Naranja de WhatsApp
             Button (
-                onClick = { /* TODO: Abrir WhatsApp */ },
+                onClick = alClickearContactar,
                 modifier = Modifier
                     .weight(1f)
                     .height(56.dp),

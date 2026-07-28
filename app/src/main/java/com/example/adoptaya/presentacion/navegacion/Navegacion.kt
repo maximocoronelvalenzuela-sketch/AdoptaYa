@@ -69,6 +69,7 @@ fun Navegacion(
                 mascotaId = mascotaId ?: "",
                 mascotaViewModel = mascotaViewModel,
                 favoritoViewModel = favoritoViewModel,
+                notificacionViewModel = notificacionViewModel,
                 alVolver = { navController.popBackStack() }
             )
         }
