@@ -24,7 +24,8 @@ fun PantallaFavoritos(
     alClickearMapa: () -> Unit,
     alClickearPerfil: () -> Unit,
     alClickearPublicar: () -> Unit,
-    alClickearNotificaciones: () -> Unit
+    alClickearNotificaciones: () -> Unit,
+    alClickearPerfilDueño: (String) -> Unit
 ) {
 
     val mascotas =
@@ -68,12 +69,15 @@ fun PantallaFavoritos(
 
                 MascotaCard(
                     mascota = mascota,
-                    alClickear = {
+                    alClickearMascota = {
                         alClickearMascota(mascota.id)
                     },
                     alClickearFavorito = {
                         // "1" hardcodeado temporalmente
                         favoritoViewModel.toggleFavorito("1", mascota)
+                    },
+                    alClickearPerfilDueño = {
+                        alClickearPerfilDueño(mascota.idUsuario)
                     },
                     esFavorito = favoritoViewModel.esFavorito(mascota.id)
                 )

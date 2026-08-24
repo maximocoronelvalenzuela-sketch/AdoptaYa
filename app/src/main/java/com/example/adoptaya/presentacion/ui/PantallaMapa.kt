@@ -5,10 +5,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
+import com.example.adoptaya.presentacion.componentes.ModalRequiereLogin
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
+import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -20,15 +26,20 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun PantallaMapa(
     mascotaViewModel: MascotaViewModel,
+    authViewModel: AuthViewModel,
     alClickearMascota: (String) -> Unit,
     alClickearInicio: () -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearPerfil: () -> Unit,
     alClickearPublicar: () -> Unit,
-    alClickearNotificaciones: () -> Unit
+    alClickearNotificaciones: () -> Unit,
+    alNavegarLogin: () -> Unit
 ) {
 
     val mascotas = mascotaViewModel.mascotas
+
+    var mostrarModalLogin by remember { mutableStateOf(false) }
+    val idActual = authViewModel.idUsuarioActual
 
     LaunchedEffect(Unit) {
         mascotaViewModel.cargarMascotas()
@@ -52,7 +63,11 @@ fun PantallaMapa(
             TopBar(
                 titulo = "Mapa",
                 mostrarBotonNotificaciones = true,
-                alClickearNotificaciones = { alClickearNotificaciones() }
+                alClickearNotificaciones = {
+                    if(idActual != null) alClickearNotificaciones() else mostrarModalLogin = true
+                },
+                mostrarBotonLogin = idActual == null,
+                alClickearLogin = { alNavegarLogin() }
             )
         },
         bottomBar = {
@@ -61,9 +76,15 @@ fun PantallaMapa(
                 alNavegar = { ruta ->
                     when (ruta) {
                         Pantallas.Mascotas.ruta -> alClickearInicio()
-                        Pantallas.Favoritos.ruta -> alClickearFavorito()
-                        Pantallas.Perfil.ruta -> alClickearPerfil()
-                        Pantallas.Publicar.ruta -> alClickearPublicar()
+                        Pantallas.Favoritos.ruta -> {
+                            if(idActual != null) alClickearFavorito() else mostrarModalLogin = true
+                        }
+                        Pantallas.Perfil.ruta -> {
+                            if (idActual != null) alClickearPerfil() else mostrarModalLogin = true
+                        }
+                        Pantallas.Publicar.ruta -> {
+                            if (idActual != null) alClickearPublicar() else mostrarModalLogin = true
+                        }
                     }
                 }
             )
@@ -92,6 +113,16 @@ fun PantallaMapa(
                     }
                 )
             }
+        }
+
+        if (mostrarModalLogin) {
+            ModalRequiereLogin(
+                onDismiss = { mostrarModalLogin = false },
+                onConfirmar = {
+                    mostrarModalLogin = false
+                    alNavegarLogin()
+                }
+            )
         }
     }
 }

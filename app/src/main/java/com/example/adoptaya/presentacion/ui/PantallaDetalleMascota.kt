@@ -13,7 +13,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.adoptaya.data.model.Enums
+import com.example.adoptaya.presentacion.componentes.ModalRequiereLogin
+import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
@@ -37,9 +43,14 @@ fun PantallaDetalleMascota(
     mascotaViewModel: MascotaViewModel,
     favoritoViewModel: FavoritoViewModel,
     notificacionViewModel: NotificacionViewModel,
-    alVolver: () -> Unit
+    authViewModel: AuthViewModel,
+    alVolver: () -> Unit,
+    alNavegarLogin: () -> Unit
 ) {
     val mascota = mascotaViewModel.mascotas.find { it.id == mascotaId }
+    val idActual = authViewModel.idUsuarioActual
+
+    var mostrarModalLogin by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val contexto = LocalContext.current
 
@@ -53,19 +64,27 @@ fun PantallaDetalleMascota(
     Scaffold(
         bottomBar = {
             BarraContactoInferior(
+                // Boton de WhatsApp fijo abajo
                 alClickearContactar = {
-                    notificacionViewModel.enviarSolicitudDeContacto(
-                        idEmisor = "1", // U1 (TODO: Hardcodeado temporalmente)
-                        idReceptor = mascota.idUsuario, // U2
-                        idMascota = mascota.id,
-                        nombreMascota = mascota.nombre,
-                        onSuccess = {
-                            android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
-                        }
-                    )
+                    if (idActual != null) {
+                       idActual?.let { id ->
+                           notificacionViewModel.enviarSolicitudDeContacto(
+                               idEmisor = idActual, // U1
+                               idReceptor = mascota.idUsuario, // U2
+                               idMascota = mascota.id,
+                               nombreMascota = mascota.nombre,
+                               onSuccess = {
+                                   android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
+                               }
+                           )
+                       }
+                    } else {
+                        // Es un usuario Invitado
+                        mostrarModalLogin = true
+                    }
                 }
             )
-        }    // Boton de WhatsApp fijo abajo
+        }
     ) { paddingValues ->
 
         Box(
@@ -254,9 +273,26 @@ fun PantallaDetalleMascota(
 
                 IconButtonFlotante(
                     icono = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    onClick = { favoritoViewModel.toggleFavorito("1", mascota) }
+                    onClick = {
+                        if (idActual != null) {
+                            favoritoViewModel.toggleFavorito(idActual, mascota)
+                        } else {
+                            mostrarModalLogin = true
+                        }
+                    }
                 )
             }
+        }
+
+        // Si el estado es true, se muestra el modal
+        if (mostrarModalLogin) {
+            ModalRequiereLogin(
+                onDismiss = { mostrarModalLogin = false },
+                onConfirmar = {
+                    mostrarModalLogin = false
+                    alNavegarLogin() // Redirige al Login
+                }
+            )
         }
     }
 }

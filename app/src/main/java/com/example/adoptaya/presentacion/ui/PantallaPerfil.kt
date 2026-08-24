@@ -23,12 +23,14 @@ import androidx.compose.ui.unit.sp
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
+import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 @Composable
 fun PantallaPerfil(
     usuarioId: String,
     usuarioViewModel: UsuarioViewModel,
+    authViewModel: AuthViewModel,
     alClickearInicio: () -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearMapa: () -> Unit,
@@ -39,9 +41,7 @@ fun PantallaPerfil(
 
     val usuario = usuarioViewModel.usuarioSeleccionado
 
-    // TODO: ID del usuario logueado cuando se implemente login real
-    val idUsuarioLogueado = "1"
-    val esMiPerfil = usuarioId == idUsuarioLogueado
+    val esMiPerfil = usuarioId == authViewModel.idUsuarioActual
     LaunchedEffect(usuarioId) {
         usuarioViewModel.cargarUsuarioPorId(usuarioId)
     }

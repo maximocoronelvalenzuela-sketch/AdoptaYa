@@ -6,11 +6,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.adoptaya.presentacion.ui.PantallaDetalleMascota
 import com.example.adoptaya.presentacion.ui.PantallaFavoritos
+import com.example.adoptaya.presentacion.ui.PantallaLogin
 import com.example.adoptaya.presentacion.ui.PantallaMapa
 import com.example.adoptaya.presentacion.ui.PantallaMascotas
 import com.example.adoptaya.presentacion.ui.PantallaNotificaciones
 import com.example.adoptaya.presentacion.ui.PantallaPerfil
 import com.example.adoptaya.presentacion.ui.PantallaPublicarMascota
+import com.example.adoptaya.presentacion.ui.PantallaRecuperarPassword
+import com.example.adoptaya.presentacion.ui.PantallaRegistro
+import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
@@ -23,20 +27,22 @@ fun Navegacion(
     favoritoViewModel: FavoritoViewModel,
     usuarioViewModel: UsuarioViewModel,
     notificacionViewModel: NotificacionViewModel,
-    publicarMascotaViewModel: PublicarMascotaViewModel
+    publicarMascotaViewModel: PublicarMascotaViewModel,
+    authViewModel: AuthViewModel
 ) {
 
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = Pantallas.Mascotas.ruta
+        startDestination = Pantallas.Login.ruta
     ) {
 
         composable(Pantallas.Mascotas.ruta) {
             PantallaMascotas(
                 mascotaViewModel = mascotaViewModel,
                 favoritoViewModel = favoritoViewModel,
+                authViewModel = authViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
@@ -46,9 +52,9 @@ fun Navegacion(
                     navController.navigate(Pantallas.Favoritos.ruta) { launchSingleTop = true }
                 },
                 alClickearPerfil = {
-                    navController.navigate(
-                        Pantallas.Perfil.crearRuta("1")
-                    )
+                    authViewModel.idUsuarioActual?.let { miId ->
+                        navController.navigate(Pantallas.Perfil.crearRuta(miId))
+                    }
                 },
                 alClickearMapa = {
                     navController.navigate(Pantallas.Mapa.ruta) { launchSingleTop = true }
@@ -58,6 +64,14 @@ fun Navegacion(
                 },
                 alClickearNotificaciones = {
                     navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
+                },
+                alClickearPerfilDueño = { usuarioId ->
+                    navController.navigate(
+                        Pantallas.Perfil.crearRuta(usuarioId)
+                    )
+                },
+                alNavegarLogin = {
+                    navController.navigate(Pantallas.Login.ruta)
                 }
             )
         }
@@ -70,7 +84,11 @@ fun Navegacion(
                 mascotaViewModel = mascotaViewModel,
                 favoritoViewModel = favoritoViewModel,
                 notificacionViewModel = notificacionViewModel,
-                alVolver = { navController.popBackStack() }
+                authViewModel = authViewModel,
+                alVolver = { navController.popBackStack() },
+                alNavegarLogin = {
+                    navController.navigate(Pantallas.Login.ruta)
+                }
             )
         }
 
@@ -98,6 +116,11 @@ fun Navegacion(
                 },
                 alClickearNotificaciones = {
                     navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
+                },
+                alClickearPerfilDueño = { usuarioId ->
+                    navController.navigate(
+                        Pantallas.Perfil.crearRuta(usuarioId)
+                    )
                 }
             )
         }
@@ -107,6 +130,7 @@ fun Navegacion(
             PantallaPerfil(
                 usuarioId = usuarioId,
                 usuarioViewModel = usuarioViewModel,
+                authViewModel = authViewModel,
                 alClickearInicio = {
                     navController.navigate(Pantallas.Mascotas.ruta) { launchSingleTop = true }
                 },
@@ -129,6 +153,7 @@ fun Navegacion(
         composable(Pantallas.Mapa.ruta) {
             PantallaMapa(
                 mascotaViewModel = mascotaViewModel,
+                authViewModel = authViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(Pantallas.DetalleMascota.crearRuta(mascotaId)
                     )
@@ -149,6 +174,9 @@ fun Navegacion(
                 },
                 alClickearNotificaciones = {
                     navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
+                },
+                alNavegarLogin = {
+                    navController.navigate(Pantallas.Login.ruta)
                 }
             )
         }
@@ -174,6 +202,67 @@ fun Navegacion(
             PantallaPublicarMascota(
                 publicarMascotaViewModel = publicarMascotaViewModel,
                 onVolver = { navController.popBackStack() }
+            )
+        }
+
+        composable(Pantallas.Login.ruta) {
+            PantallaLogin(
+                authViewModel = authViewModel,
+                alNavegarRegistro = { navController.navigate(Pantallas.Registro.ruta) },
+                alNavegarRecuperarPassword = { navController.navigate(Pantallas.RecuperarPassword.ruta) },
+                alIngresarComoInvitado = {
+                    authViewModel.ingresarComoInvitado(
+                        onExito = {
+                            navController.navigate(Pantallas.Mascotas.ruta) {
+                                popUpTo(Pantallas.Login.ruta) { inclusive = true }
+                            }
+                        }
+                    )
+                },
+                alIniciarSesion = { email, password ->
+                    authViewModel.iniciarSesion(
+                        email = email,
+                        password = password,
+                        onExito = {
+                            navController.navigate(Pantallas.Mascotas.ruta) {
+                                popUpTo(Pantallas.Login.ruta) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+            )
+        }
+
+        composable(Pantallas.Registro.ruta) {
+            PantallaRegistro(
+                alNavegarLogin = {
+                    navController.navigate(Pantallas.Login.ruta) {
+                        popUpTo(Pantallas.Registro.ruta) { inclusive = true }
+                    }
+                },
+                alRegistrar = { nombre, email, password ->
+                    authViewModel.registrar(
+                        nombre = nombre,
+                        email = email,
+                        password = password,
+                        onExito = {
+                            navController.navigate(Pantallas.Mascotas.ruta) {
+                                popUpTo(Pantallas.Login.ruta) { inclusive = true }
+                                popUpTo(Pantallas.Registro.ruta) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+            )
+        }
+
+        composable(Pantallas.RecuperarPassword.ruta) {
+            PantallaRecuperarPassword(
+                alVolver = { navController.popBackStack() },
+                alEnviarCorreo = { email ->
+                    // Por ahora solo se vuelve atras
+                    navController.popBackStack()
+                }
             )
         }
     }

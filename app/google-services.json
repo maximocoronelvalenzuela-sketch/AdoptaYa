@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "73793307616",
+    "project_id": "adoptaya-c5c01",
+    "storage_bucket": "adoptaya-c5c01.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:73793307616:android:c42483ddc24b80099c6185",
+        "android_client_info": {
+          "package_name": "com.example.adoptaya"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3KAhQy-elVacmaAl69yLzAvc9NtV3fmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

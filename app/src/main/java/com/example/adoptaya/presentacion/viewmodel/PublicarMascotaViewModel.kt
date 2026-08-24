@@ -11,6 +11,7 @@ import com.example.adoptaya.data.model.Mascota
 import com.example.adoptaya.data.remoto.GeorefApi
 import com.example.adoptaya.data.remoto.model.LocalidadGeoref
 import com.example.adoptaya.data.remoto.model.ProvinciaGeoref
+import com.example.adoptaya.dominio.usecase.auth.ObtenerIdUsuarioActualUseCase
 import com.example.adoptaya.dominio.usecase.mascota.GuardarMascotaUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,7 +21,8 @@ import java.util.Locale
 import java.util.UUID
 
 class PublicarMascotaViewModel(
-    private val guardarMascotaUseCase: GuardarMascotaUseCase
+    private val guardarMascotaUseCase: GuardarMascotaUseCase,
+    private val obtenerIdUsuarioActualUseCase: ObtenerIdUsuarioActualUseCase
 ) : ViewModel() {
     private val apiGeoref = GeorefApi.crear()
 
@@ -223,6 +225,10 @@ class PublicarMascotaViewModel(
     fun guardarMascota(onSuccess: () -> Unit) {
         if (!validarDatos()) return
 
+        val idActual = obtenerIdUsuarioActualUseCase()
+
+        if(idActual == null) return
+
         val nuevaMascota = Mascota(
             id = UUID.randomUUID().toString(),
             nombre = nombre,
@@ -247,7 +253,7 @@ class PublicarMascotaViewModel(
             numero = numero,
             imagenes = imagenesSeleccionadas,
             fechaHoraAlta = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-            idUsuario = "1" // Hardcodeado
+            idUsuario = idActual
         )
 
         viewModelScope.launch {

@@ -25,4 +25,10 @@ sealed class Pantallas(val ruta: String) {
     object Publicar : Pantallas("publicar")
 
     object Notificaciones : Pantallas("notificaciones")
+
+    object Login : Pantallas("login")
+
+    object Registro : Pantallas("registro")
+
+    object RecuperarPassword : Pantallas("recuperar_password")
 }
