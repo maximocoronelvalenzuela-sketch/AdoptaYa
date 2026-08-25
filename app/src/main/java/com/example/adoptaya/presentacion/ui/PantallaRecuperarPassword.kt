@@ -57,7 +57,7 @@ fun PantallaRecuperarPassword(
         Button(
             onClick = {
                 if (!email.lowercase().endsWith("@gmail.com")) {
-                    errorEmail = "El eMail debe ser de Google (@gmail.com)"
+                    errorEmail = "El Email debe ser de Google (@gmail.com)"
                 } else {
                     alEnviarCorreo(email)
                 }

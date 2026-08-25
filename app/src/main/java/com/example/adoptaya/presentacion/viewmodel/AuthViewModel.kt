@@ -104,4 +104,10 @@ class AuthViewModel(
         idUsuarioActual = null
         onExito()
     }
+
+    fun cerrarSesion(onExito: () -> Unit) {
+        cerrarSesionUseCase()
+        idUsuarioActual = null
+        onExito()
+    }
 }

@@ -57,7 +57,7 @@ fun MascotaCard(
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(12.dp),
         shape = RoundedCornerShape(24.dp),  // Esquinas redondeadas
         colors = CardDefaults.cardColors(
             containerColor = Color.White    // Fondo de la Card blanca

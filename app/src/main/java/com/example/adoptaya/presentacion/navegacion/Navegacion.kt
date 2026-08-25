@@ -35,7 +35,7 @@ fun Navegacion(
 
     NavHost(
         navController = navController,
-        startDestination = Pantallas.Login.ruta
+        startDestination = Pantallas.Mascotas.ruta
     ) {
 
         composable(Pantallas.Mascotas.ruta) {
@@ -130,6 +130,8 @@ fun Navegacion(
             PantallaPerfil(
                 usuarioId = usuarioId,
                 usuarioViewModel = usuarioViewModel,
+                mascotaViewModel = mascotaViewModel,
+                favoritoViewModel = favoritoViewModel,
                 authViewModel = authViewModel,
                 alClickearInicio = {
                     navController.navigate(Pantallas.Mascotas.ruta) { launchSingleTop = true }
@@ -146,7 +148,18 @@ fun Navegacion(
                 alClickearNotificaciones = {
                     navController.navigate(Pantallas.Notificaciones.ruta) { launchSingleTop = true }
                 },
-                alVolver = { navController.popBackStack() }
+                alVolver = { navController.popBackStack() },
+                alCerrarSesion = {
+                    navController.navigate(Pantallas.Mascotas.ruta) {
+                        popUpTo(0)
+                    }
+                },
+                alClickearMascota = { mascotaId ->
+                    navController.navigate(Pantallas.DetalleMascota.crearRuta(mascotaId))
+                },
+                alNavegarLogin = {
+                    navController.navigate(Pantallas.Login.ruta)
+                }
             )
         }
 
