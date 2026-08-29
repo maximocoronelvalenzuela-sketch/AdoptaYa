@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 data class Usuario(
     @PrimaryKey val id: String,
     val email: String,
-    val password: String,
     val nombre: String,
     val telefono: String,
     val latitud: Double,

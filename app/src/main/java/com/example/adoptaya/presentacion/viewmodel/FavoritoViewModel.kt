@@ -31,7 +31,7 @@ class FavoritoViewModel (
     }
 
     // Agrega o quita de la base de datos y de favoritosDeUsuario
-        fun toggleFavorito(idUsuario: String, mascota: Mascota) {
+    fun toggleFavorito(idUsuario: String, mascota: Mascota) {
         viewModelScope.launch {
             val yaEsFavorito = esFavorito(mascota.id)
 

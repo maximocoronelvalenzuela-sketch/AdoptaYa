@@ -15,25 +15,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 
 @Composable
 fun PantallaRegistro(
+    authViewModel: AuthViewModel,
     alNavegarLogin: () -> Unit,
-    alRegistrar: (String, String, String) -> Unit // Recibe nombre, email y contraseña
+    alRegistrar: (String, String, String, String) -> Unit // Recibe nombre, email, contraseña y telefono
 ) {
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-
-    var errorNombre by remember { mutableStateOf<String?>(null) }
-    var errorEmail by remember { mutableStateOf<String?>(null) }
-    var errorPassword by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
+            .systemBarsPadding()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -45,15 +44,15 @@ fun PantallaRegistro(
             value = nombre,
             onValueChange = {
                 nombre = it
-                if (errorNombre != null) errorNombre = null
+                authViewModel.limpiarError("nombre")
             },
             label = { Text("Nombre completo") },
-            isError = errorNombre != null,
+            isError = authViewModel.mensajeErrorNombre != null,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp)
         )
-        if (errorNombre != null) {
-            Text(text = errorNombre!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp))
+        if (authViewModel.mensajeErrorNombre != null) {
+            Text(text = authViewModel.mensajeErrorNombre!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -62,15 +61,48 @@ fun PantallaRegistro(
             value = email,
             onValueChange = {
                 email = it
-                if (errorEmail != null) errorEmail = null
+                authViewModel.limpiarError("email")
             },
             label = { Text("Correo electrónico de Google") },
-            isError = errorEmail != null,
+            placeholder = { Text("Ej: ejemplo@gmail.com") },
+            isError = authViewModel.mensajeErrorEmail != null,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp)
         )
-        if (errorEmail != null) {
-            Text(text = errorEmail!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp))
+        if (authViewModel.mensajeErrorEmail != null) {
+            Text(text = authViewModel.mensajeErrorEmail!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = telefono,
+            onValueChange = { input ->
+                val soloNumeros = input.filter { it.isDigit() }
+                if (soloNumeros.length <= 10) {
+                    telefono = soloNumeros
+                    authViewModel.limpiarError("telefono")
+                }
+            },
+            label = { Text("Celular (sin 0 ni 15)") },
+            placeholder = { Text("Ej: 3851234567") },
+            leadingIcon = {
+                Text(
+                    text = "+54 9",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.DarkGray,
+                    modifier = Modifier.padding(start = 16.dp, end = 8.dp)
+                )
+            },
+            isError = authViewModel.mensajeErrorTelefono != null,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
+            )
+        )
+        if (authViewModel.mensajeErrorTelefono != null) {
+            Text(text = authViewModel.mensajeErrorTelefono!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -79,10 +111,10 @@ fun PantallaRegistro(
             value = password,
             onValueChange = {
                 password = it
-                if (errorPassword != null) errorPassword = null
+                authViewModel.limpiarError("password")
             },
             label = { Text("Contraseña (min. 6 caracteres)") },
-            isError = errorPassword != null,
+            isError = authViewModel.mensajeErrorPassword != null,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -93,39 +125,30 @@ fun PantallaRegistro(
                 }
             }
         )
-        if (errorPassword != null) {
-            Text(text = errorPassword!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp))
+        if (authViewModel.mensajeErrorPassword != null) {
+            Text(text = authViewModel.mensajeErrorPassword!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 4.dp))
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
             onClick = {
-                var todoValido = true
-
-                // Validaciones
-                if (nombre.isBlank()) {
-                    errorNombre = "El nombre no puede estar vacío"
-                    todoValido = false
-                }
-                if (!email.lowercase().endsWith("@gmail.com")) {
-                    errorEmail = "El eMail debe ser de Google (@gmail.com)"
-                    todoValido = false
-                }
-                if (password.length < 6) {
-                    errorPassword = "La contraseña debe tener al menos 6 caracteres"
-                    todoValido = false
-                }
-
-                if (todoValido) {
-                    alRegistrar(nombre, email, password)
-                }
+                alRegistrar(nombre, email, password, telefono)
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
+            enabled = !authViewModel.estaCargando,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE85A13)),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Registrarse", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            if (authViewModel.estaCargando) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Registrarse", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+        if (authViewModel.mensajeError != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = authViewModel.mensajeError!!, color = Color.Red, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.weight(1f))

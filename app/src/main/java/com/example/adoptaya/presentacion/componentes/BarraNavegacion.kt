@@ -14,6 +14,7 @@ import com.example.adoptaya.presentacion.navegacion.Pantallas
 @Composable
 fun BarraNavegacion(
     rutaActual: String?,
+    mostrarAlertaPerfil: Boolean = false,
     alNavegar: (String) -> Unit
 ) {
     NavigationBar(
@@ -95,11 +96,21 @@ fun BarraNavegacion(
         // Perfil
         NavigationBarItem(
             icon = {
-                Icon(
-                    imageVector = if (rutaActual == Pantallas.Perfil.ruta) Icons.Filled.Person else Icons.Outlined.Person,
-                    contentDescription = "Perfil",
-                    modifier = Modifier.size(26.dp)
-                )
+                BadgedBox(
+                    badge = {
+                        if (mostrarAlertaPerfil) {
+                            Badge(containerColor = Color.Red, contentColor = Color.White) {
+                                Text("!")
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (rutaActual == Pantallas.Perfil.ruta) Icons.Filled.Person else Icons.Outlined.Person,
+                        contentDescription = "Perfil",
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
             },
             label = { Text("Perfil") },
             selected = rutaActual == Pantallas.Perfil.ruta,

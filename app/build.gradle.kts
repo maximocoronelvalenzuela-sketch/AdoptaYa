@@ -63,6 +63,9 @@ dependencies {
     // Autenticacion
     implementation("com.google.firebase:firebase-auth")
 
+    // Validacion de Telefono: Google LibPhoneNumber
+    implementation("com.googlecode.libphonenumber:libphonenumber:8.13.27")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

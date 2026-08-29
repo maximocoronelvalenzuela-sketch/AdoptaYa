@@ -67,17 +67,15 @@ fun PantallaDetalleMascota(
                 // Boton de WhatsApp fijo abajo
                 alClickearContactar = {
                     if (idActual != null) {
-                       idActual?.let { id ->
-                           notificacionViewModel.enviarSolicitudDeContacto(
-                               idEmisor = idActual, // U1
-                               idReceptor = mascota.idUsuario, // U2
-                               idMascota = mascota.id,
-                               nombreMascota = mascota.nombre,
-                               onSuccess = {
-                                   android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
-                               }
-                           )
-                       }
+                       notificacionViewModel.enviarSolicitudDeContacto(
+                           idEmisor = idActual, // U1
+                           idReceptor = mascota.idUsuario, // U2
+                           idMascota = mascota.id,
+                           nombreMascota = mascota.nombre,
+                           onSuccess = {
+                               android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
+                           }
+                       )
                     } else {
                         // Es un usuario Invitado
                         mostrarModalLogin = true
@@ -249,8 +247,8 @@ fun PantallaDetalleMascota(
                                     Icon(Icons.Default.Pets, contentDescription = null, tint = Color(0xFFE85A13))
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
-                                        Text(mascota.barrio, fontSize = 10.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                        Text(mascota.ciudad, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                                        Text(mascota.barrio, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
+                                        Text(mascota.ciudad, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }

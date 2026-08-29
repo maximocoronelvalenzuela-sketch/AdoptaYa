@@ -29,24 +29,31 @@ import androidx.compose.ui.window.Dialog
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Notificacion
 import com.example.adoptaya.presentacion.componentes.TopBar
+import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
+import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 import java.net.URLEncoder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaNotificaciones(
     notificacionViewModel: NotificacionViewModel,
+    authViewModel: AuthViewModel,
+    usuarioViewModel: UsuarioViewModel,
     alVolver: () -> Unit,
     alClickearMascota: (String) -> Unit,
     alClickearPerfil: (String) -> Unit
 ) {
     val notificaciones = notificacionViewModel.notificacionesDeUsuario
+    val idActual = authViewModel.idUsuarioActual
 
     // Estado para controlar qué notificación mostrar en el modal (null = cerrado)
     var notificacionSeleccionada by remember { mutableStateOf<Notificacion?>(null) }
 
-    LaunchedEffect(Unit) {
-        notificacionViewModel.cargarNotificacionesDeUsuario("1")
+    LaunchedEffect(idActual) {
+        if (idActual != null) {
+            notificacionViewModel.cargarNotificacionesDeUsuario(idActual)
+        }
     }
 
     Scaffold(
@@ -106,9 +113,18 @@ fun PantallaNotificaciones(
 
         // El modal de detalle (se muestra solo si hay una seleccionada)
         notificacionSeleccionada?.let { noti ->
+            val emisor = usuarioViewModel.usuarioSeleccionado
+            LaunchedEffect(notificacionSeleccionada!!.idUsuarioEmisor) {
+                usuarioViewModel.cargarUsuarioPorId(notificacionSeleccionada!!.idUsuarioEmisor)
+            }
+
             DialogoDetalleNotificacion(
                 notificacion = noti,
-                onDismiss = { notificacionSeleccionada = null }, // Cierra el modal
+                telefonoEmisor = emisor?.telefono,
+                onDismiss = {
+                    notificacionSeleccionada = null
+                    usuarioViewModel.limpiarUsuario()
+                },
                 onNavegarAMascota = { id ->
                     alClickearMascota(id)
                     notificacionSeleccionada = null
@@ -210,6 +226,7 @@ fun ItemNotificacion(notificacion: Notificacion, alClickear: () -> Unit) {
 @Composable
 fun DialogoDetalleNotificacion(
     notificacion: Notificacion,
+    telefonoEmisor: String?,
     onDismiss: () -> Unit,
     onNavegarAMascota: (String) -> Unit,
     onNavegarAPerfil: (String) -> Unit
@@ -242,6 +259,7 @@ fun DialogoDetalleNotificacion(
                     color = Color.LightGray,
                     modifier = Modifier.size(80.dp)
                 ) {
+                    // TODO: Foto perfil real del usuario
                     Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.padding(16.dp), tint = Color.DarkGray)
                 }
 
@@ -284,24 +302,24 @@ fun DialogoDetalleNotificacion(
                         }
                     }
                     Enums.TipoNotificacion.CONTACTO -> {
-                        BotonPrimario(texto = "WhatsApp de contacto", icono = Icons.AutoMirrored.Default.Chat) {
-                            try {
-                                // Numero de prueba. A futuro, buscar el teléfono real del 'notificacion.idUsuarioEmisor'
-                                val numeroTelefono = "5493813558837"
+                        BotonPrimario(
+                            texto = "WhatsApp de contacto",
+                            icono = Icons.AutoMirrored.Default.Chat,
+                            habilitado = telefonoEmisor != null
+                        ) {
+                            if (telefonoEmisor != null) {
+                                try {
+                                    val mensajeBase = "Hola, vi tu solicitud en AdoptaYa. ¿Sigues interesado/a en la adopción?"
+                                    // Se codifica el texto para que los espacios y signos pasen bien por la URL
+                                    val mensajeCodificado = java.net.URLEncoder.encode(mensajeBase, "UTF-8")
 
-                                // El mensaje precargado que verá el dueño en su caja de texto
-                                val mensajeBase = "Hola, vi tu solicitud en AdoptaYa. ¿Sigues interesado/a en la adopción?"
-
-                                // Se codifica el texto para que los espacios y signos pasen bien por la URL
-                                val mensajeCodificado = URLEncoder.encode(mensajeBase, "UTF-8")
-
-                                val intent = Intent(Intent.ACTION_VIEW).apply {
-                                    data = Uri.parse("https://wa.me/$numeroTelefono?text=$mensajeCodificado")
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        data = Uri.parse("https://wa.me/$telefonoEmisor?text=$mensajeCodificado")
+                                    }
+                                    contexto.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(contexto, "No se pudo abrir el enlace", Toast.LENGTH_SHORT).show()
                                 }
-                                contexto.startActivity(intent)
-                            } catch (e: Exception) {
-                                // Por si el dispositivo no tiene un navegador o no tiene una forma de resolver el enlace
-                                Toast.makeText(contexto, "No se pudo abrir el enlace", Toast.LENGTH_SHORT).show()
                             }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
@@ -317,7 +335,7 @@ fun DialogoDetalleNotificacion(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Footer de tiempo (hardcodeado)
+                // Footer de tiempo (TODO: hardcodeado)
                 Text("RECIBIDO HOY A LAS 10:45 AM", color = Color.LightGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             }
         }
@@ -326,11 +344,17 @@ fun DialogoDetalleNotificacion(
 
 // Estilos de botones
 @Composable
-fun BotonPrimario(texto: String, icono: ImageVector, onClick: () -> Unit) {
+fun BotonPrimario(texto: String, icono: ImageVector, habilitado: Boolean = true, onClick: () -> Unit) {
     Button(
         onClick = onClick,
+        enabled = habilitado,
         modifier = Modifier.fillMaxWidth().height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE85A13)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFFE85A13),
+            contentColor = Color.White,
+            disabledContainerColor = Color.LightGray,
+            disabledContentColor = Color.DarkGray
+        ),
         shape = RoundedCornerShape(25.dp)
     ) {
         Icon(icono, contentDescription = null); Spacer(modifier = Modifier.width(8.dp))

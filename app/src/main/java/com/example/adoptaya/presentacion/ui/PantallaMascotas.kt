@@ -22,12 +22,14 @@ import com.example.adoptaya.presentacion.navegacion.Pantallas
 import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 @Composable
 fun PantallaMascotas(
     mascotaViewModel: MascotaViewModel,
     favoritoViewModel: FavoritoViewModel,
     authViewModel: AuthViewModel,
+    usuarioViewModel: UsuarioViewModel,
     alClickearMascota: (String) -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearPerfil: () -> Unit,
@@ -42,9 +44,16 @@ fun PantallaMascotas(
 
     var mostrarModalLogin by remember { mutableStateOf(false) }
     val idActual = authViewModel.idUsuarioActual
+    val alertaPerfil = usuarioViewModel.perfilEstaIncompleto
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(idActual) {
         mascotaViewModel.cargarMascotas()
+
+        if (idActual != null) {
+            usuarioViewModel.cargarUsuarioPorId(idActual)
+        } else {
+            usuarioViewModel.limpiarUsuario()
+        }
     }
 
     Scaffold(
@@ -64,6 +73,7 @@ fun PantallaMascotas(
         bottomBar = {
             BarraNavegacion(
                 rutaActual = Pantallas.Mascotas.ruta,
+                mostrarAlertaPerfil = alertaPerfil,
                 alNavegar = { ruta ->
                     when (ruta) {
                         Pantallas.Favoritos.ruta -> {

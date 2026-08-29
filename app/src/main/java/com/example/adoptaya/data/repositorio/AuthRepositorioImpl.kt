@@ -17,10 +17,8 @@ class AuthRepositorioImpl(
         }
     }
 
-    override suspend fun registrar(nombre: String, email: String, password: String): Result<String> {
+    override suspend fun registrar(nombre: String, email: String, password: String, telefono: String): Result<String> {
         return try {
-            // Firebase Auth solo maneja email y pass.
-            // TODO: Guardar el nombre en Room usando el uid
             val resultado = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             Result.success(resultado.user?.uid ?: "")
         } catch (e: Exception) {

@@ -33,7 +33,7 @@ fun PantallaLogin(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
+            .systemBarsPadding()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -66,7 +66,6 @@ fun PantallaLogin(
             }
         )
 
-        // Boton "Olvidé mi contraseña"
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             TextButton(onClick = alNavegarRecuperarPassword) {
                 Text("¿Olvidaste tu contraseña?", color = Color(0xFFE85A13))

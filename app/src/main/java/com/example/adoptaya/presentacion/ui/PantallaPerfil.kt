@@ -56,6 +56,7 @@ fun PantallaPerfil(
 ) {
 
     val usuario = usuarioViewModel.usuarioSeleccionado
+    val alertaPerfil = usuarioViewModel.perfilEstaIncompleto
     val contexto = LocalContext.current
     val esMiPerfil = usuarioId == authViewModel.idUsuarioActual
     var mostrarModalLogin by remember { mutableStateOf(false) }
@@ -78,6 +79,7 @@ fun PantallaPerfil(
             if (esMiPerfil) {   // Solo muestro el bottomBar si es mi perfil
                 BarraNavegacion(
                     rutaActual = Pantallas.Perfil.ruta,
+                    mostrarAlertaPerfil = alertaPerfil,
                     alNavegar = { ruta ->
                         when (ruta) {
                             Pantallas.Mascotas.ruta -> alClickearInicio()
@@ -102,6 +104,36 @@ fun PantallaPerfil(
                     .background(Color(0xFFF3F3F3)),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                if (esMiPerfil && alertaPerfil) {
+                    item {
+                        Surface(
+                            color = Color(0xFFFFF3CD),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp)
+                                .padding(top = 24.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.WarningAmber,
+                                    contentDescription = "Perfil incompleto",
+                                    tint = Color.DarkGray
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "Tu perfil está incompleto. Te recomendamos sumar tu ubicación y foto para generar más confianza en la comunidad.",
+                                    color = Color.DarkGray,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
                 item {
                     Spacer(modifier = Modifier.height(32.dp))
 

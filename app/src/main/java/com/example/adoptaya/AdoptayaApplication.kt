@@ -12,6 +12,6 @@ class AdoptayaApplication : Application() {
             this,
             AdoptaYaDatabase::class.java,
             "adoptaya_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 }

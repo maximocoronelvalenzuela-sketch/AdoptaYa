@@ -14,7 +14,7 @@ import com.example.adoptaya.data.model.Usuario
 
 @Database(
     entities = [Usuario::class, Mascota::class, Notificacion::class, Favorito::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

@@ -16,6 +16,7 @@ import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
 import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -27,6 +28,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 fun PantallaMapa(
     mascotaViewModel: MascotaViewModel,
     authViewModel: AuthViewModel,
+    usuarioViewModel: UsuarioViewModel,
     alClickearMascota: (String) -> Unit,
     alClickearInicio: () -> Unit,
     alClickearFavorito: () -> Unit,
@@ -40,9 +42,14 @@ fun PantallaMapa(
 
     var mostrarModalLogin by remember { mutableStateOf(false) }
     val idActual = authViewModel.idUsuarioActual
+    val alertaPerfil = usuarioViewModel.perfilEstaIncompleto
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(idActual) {
         mascotaViewModel.cargarMascotas()
+
+        if (idActual != null) {
+            usuarioViewModel.cargarUsuarioPorId(idActual)
+        }
     }
 
     val santiago = LatLng(
@@ -73,6 +80,7 @@ fun PantallaMapa(
         bottomBar = {
             BarraNavegacion(
                 rutaActual = Pantallas.Mapa.ruta,
+                mostrarAlertaPerfil = alertaPerfil,
                 alNavegar = { ruta ->
                     when (ruta) {
                         Pantallas.Mascotas.ruta -> alClickearInicio()

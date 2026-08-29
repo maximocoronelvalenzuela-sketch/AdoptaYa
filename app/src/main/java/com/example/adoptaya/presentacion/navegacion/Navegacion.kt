@@ -43,6 +43,7 @@ fun Navegacion(
                 mascotaViewModel = mascotaViewModel,
                 favoritoViewModel = favoritoViewModel,
                 authViewModel = authViewModel,
+                usuarioViewModel = usuarioViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
@@ -95,6 +96,8 @@ fun Navegacion(
         composable(Pantallas.Favoritos.ruta) {
             PantallaFavoritos(
                 favoritoViewModel = favoritoViewModel,
+                usuarioViewModel = usuarioViewModel,
+                authViewModel = authViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
@@ -167,6 +170,7 @@ fun Navegacion(
             PantallaMapa(
                 mascotaViewModel = mascotaViewModel,
                 authViewModel = authViewModel,
+                usuarioViewModel = usuarioViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(Pantallas.DetalleMascota.crearRuta(mascotaId)
                     )
@@ -197,7 +201,11 @@ fun Navegacion(
         composable(Pantallas.Notificaciones.ruta) {
             PantallaNotificaciones(
                 notificacionViewModel = notificacionViewModel,
-                alVolver = { navController.popBackStack() },
+                usuarioViewModel = usuarioViewModel,
+                authViewModel = authViewModel,
+                alVolver = {
+                    navController.popBackStack()
+                },
                 alClickearMascota = { mascotaId ->
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
@@ -248,16 +256,18 @@ fun Navegacion(
 
         composable(Pantallas.Registro.ruta) {
             PantallaRegistro(
+                authViewModel = authViewModel,
                 alNavegarLogin = {
                     navController.navigate(Pantallas.Login.ruta) {
                         popUpTo(Pantallas.Registro.ruta) { inclusive = true }
                     }
                 },
-                alRegistrar = { nombre, email, password ->
+                alRegistrar = { nombre, email, password, telefono ->
                     authViewModel.registrar(
                         nombre = nombre,
                         email = email,
                         password = password,
+                        telefono = telefono,
                         onExito = {
                             navController.navigate(Pantallas.Mascotas.ruta) {
                                 popUpTo(Pantallas.Login.ruta) { inclusive = true }

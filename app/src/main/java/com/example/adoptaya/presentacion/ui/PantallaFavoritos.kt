@@ -14,11 +14,15 @@ import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.MascotaCard
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.navegacion.Pantallas
+import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
+import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 @Composable
 fun PantallaFavoritos(
     favoritoViewModel: FavoritoViewModel,
+    usuarioViewModel: UsuarioViewModel,
+    authViewModel: AuthViewModel,
     alClickearMascota: (String) -> Unit,
     alClickearInicio: () -> Unit,
     alClickearMapa: () -> Unit,
@@ -28,12 +32,15 @@ fun PantallaFavoritos(
     alClickearPerfilDueño: (String) -> Unit
 ) {
 
-    val mascotas =
-        favoritoViewModel.favoritosDeUsuario
+    val mascotas = favoritoViewModel.favoritosDeUsuario
+    val idActual = authViewModel.idUsuarioActual
+    val alertaPerfil = usuarioViewModel.perfilEstaIncompleto
 
-    LaunchedEffect(Unit) {
-        // TODO: Hardcodeado temporalmente porque todavia no hay sesion
-        favoritoViewModel.cargarFavoritosDeUsuario("1")
+    LaunchedEffect(idActual) {
+        if (idActual != null) {
+            favoritoViewModel.cargarFavoritosDeUsuario(idActual)
+            usuarioViewModel.cargarUsuarioPorId(idActual)
+        }
     }
 
     Scaffold(
@@ -47,6 +54,7 @@ fun PantallaFavoritos(
         bottomBar = {
             BarraNavegacion(
                 rutaActual = Pantallas.Favoritos.ruta,
+                mostrarAlertaPerfil = alertaPerfil,
                 alNavegar = { ruta ->
                     when (ruta) {
                         Pantallas.Mascotas.ruta -> alClickearInicio()
@@ -73,8 +81,9 @@ fun PantallaFavoritos(
                         alClickearMascota(mascota.id)
                     },
                     alClickearFavorito = {
-                        // "1" hardcodeado temporalmente
-                        favoritoViewModel.toggleFavorito("1", mascota)
+                        if (idActual != null) {
+                            favoritoViewModel.toggleFavorito(idActual, mascota)
+                        }
                     },
                     alClickearPerfilDueño = {
                         alClickearPerfilDueño(mascota.idUsuario)

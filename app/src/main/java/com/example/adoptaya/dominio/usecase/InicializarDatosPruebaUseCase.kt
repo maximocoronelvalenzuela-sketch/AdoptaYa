@@ -18,14 +18,14 @@ class InicializarDatosPruebaUseCase(
 
         // Usuarios de prueba
         val usuario1 = Usuario(
-            id = "1", email = "juan@mail.com", password = "123456",
+            id = "1", email = "juan@mail.com",
             nombre = "Juan Pérez", telefono = "3851234567",
             latitud = -27.7833, longitud = -64.2667,
             provincia = "Santiago del Estero", ciudad = "Santiago del Estero",
             barrio = "Centro", imagen = null, fechaHoraAlta = "2024-01-01T10:00:00"
         )
         val usuario2 = Usuario(
-            id = "2", email = "maria@mail.com", password = "123456",
+            id = "2", email = "maria@mail.com",
             nombre = "María Gómez", telefono = "3857654321",
             latitud = -27.8000, longitud = -64.2500,
             provincia = "Santiago del Estero", ciudad = "Santiago del Estero",
