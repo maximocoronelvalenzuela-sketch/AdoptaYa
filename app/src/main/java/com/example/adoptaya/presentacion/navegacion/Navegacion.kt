@@ -285,11 +285,8 @@ fun Navegacion(
 
         composable(Pantallas.RecuperarPassword.ruta) {
             PantallaRecuperarPassword(
-                alVolver = { navController.popBackStack() },
-                alEnviarCorreo = { email ->
-                    // TODO: Por ahora solo se vuelve atras
-                    navController.popBackStack()
-                }
+                authViewModel = authViewModel,
+                alVolver = { navController.popBackStack() }
             )
         }
 

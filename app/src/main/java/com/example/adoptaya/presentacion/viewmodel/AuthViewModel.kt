@@ -11,8 +11,10 @@ import com.example.adoptaya.dominio.usecase.auth.CerrarSesionUseCase
 import com.example.adoptaya.dominio.usecase.auth.IngresarComoInvitadoUseCase
 import com.example.adoptaya.dominio.usecase.auth.IniciarSesionUseCase
 import com.example.adoptaya.dominio.usecase.auth.ObtenerIdUsuarioActualUseCase
+import com.example.adoptaya.dominio.usecase.auth.RecuperarPasswordUseCase
 import com.example.adoptaya.dominio.usecase.auth.RegistrarUseCase
 import com.example.adoptaya.dominio.usecase.usuario.CrearUsuarioUseCase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -24,7 +26,8 @@ class AuthViewModel(
     private val registrarUseCase: RegistrarUseCase,
     private val obtenerIdUsuarioActualUseCase: ObtenerIdUsuarioActualUseCase,
     private val crearUsuarioUseCase: CrearUsuarioUseCase,
-    private val cerrarSesionUseCase: CerrarSesionUseCase
+    private val cerrarSesionUseCase: CerrarSesionUseCase,
+    private val recuperarPasswordUseCase: RecuperarPasswordUseCase
 ) : ViewModel() {
 
     var estaCargando by mutableStateOf(false)
@@ -166,6 +169,27 @@ class AuthViewModel(
             "email" -> mensajeErrorEmail = null
             "password" -> mensajeErrorPassword = null
             "telefono" -> mensajeErrorTelefono = null
+        }
+    }
+
+    fun enviarCorreoRecuperacion(
+        email: String,
+        onExito: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            estaCargando = true
+
+            val resultado = recuperarPasswordUseCase(email)
+
+            resultado.onSuccess {
+                estaCargando = false
+                onExito()
+            }.onFailure { excepcion ->
+                estaCargando = false
+                // Si Firebase devuelve un error (ej: el usuario no existe)
+                onError(excepcion.message ?: "Error al enviar el correo")
+            }
         }
     }
 }

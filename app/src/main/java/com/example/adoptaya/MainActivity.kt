@@ -30,6 +30,7 @@ import com.example.adoptaya.dominio.usecase.auth.CerrarSesionUseCase
 import com.example.adoptaya.dominio.usecase.auth.IngresarComoInvitadoUseCase
 import com.example.adoptaya.dominio.usecase.auth.IniciarSesionUseCase
 import com.example.adoptaya.dominio.usecase.auth.ObtenerIdUsuarioActualUseCase
+import com.example.adoptaya.dominio.usecase.auth.RecuperarPasswordUseCase
 import com.example.adoptaya.dominio.usecase.auth.RegistrarUseCase
 import com.example.adoptaya.dominio.usecase.favorito.AgregarFavoritoUseCase
 import com.example.adoptaya.dominio.usecase.favorito.EliminarFavoritoUseCase
@@ -88,13 +89,14 @@ class MainActivity : ComponentActivity() {
         val cerrarSesionUC = CerrarSesionUseCase(authRepositorio)
         val verificarPerfilIncompletoUC = VerificarPerfilIncompletoUseCase()
         val actualizarUsuarioUC = ActualizarUsuarioUseCase(usuarioRepositorio)
+        val recuperarPasswordUC = RecuperarPasswordUseCase(authRepositorio)
 
         val mascotaViewModel = MascotaViewModel(obtenerMascotasUC, obtenerPorIdUC)
         val usuarioViewModel = UsuarioViewModel(obtenerUsuarioPorIdUC, verificarPerfilIncompletoUC, actualizarUsuarioUC)
         val favoritoViewModel = FavoritoViewModel(obtenerFavoritosPorUsuarioUC, agregarFavoritoUC, eliminarFavoritoUC)
         val notificacionViewModel = NotificacionViewModel(obtenerNotificacionesPorUsuarioUC, guardarNotificacionUC)
         val publicarMascotaViewModel = PublicarMascotaViewModel(guardarMascotaUC, obtenerIdUsuarioActualUC)
-        val authViewModel = AuthViewModel(iniciarSesionUC, registrarUC, obtenerIdUsuarioActualUC, crearUsuarioUC, cerrarSesionUC)
+        val authViewModel = AuthViewModel(iniciarSesionUC, registrarUC, obtenerIdUsuarioActualUC, crearUsuarioUC, cerrarSesionUC, recuperarPasswordUC)
 
         val inicializarDatosPruebaUC = InicializarDatosPruebaUseCase(mascotaRepositorio, usuarioRepositorio)
 
