@@ -61,8 +61,8 @@ class AuthViewModel(
             val resultado = iniciarSesionUseCase(email, password)
             resultado.onSuccess { uid ->
                 idUsuarioActual = uid
-                onExito() // Navega a la pantalla principal
-            }.onFailure { excepcion ->
+                onExito()
+            }.onFailure {
                 mensajeError = "El correo o la contraseña son incorrectos."
             }
 
@@ -116,7 +116,6 @@ class AuthViewModel(
                         longitud = 0.0, // Provisorio
                         provincia = "", // Provisorio
                         ciudad = "",    // Provisorio
-                        barrio = "",    // Provisorio
                         imagen = null,  // Provisorio
                         fechaHoraAlta = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                     )

@@ -8,7 +8,6 @@ class VerificarPerfilIncompletoUseCase {
 
         return usuario.provincia.isBlank() ||
                 usuario.ciudad.isBlank() ||
-                usuario.barrio.isBlank() ||
                 usuario.latitud == 0.0 ||
                 usuario.longitud == 0.0 ||
                 usuario.imagen == null

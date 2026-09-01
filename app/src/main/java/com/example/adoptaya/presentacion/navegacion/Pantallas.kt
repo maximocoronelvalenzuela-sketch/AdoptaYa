@@ -31,4 +31,6 @@ sealed class Pantallas(val ruta: String) {
     object Registro : Pantallas("registro")
 
     object RecuperarPassword : Pantallas("recuperar_password")
+
+    object EditarPerfil : Pantallas("editar_perfil")
 }

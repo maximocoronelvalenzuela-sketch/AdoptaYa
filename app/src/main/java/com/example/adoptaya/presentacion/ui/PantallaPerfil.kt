@@ -5,12 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -23,10 +20,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.MascotaCard
 import com.example.adoptaya.presentacion.componentes.ModalRequiereLogin
@@ -52,7 +51,8 @@ fun PantallaPerfil(
     alVolver: () -> Unit,
     alCerrarSesion: () -> Unit,
     alClickearMascota: (String) -> Unit,
-    alNavegarLogin: () -> Unit
+    alNavegarLogin: () -> Unit,
+    alEditarPerfil: () -> Unit
 ) {
 
     val usuario = usuarioViewModel.usuarioSeleccionado
@@ -143,12 +143,16 @@ fun PantallaPerfil(
                         color = Color(0xFFFFF3E0),
                         modifier = Modifier.size(120.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Foto de perfil",
-                            tint = Color(0xFFE85A13),
-                            modifier = Modifier.padding(24.dp)
-                        )
+                        if (usuario.imagen != null) {
+                            AsyncImage(
+                                model = usuario.imagen,
+                                contentDescription = "Foto de perfil",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.padding(24.dp), tint = Color.DarkGray)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -175,7 +179,7 @@ fun PantallaPerfil(
                     ) {
                         if (esMiPerfil) {
                             Button(
-                                onClick = { /* TODO: Editar perfil */ },
+                                onClick = { alEditarPerfil() },
                                 modifier = Modifier.weight(1f).height(48.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE85A13)),
                                 shape = RoundedCornerShape(12.dp)

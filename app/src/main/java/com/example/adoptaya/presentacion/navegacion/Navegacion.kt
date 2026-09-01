@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.adoptaya.presentacion.ui.PantallaDetalleMascota
+import com.example.adoptaya.presentacion.ui.PantallaEditarPerfil
 import com.example.adoptaya.presentacion.ui.PantallaFavoritos
 import com.example.adoptaya.presentacion.ui.PantallaLogin
 import com.example.adoptaya.presentacion.ui.PantallaMapa
@@ -110,9 +111,9 @@ fun Navegacion(
                     navController.navigate(Pantallas.Mapa.ruta) { launchSingleTop = true }
                 },
                 alClickearPerfil = {
-                    navController.navigate(
-                        Pantallas.Perfil.crearRuta("1")
-                    )
+                    authViewModel.idUsuarioActual?.let { miId ->
+                        navController.navigate(Pantallas.Perfil.crearRuta(miId))
+                    }
                 },
                 alClickearPublicar = {
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
@@ -162,6 +163,9 @@ fun Navegacion(
                 },
                 alNavegarLogin = {
                     navController.navigate(Pantallas.Login.ruta)
+                },
+                alEditarPerfil = {
+                    navController.navigate(Pantallas.EditarPerfil.ruta)
                 }
             )
         }
@@ -182,9 +186,9 @@ fun Navegacion(
                     navController.navigate(Pantallas.Favoritos.ruta) { launchSingleTop = true }
                 },
                 alClickearPerfil = {
-                    navController.navigate(
-                        Pantallas.Perfil.crearRuta("1")
-                    )
+                    authViewModel.idUsuarioActual?.let { miId ->
+                        navController.navigate(Pantallas.Perfil.crearRuta(miId))
+                    }
                 },
                 alClickearPublicar = {
                     navController.navigate(Pantallas.Publicar.ruta) { launchSingleTop = true }
@@ -283,9 +287,16 @@ fun Navegacion(
             PantallaRecuperarPassword(
                 alVolver = { navController.popBackStack() },
                 alEnviarCorreo = { email ->
-                    // Por ahora solo se vuelve atras
+                    // TODO: Por ahora solo se vuelve atras
                     navController.popBackStack()
                 }
+            )
+        }
+
+        composable(Pantallas.EditarPerfil.ruta) {
+            PantallaEditarPerfil(
+                usuarioViewModel = usuarioViewModel,
+                alVolver = { navController.popBackStack() }
             )
         }
     }

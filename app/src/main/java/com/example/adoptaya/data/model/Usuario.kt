@@ -13,7 +13,6 @@ data class Usuario(
     val longitud: Double,
     val provincia: String,
     val ciudad: String,
-    val barrio: String,
     val imagen: String?,
     val fechaHoraAlta: String
 )

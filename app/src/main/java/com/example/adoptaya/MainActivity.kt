@@ -39,6 +39,7 @@ import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotasUseCase
 import com.example.adoptaya.dominio.usecase.notificacion.GuardarNotificacionUseCase
 import com.example.adoptaya.dominio.usecase.notificacion.ObtenerNotificacionesPorUsuario
+import com.example.adoptaya.dominio.usecase.usuario.ActualizarUsuarioUseCase
 import com.example.adoptaya.dominio.usecase.usuario.CrearUsuarioUseCase
 import com.example.adoptaya.dominio.usecase.usuario.ObtenerUsuarioPorIdUseCase
 import com.example.adoptaya.dominio.usecase.usuario.VerificarPerfilIncompletoUseCase
@@ -86,9 +87,10 @@ class MainActivity : ComponentActivity() {
         val crearUsuarioUC = CrearUsuarioUseCase(usuarioRepositorio)
         val cerrarSesionUC = CerrarSesionUseCase(authRepositorio)
         val verificarPerfilIncompletoUC = VerificarPerfilIncompletoUseCase()
+        val actualizarUsuarioUC = ActualizarUsuarioUseCase(usuarioRepositorio)
 
         val mascotaViewModel = MascotaViewModel(obtenerMascotasUC, obtenerPorIdUC)
-        val usuarioViewModel = UsuarioViewModel(obtenerUsuarioPorIdUC, verificarPerfilIncompletoUC)
+        val usuarioViewModel = UsuarioViewModel(obtenerUsuarioPorIdUC, verificarPerfilIncompletoUC, actualizarUsuarioUC)
         val favoritoViewModel = FavoritoViewModel(obtenerFavoritosPorUsuarioUC, agregarFavoritoUC, eliminarFavoritoUC)
         val notificacionViewModel = NotificacionViewModel(obtenerNotificacionesPorUsuarioUC, guardarNotificacionUC)
         val publicarMascotaViewModel = PublicarMascotaViewModel(guardarMascotaUC, obtenerIdUsuarioActualUC)

@@ -22,14 +22,14 @@ class InicializarDatosPruebaUseCase(
             nombre = "Juan Pérez", telefono = "3851234567",
             latitud = -27.7833, longitud = -64.2667,
             provincia = "Santiago del Estero", ciudad = "Santiago del Estero",
-            barrio = "Centro", imagen = null, fechaHoraAlta = "2024-01-01T10:00:00"
+            imagen = null, fechaHoraAlta = "2024-01-01T10:00:00"
         )
         val usuario2 = Usuario(
             id = "2", email = "maria@mail.com",
             nombre = "María Gómez", telefono = "3857654321",
             latitud = -27.8000, longitud = -64.2500,
             provincia = "Santiago del Estero", ciudad = "Santiago del Estero",
-            barrio = "Belgrano", imagen = null, fechaHoraAlta = "2024-01-02T11:00:00"
+            imagen = null, fechaHoraAlta = "2024-01-02T11:00:00"
         )
 
         usuarioRepositorio.guardarUsuario(usuario1)
