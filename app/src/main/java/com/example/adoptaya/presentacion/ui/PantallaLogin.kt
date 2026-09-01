@@ -87,10 +87,18 @@ fun PantallaLogin(
         Button(
             onClick = { alIniciarSesion(email, password) },
             modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE85A13)),
+            enabled = !authViewModel.estaCargando,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFE85A13),
+                disabledContainerColor = Color.LightGray
+            ),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Text("Iniciar Sesión", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            if (authViewModel.estaCargando) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Iniciar Sesión", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -113,9 +113,9 @@ fun PantallaNotificaciones(
 
         // El modal de detalle (se muestra solo si hay una seleccionada)
         notificacionSeleccionada?.let { noti ->
-            val emisor = usuarioViewModel.usuarioSeleccionado
+            val emisor = usuarioViewModel.usuarioVisitado
             LaunchedEffect(notificacionSeleccionada!!.idUsuarioEmisor) {
-                usuarioViewModel.cargarUsuarioPorId(notificacionSeleccionada!!.idUsuarioEmisor)
+                usuarioViewModel.cargarUsuarioPorId(notificacionSeleccionada!!.idUsuarioEmisor, false)
             }
 
             DialogoDetalleNotificacion(

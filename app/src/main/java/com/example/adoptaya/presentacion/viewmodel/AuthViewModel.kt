@@ -1,6 +1,5 @@
 package com.example.adoptaya.presentacion.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,16 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.adoptaya.data.model.Usuario
 import com.example.adoptaya.dominio.usecase.auth.CerrarSesionUseCase
-import com.example.adoptaya.dominio.usecase.auth.IngresarComoInvitadoUseCase
 import com.example.adoptaya.dominio.usecase.auth.IniciarSesionUseCase
 import com.example.adoptaya.dominio.usecase.auth.ObtenerIdUsuarioActualUseCase
 import com.example.adoptaya.dominio.usecase.auth.RecuperarPasswordUseCase
 import com.example.adoptaya.dominio.usecase.auth.RegistrarUseCase
 import com.example.adoptaya.dominio.usecase.usuario.CrearUsuarioUseCase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -112,7 +108,7 @@ class AuthViewModel(
                     idUsuarioActual = uid
                     val nuevoUsuario = Usuario(
                         id = uid,
-                        nombre = nombre,
+                        nombre = nombre.capitalizarPalabras(),
                         email = email,
                         telefono = telefonoCompleto,
                         latitud = 0.0,  // Provisorio hasta que edite su perfil
@@ -190,6 +186,12 @@ class AuthViewModel(
                 // Si Firebase devuelve un error (ej: el usuario no existe)
                 onError(excepcion.message ?: "Error al enviar el correo")
             }
+        }
+    }
+
+    fun String.capitalizarPalabras(): String {
+        return this.lowercase().split(" ").joinToString(" ") {
+            it.replaceFirstChar { char -> char.uppercase() }
         }
     }
 }

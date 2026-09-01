@@ -55,14 +55,14 @@ fun PantallaPerfil(
     alEditarPerfil: () -> Unit
 ) {
 
-    val usuario = usuarioViewModel.usuarioSeleccionado
     val alertaPerfil = usuarioViewModel.perfilEstaIncompleto
     val contexto = LocalContext.current
     val esMiPerfil = usuarioId == authViewModel.idUsuarioActual
+    val usuario = if (esMiPerfil) usuarioViewModel.usuarioSeleccionado else usuarioViewModel.usuarioVisitado
     var mostrarModalLogin by remember { mutableStateOf(false) }
 
     LaunchedEffect(usuarioId) {
-        usuarioViewModel.cargarUsuarioPorId(usuarioId)
+        usuarioViewModel.cargarUsuarioPorId(usuarioId, esMiPerfil)
     }
 
     Scaffold(

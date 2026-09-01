@@ -50,7 +50,7 @@ fun PantallaMascotas(
         mascotaViewModel.cargarMascotas()
 
         if (idActual != null) {
-            usuarioViewModel.cargarUsuarioPorId(idActual)
+            usuarioViewModel.cargarUsuarioPorId(idActual, true)
         } else {
             usuarioViewModel.limpiarUsuario()
         }

@@ -48,7 +48,7 @@ fun PantallaMapa(
         mascotaViewModel.cargarMascotas()
 
         if (idActual != null) {
-            usuarioViewModel.cargarUsuarioPorId(idActual)
+            usuarioViewModel.cargarUsuarioPorId(idActual, true)
         }
     }
 

@@ -39,7 +39,7 @@ fun PantallaFavoritos(
     LaunchedEffect(idActual) {
         if (idActual != null) {
             favoritoViewModel.cargarFavoritosDeUsuario(idActual)
-            usuarioViewModel.cargarUsuarioPorId(idActual)
+            usuarioViewModel.cargarUsuarioPorId(idActual, true)
         }
     }
 

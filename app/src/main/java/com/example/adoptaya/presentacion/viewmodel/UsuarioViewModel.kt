@@ -12,7 +12,6 @@ import com.example.adoptaya.data.remoto.model.ProvinciaGeoref
 import com.example.adoptaya.dominio.usecase.usuario.ActualizarUsuarioUseCase
 import com.example.adoptaya.dominio.usecase.usuario.ObtenerUsuarioPorIdUseCase
 import com.example.adoptaya.dominio.usecase.usuario.VerificarPerfilIncompletoUseCase
-import com.google.android.play.integrity.internal.ac
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,10 +21,13 @@ class UsuarioViewModel (
     private val verificarPerfilIncompletoUseCase: VerificarPerfilIncompletoUseCase,
     private val actualizarUsuarioUseCase: ActualizarUsuarioUseCase
 ) : ViewModel() {
-    var usuarioSeleccionado by mutableStateOf<Usuario?>(null)
+    var usuarioSeleccionado by mutableStateOf<Usuario?>(null) // Para mostrar mi propio perfil
+        private set
+    var usuarioVisitado by mutableStateOf<Usuario?>(null) // Para mostrar el perfil de otro usuario
         private set
     var perfilEstaIncompleto by mutableStateOf(false)
         private set
+
     private val apiGeoref = GeorefApi.crear()
     var listaProvincias by mutableStateOf(emptyList<ProvinciaGeoref>())
     var listaLocalidades by mutableStateOf(emptyList<LocalidadGeoref>())
@@ -38,11 +40,16 @@ class UsuarioViewModel (
         cargarProvincias()
     }
 
-    fun cargarUsuarioPorId(id: String) {
+    fun cargarUsuarioPorId(id: String, esMiPerfil: Boolean) {
         viewModelScope.launch {
-            usuarioSeleccionado = obtenerUsuarioPorIdUseCase(id)
+            val resultado = obtenerUsuarioPorIdUseCase(id)
 
-            perfilEstaIncompleto = verificarPerfilIncompletoUseCase(usuarioSeleccionado)
+            if (esMiPerfil) {
+                usuarioSeleccionado = resultado
+                perfilEstaIncompleto = verificarPerfilIncompletoUseCase(usuarioSeleccionado)
+            } else {
+                usuarioVisitado = resultado
+            }
         }
     }
 
@@ -84,7 +91,7 @@ class UsuarioViewModel (
             }
 
             val usuarioActualizado = usuarioActual.copy(
-                nombre = nombreNuevo,
+                nombre = nombreNuevo.capitalizarPalabras(),
                 provincia = provinciaNueva,
                 ciudad = ciudadNueva,
                 latitud = lat,
@@ -137,5 +144,11 @@ class UsuarioViewModel (
         outputStream.close()
 
         return archivoLocal.absolutePath
+    }
+
+    fun String.capitalizarPalabras(): String {
+        return this.lowercase().split(" ").joinToString(" ") {
+            it.replaceFirstChar { char -> char.uppercase() }
+        }
     }
 }
