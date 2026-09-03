@@ -20,6 +20,8 @@ class NotificacionViewModel (
 ) : ViewModel() {
     var notificacionesDeUsuario by mutableStateOf<List<Notificacion>>(emptyList())
         private set
+    var filtroActual by mutableStateOf("Todas")
+        private set
 
     fun cargarNotificacionesDeUsuario(idUsuario: String) {
         viewModelScope.launch {
@@ -32,6 +34,7 @@ class NotificacionViewModel (
         idReceptor: String,
         idMascota: String,
         nombreMascota: String,
+        imagenMascota: String?,
         onSuccess: (String) -> Unit
     ) {
         val idNoti = UUID.randomUUID().toString()
@@ -39,7 +42,7 @@ class NotificacionViewModel (
             id = idNoti,
             titulo = "Nueva solicitud de contacto",
             descripcion = "Alguien está interesado en adoptar a "+nombreMascota+". ¡Contactalo por WhatsApp!",
-            imagen = null,
+            imagen = imagenMascota,
             tipo = Enums.TipoNotificacion.CONTACTO,
             leida = false,
             fechaHora = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
@@ -54,13 +57,13 @@ class NotificacionViewModel (
         }
     }
 
-    fun enviarNotificacionFavorito(idEmisor: String, idReceptor: String, idMascota: String, nombreMascota: String, onSuccess: (String) -> Unit) {
+    fun enviarNotificacionFavorito(idEmisor: String, idReceptor: String, idMascota: String, nombreMascota: String, imagenMascota: String?, onSuccess: (String) -> Unit) {
         val idNoti = UUID.randomUUID().toString()
         val noti = Notificacion(
             id = idNoti,
             titulo = "¡A alguien le gusta tu mascota!",
             descripcion = "$nombreMascota fue agregado a favoritos.",
-            imagen = null,
+            imagen = imagenMascota,
             tipo = Enums.TipoNotificacion.FAVORITO,
             leida = false,
             fechaHora = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
@@ -75,13 +78,13 @@ class NotificacionViewModel (
     }
 
     // Mandamos la notificación al mismo creador para la demostracion
-    fun enviarNotificacionNuevaMascota(idDueño: String, idMascota: String, nombreMascota: String, onSuccess: (String) -> Unit) {
+    fun enviarNotificacionNuevaMascota(idDueño: String, idMascota: String, nombreMascota: String, imagenMascota: String?, onSuccess: (String) -> Unit) {
         val idNoti = UUID.randomUUID().toString()
         val noti = Notificacion(
             id = idNoti,
             titulo = "¡Nueva mascota publicada!",
             descripcion = "Se acaba de sumar "+nombreMascota+" y buscando un hogar.",
-            imagen = null,
+            imagen = imagenMascota,
             tipo = Enums.TipoNotificacion.NUEVA_MASCOTA,
             leida = false,
             fechaHora = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
@@ -92,6 +95,44 @@ class NotificacionViewModel (
         viewModelScope.launch {
             guardarNotificacion(noti)
             onSuccess(idNoti)
+        }
+    }
+
+    fun cambiarFiltro(nuevoFiltro: String) {
+        filtroActual = nuevoFiltro
+    }
+
+    val notificacionesFiltradas: List<Notificacion>
+        get() = when (filtroActual) {
+            "Solicitudes" -> notificacionesDeUsuario.filter { it.tipo == Enums.TipoNotificacion.CONTACTO }
+            "Favoritos" -> notificacionesDeUsuario.filter { it.tipo == Enums.TipoNotificacion.FAVORITO }
+            "Nuevas mascotas" -> notificacionesDeUsuario.filter { it.tipo == Enums.TipoNotificacion.NUEVA_MASCOTA }
+            else -> notificacionesDeUsuario // "Todas"
+        }
+
+    fun marcarComoLeida(notificacion: Notificacion) {
+        if (!notificacion.leida) {
+            val notiLeida = notificacion.copy(leida = true)
+            viewModelScope.launch {
+                guardarNotificacion(notiLeida) // Se actualiza la notificacion existente
+                notificacionesDeUsuario = notificacionesDeUsuario.map { if (it.id == notiLeida.id) notiLeida else it }
+            }
+        }
+    }
+
+    fun obtenerTiempoTranscurrido(fechaHoraString: String): String {
+        return try {
+            val fechaNoti = LocalDateTime.parse(fechaHoraString, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            val ahora = LocalDateTime.now()
+            val minutos = java.time.Duration.between(fechaNoti, ahora).toMinutes()
+
+            when {
+                minutos < 60 -> "Hace $minutos min"
+                minutos < 1440 -> "Hace ${minutos / 60} h" // 1440 mins = 24 horas
+                else -> "Hace ${minutos / 1440} d" // Solo llega a contar por dias
+            }
+        } catch (e: Exception) {
+            "Hace un momento"
         }
     }
 }

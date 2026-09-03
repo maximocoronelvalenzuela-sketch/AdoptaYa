@@ -675,6 +675,7 @@ fun PantallaPublicarMascota(
 
             // Boton de Publicar
             val nombreCapturado = publicarMascotaViewModel.nombre
+            val primeraImagen = publicarMascotaViewModel.imagenesSeleccionadas.firstOrNull()
             Button(
                 onClick = {
                     publicarMascotaViewModel.guardarMascota { idMascotaGenerado ->
@@ -684,6 +685,7 @@ fun PantallaPublicarMascota(
                             idDueño = idDueño,
                             idMascota = idMascotaGenerado,
                             nombreMascota = nombreCapturado,
+                            imagenMascota = primeraImagen,
                             onSuccess = { idGenerado ->
                                 // Se genera la notificacion
                                 val datos = androidx.work.workDataOf(

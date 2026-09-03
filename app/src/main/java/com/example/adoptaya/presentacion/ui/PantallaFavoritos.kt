@@ -90,12 +90,13 @@ fun PantallaFavoritos(
                         if (idActual != null) {
                             favoritoViewModel.toggleFavorito(idActual, mascota)
 
-                            if (!esFav) {
+                            if (!esFav && idActual != mascota.idUsuario) {
                                 notificacionViewModel.enviarNotificacionFavorito(
                                     idEmisor = idActual,
                                     idReceptor = mascota.idUsuario,
                                     idMascota = mascota.id,
                                     nombreMascota = mascota.nombre,
+                                    imagenMascota = mascota.imagenes[0],
                                     onSuccess = { idGenerado ->
                                         val datos = androidx.work.workDataOf(
                                             "titulo" to "¡A alguien le gusta tu mascota!",

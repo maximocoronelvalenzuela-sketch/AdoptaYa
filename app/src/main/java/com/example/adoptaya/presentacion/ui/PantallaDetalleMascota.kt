@@ -73,28 +73,39 @@ fun PantallaDetalleMascota(
                 // Boton de WhatsApp fijo abajo
                 alClickearContactar = {
                     if (idActual != null) {
-                       notificacionViewModel.enviarSolicitudDeContacto(
-                           idEmisor = idActual, // U1
-                           idReceptor = mascota.idUsuario, // U2
-                           idMascota = mascota.id,
-                           nombreMascota = mascota.nombre,
-                           onSuccess = { idGenerado ->
-                               android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
+                        if (idActual != mascota.idUsuario) {
+                            notificacionViewModel.enviarSolicitudDeContacto(
+                                idEmisor = idActual, // U1
+                                idReceptor = mascota.idUsuario, // U2
+                                idMascota = mascota.id,
+                                nombreMascota = mascota.nombre,
+                                imagenMascota = mascota.imagenes[0],
+                                onSuccess = { idGenerado ->
+                                    android.widget.Toast.makeText(
+                                        contexto,
+                                        "Solicitud de contacto enviada al dueño",
+                                        android.widget.Toast.LENGTH_LONG
+                                    ).show()
 
-                               // Se genera la notificacion
-                               val datos = androidx.work.workDataOf(
-                                   "titulo" to "Nueva solicitud de contacto",
-                                   "descripcion" to "Alguien está interesado en adoptar a "+mascota.nombre+".",
-                                   "notificacionId" to idGenerado
-                               )
-                               val peticionNoti = androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()
-                                   .setInputData(datos)
-                                   .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
-                                   .build()
+                                    // Se genera la notificacion
+                                    val datos = androidx.work.workDataOf(
+                                        "titulo" to "Nueva solicitud de contacto",
+                                        "descripcion" to "Alguien está interesado en adoptar a " + mascota.nombre + ".",
+                                        "notificacionId" to idGenerado
+                                    )
+                                    val peticion =
+                                        androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()
+                                            .setInputData(datos)
+                                            .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
+                                            .build()
 
-                               androidx.work.WorkManager.getInstance(contexto).enqueue(peticionNoti)
-                           }
-                       )
+                                    androidx.work.WorkManager.getInstance(contexto)
+                                        .enqueue(peticion)
+                                }
+                            )
+                        } else {
+                            android.widget.Toast.makeText(contexto, "Esta es tu propia mascota", android.widget.Toast.LENGTH_SHORT).show()
+                        }
                     } else {
                         // Es un usuario Invitado
                         mostrarModalLogin = true

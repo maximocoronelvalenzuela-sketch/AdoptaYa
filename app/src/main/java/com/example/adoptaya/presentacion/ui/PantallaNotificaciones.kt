@@ -6,9 +6,11 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,7 +48,8 @@ fun PantallaNotificaciones(
     alClickearMascota: (String) -> Unit,
     alClickearPerfil: (String) -> Unit
 ) {
-    val notificaciones = notificacionViewModel.notificacionesDeUsuario
+    //val notificaciones = notificacionViewModel.notificacionesDeUsuario
+    val notificaciones = notificacionViewModel.notificacionesFiltradas
     val idActual = authViewModel.idUsuarioActual
 
     // Estado para controlar qué notificación mostrar en el modal (null = cerrado)
@@ -91,12 +94,18 @@ fun PantallaNotificaciones(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                ChipFiltro(texto = "Todas", seleccionado = true)
-                ChipFiltro(texto = "Solicitudes", seleccionado = false)
-                ChipFiltro(texto = "Mascotas", seleccionado = false)
+                val opcionesFiltro = listOf("Todas", "Solicitudes", "Favoritos", "Nuevas mascotas")
+                opcionesFiltro.forEach { filtro ->
+                    ChipFiltro(
+                        texto = filtro,
+                        seleccionado = notificacionViewModel.filtroActual == filtro,
+                        alClickear = { notificacionViewModel.cambiarFiltro(filtro) }
+                    )
+                }
             }
 
 
@@ -106,21 +115,14 @@ fun PantallaNotificaciones(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                item {
-                    Text(
-                        "HOY",
-                        color = Color.Gray,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .padding(bottom = 8.dp))
-                }
-
                 items(notificaciones) { noti ->
                     ItemNotificacion(
                         notificacion = noti,
-                        alClickear = { notificacionSeleccionada = noti },
-
+                        tiempoTranscurrido = notificacionViewModel.obtenerTiempoTranscurrido(noti.fechaHora),
+                        alClickear = {
+                            notificacionViewModel.marcarComoLeida(noti)
+                            notificacionSeleccionada = noti
+                        }
                     )
                 }
             }
@@ -137,6 +139,8 @@ fun PantallaNotificaciones(
             DialogoDetalleNotificacion(
                 notificacion = noti,
                 telefonoEmisor = emisor?.telefono,
+                nombreEmisor = emisor?.nombre ?: "Cargando...",
+                fotoEmisor = emisor?.imagen,
                 onDismiss = {
                     notificacionSeleccionada = null
                     usuarioViewModel.limpiarUsuario()
@@ -157,11 +161,12 @@ fun PantallaNotificaciones(
 
 // Componentes de la misma pantalla (modularidad)
 @Composable
-fun ChipFiltro(texto: String, seleccionado: Boolean) {
+fun ChipFiltro(texto: String, seleccionado: Boolean, alClickear: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = if (seleccionado) Color(0xFFE85A13) else Color.White,
-        border = if (!seleccionado) BorderStroke(1.dp, Color(0xFFEEEEEE)) else null
+        border = if (!seleccionado) BorderStroke(1.dp, Color(0xFFEEEEEE)) else null,
+        modifier = Modifier.clickable { alClickear() }
     ) {
         Text(
             text = texto,
@@ -174,7 +179,7 @@ fun ChipFiltro(texto: String, seleccionado: Boolean) {
 }
 
 @Composable
-fun ItemNotificacion(notificacion: Notificacion, alClickear: () -> Unit) {
+fun ItemNotificacion(notificacion: Notificacion, tiempoTranscurrido: String, alClickear: () -> Unit) {
     Surface(
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, Color.LightGray),
@@ -190,14 +195,26 @@ fun ItemNotificacion(notificacion: Notificacion, alClickear: () -> Unit) {
             // Avatar
             Surface(
                 shape = CircleShape,
-                color = Color(0xFFFFF3E0),
+                color = if (notificacion.tipo == Enums.TipoNotificacion.FAVORITO) Color(0xFFFFEbee) else Color(0xFFFFF3E0),
                 modifier = Modifier.size(48.dp)
             ) {
-                Icon(
-                    Icons.Default.Person,
-                    contentDescription = null,
-                    tint = Color(0xFFE85A13),
-                    modifier = Modifier.padding(12.dp))
+                when (notificacion.tipo) {
+                    Enums.TipoNotificacion.FAVORITO -> {
+                        Icon(Icons.Default.Favorite, contentDescription = null, tint = Color.Red, modifier = Modifier.padding(12.dp))
+                    }
+                    else -> { // MASCOTA_NUEVA o CONTACTO
+                        if (!notificacion.imagen.isNullOrEmpty()) {
+                            coil.compose.AsyncImage(
+                                model = notificacion.imagen,
+                                contentDescription = "Foto mascota",
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        } else { // Si no hay foto
+                            Icon(Icons.Default.Pets, contentDescription = null, tint = Color(0xFFE85A13), modifier = Modifier.padding(12.dp))
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -219,7 +236,7 @@ fun ItemNotificacion(notificacion: Notificacion, alClickear: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Hace 10 min", // Hardcodeado por ahora
+                    text = tiempoTranscurrido,
                     fontSize = 12.sp,
                     color = Color(0xFFE85A13)
                 )
@@ -243,11 +260,21 @@ fun ItemNotificacion(notificacion: Notificacion, alClickear: () -> Unit) {
 fun DialogoDetalleNotificacion(
     notificacion: Notificacion,
     telefonoEmisor: String?,
+    nombreEmisor: String,
+    fotoEmisor: String?,
     onDismiss: () -> Unit,
     onNavegarAMascota: (String) -> Unit,
     onNavegarAPerfil: (String) -> Unit
 ) {
     val contexto = LocalContext.current
+
+    val textoFecha = try {
+        val fechaOriginal = java.time.LocalDateTime.parse(notificacion.fechaHora, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        val formateador = java.time.format.DateTimeFormatter.ofPattern("d/M/yyyy 'A LAS' hh:mm a", java.util.Locale("es", "AR"))
+        "RECIBIDO EL ${fechaOriginal.format(formateador).uppercase()}"
+    } catch (e: Exception) {
+        "FECHA DESCONOCIDA"
+    }
 
     Dialog(onDismissRequest = { onDismiss() }) {
         Surface(
@@ -275,14 +302,23 @@ fun DialogoDetalleNotificacion(
                     color = Color.LightGray,
                     modifier = Modifier.size(80.dp)
                 ) {
-                    // TODO: Foto perfil real del usuario
-                    Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.padding(16.dp), tint = Color.DarkGray)
+                    if (!fotoEmisor.isNullOrEmpty()) {
+                        coil.compose.AsyncImage(
+                            model = fotoEmisor,
+                            contentDescription = "Foto del usuario",
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.padding(16.dp), tint = Color.DarkGray)
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Nombre y Mensaje
-                Text("Juan Perez", fontWeight = FontWeight.Bold, fontSize = 22.sp)
+                Text(text = nombreEmisor, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+                Spacer(modifier = Modifier.height(16.dp))
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = Color(0xFFFFF6ED),  // Naranja tenue
@@ -291,7 +327,7 @@ fun DialogoDetalleNotificacion(
                     Text(
                         text = notificacion.descripcion,
                         modifier = Modifier.padding(16.dp),
-                        color = Color.Gray
+                        color = Color.DarkGray
                     )
                 }
 
@@ -351,8 +387,8 @@ fun DialogoDetalleNotificacion(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Footer de tiempo (TODO: hardcodeado)
-                Text("RECIBIDO HOY A LAS 10:45 AM", color = Color.LightGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                // Footer de tiempo
+                Text(text = textoFecha, color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
