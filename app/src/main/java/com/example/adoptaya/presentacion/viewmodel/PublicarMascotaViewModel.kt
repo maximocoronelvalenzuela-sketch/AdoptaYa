@@ -74,6 +74,9 @@ class PublicarMascotaViewModel(
     var numeroError by mutableStateOf<String?>(null)
     var descripcionError by mutableStateOf<String?>(null)
 
+    var estaPublicando by mutableStateOf(false)
+        private set
+
 
     init {
         cargarProvincias()
@@ -222,15 +225,16 @@ class PublicarMascotaViewModel(
         }
     }
 
-    fun guardarMascota(onSuccess: () -> Unit) {
+    fun guardarMascota(onSuccess: (String) -> Unit) {
         if (!validarDatos()) return
 
         val idActual = obtenerIdUsuarioActualUseCase()
 
         if(idActual == null) return
 
+        val idGenerado = UUID.randomUUID().toString()
         val nuevaMascota = Mascota(
-            id = UUID.randomUUID().toString(),
+            id = idGenerado,
             nombre = nombre,
             tipo = tipo,
             edad = edad,
@@ -257,9 +261,11 @@ class PublicarMascotaViewModel(
         )
 
         viewModelScope.launch {
+            estaPublicando = true
             guardarMascotaUseCase(nuevaMascota)
             limpiarFormulario()
-            onSuccess()
+            onSuccess(idGenerado)
+            estaPublicando = false
         }
     }
 

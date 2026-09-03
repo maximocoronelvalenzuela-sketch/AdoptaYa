@@ -1,5 +1,8 @@
 package com.example.adoptaya.presentacion.ui
 
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,12 +26,19 @@ fun PantallaLogin(
     alNavegarRegistro: () -> Unit,
     alNavegarRecuperarPassword: () -> Unit,
     alIngresarComoInvitado: () -> Unit,
-    alIniciarSesion: (String, String) -> Unit // Recibe email y contraseña
+    alLoginExitoso: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        // Acepte o rechace, el usuario entra al Home
+        alLoginExitoso()
+    }
 
     Column(
         modifier = Modifier
@@ -85,7 +95,19 @@ fun PantallaLogin(
         }
 
         Button(
-            onClick = { alIniciarSesion(email, password) },
+            onClick = {
+                authViewModel.iniciarSesion(email, password) {
+                    // Si el login fue exitoso, comprobamos la versión de Android
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        // Si es Android 13 o superior, pedimos el permiso.
+                        // Al responder, el permissionLauncher ejecutará alLoginExitoso()
+                        permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        // En Android 12 o inferior, el permiso se otorga al instalar. Pasa directo al Home
+                        alLoginExitoso()
+                    }
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             enabled = !authViewModel.estaCargando,
             colors = ButtonDefaults.buttonColors(

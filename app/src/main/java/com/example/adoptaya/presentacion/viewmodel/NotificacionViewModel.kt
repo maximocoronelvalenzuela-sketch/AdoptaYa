@@ -32,10 +32,11 @@ class NotificacionViewModel (
         idReceptor: String,
         idMascota: String,
         nombreMascota: String,
-        onSuccess: () -> Unit
+        onSuccess: (String) -> Unit
     ) {
+        val idNoti = UUID.randomUUID().toString()
         val nuevaNotificacion = Notificacion(
-            id = UUID.randomUUID().toString(),
+            id = idNoti,
             titulo = "Nueva solicitud de contacto",
             descripcion = "Alguien está interesado en adoptar a "+nombreMascota+". ¡Contactalo por WhatsApp!",
             imagen = null,
@@ -49,7 +50,48 @@ class NotificacionViewModel (
 
         viewModelScope.launch {
             guardarNotificacion(nuevaNotificacion)
-            onSuccess() // Se manda un mensaje en la pantalla
+            onSuccess(idNoti) // Se manda un mensaje en la pantalla
+        }
+    }
+
+    fun enviarNotificacionFavorito(idEmisor: String, idReceptor: String, idMascota: String, nombreMascota: String, onSuccess: (String) -> Unit) {
+        val idNoti = UUID.randomUUID().toString()
+        val noti = Notificacion(
+            id = idNoti,
+            titulo = "¡A alguien le gusta tu mascota!",
+            descripcion = "$nombreMascota fue agregado a favoritos.",
+            imagen = null,
+            tipo = Enums.TipoNotificacion.FAVORITO,
+            leida = false,
+            fechaHora = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+            idUsuario = idReceptor,
+            idMascota = idMascota,
+            idUsuarioEmisor = idEmisor
+        )
+        viewModelScope.launch {
+            guardarNotificacion(noti)
+            onSuccess(idNoti)
+        }
+    }
+
+    // Mandamos la notificación al mismo creador para la demostracion
+    fun enviarNotificacionNuevaMascota(idDueño: String, idMascota: String, nombreMascota: String, onSuccess: (String) -> Unit) {
+        val idNoti = UUID.randomUUID().toString()
+        val noti = Notificacion(
+            id = idNoti,
+            titulo = "¡Nueva mascota publicada!",
+            descripcion = "Se acaba de sumar "+nombreMascota+" y buscando un hogar.",
+            imagen = null,
+            tipo = Enums.TipoNotificacion.NUEVA_MASCOTA,
+            leida = false,
+            fechaHora = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+            idUsuario = idDueño,
+            idMascota = idMascota,
+            idUsuarioEmisor = idDueño
+        )
+        viewModelScope.launch {
+            guardarNotificacion(noti)
+            onSuccess(idNoti)
         }
     }
 }

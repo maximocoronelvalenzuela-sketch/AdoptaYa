@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +41,7 @@ fun PantallaNotificaciones(
     notificacionViewModel: NotificacionViewModel,
     authViewModel: AuthViewModel,
     usuarioViewModel: UsuarioViewModel,
+    notificacionIdInicial: String? = null,
     alVolver: () -> Unit,
     alClickearMascota: (String) -> Unit,
     alClickearPerfil: (String) -> Unit
@@ -50,9 +52,23 @@ fun PantallaNotificaciones(
     // Estado para controlar qué notificación mostrar en el modal (null = cerrado)
     var notificacionSeleccionada by remember { mutableStateOf<Notificacion?>(null) }
 
+    // Estado para controlar si el deep link ya fue consumido
+    var deepLinkConsumido by rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(idActual) {
         if (idActual != null) {
             notificacionViewModel.cargarNotificacionesDeUsuario(idActual)
+        }
+    }
+
+    // Efecto para abrir el modal automáticamente si llegamos desde el toque de la notificación
+    LaunchedEffect(notificaciones, notificacionIdInicial) {
+        if (notificacionIdInicial != null && notificaciones.isNotEmpty() && notificacionSeleccionada == null && !deepLinkConsumido) {
+            val notiEncontrada = notificaciones.find { it.id == notificacionIdInicial }
+            if (notiEncontrada != null) {
+                notificacionSeleccionada = notiEncontrada
+                deepLinkConsumido = true
+            }
         }
     }
 

@@ -13,7 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
+import com.example.adoptaya.data.servicios.NotificacionWorker
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.MascotaCard
 import com.example.adoptaya.presentacion.componentes.ModalRequiereLogin
@@ -22,6 +24,7 @@ import com.example.adoptaya.presentacion.navegacion.Pantallas
 import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
+import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 
 @Composable
@@ -30,6 +33,7 @@ fun PantallaMascotas(
     favoritoViewModel: FavoritoViewModel,
     authViewModel: AuthViewModel,
     usuarioViewModel: UsuarioViewModel,
+    notificacionViewModel: NotificacionViewModel,
     alClickearMascota: (String) -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearPerfil: () -> Unit,
@@ -41,6 +45,7 @@ fun PantallaMascotas(
 ) {
 
     val mascotas = mascotaViewModel.mascotas
+    val contexto = LocalContext.current
 
     var mostrarModalLogin by remember { mutableStateOf(false) }
     val idActual = authViewModel.idUsuarioActual
@@ -111,6 +116,27 @@ fun PantallaMascotas(
                     alClickearFavorito = {
                         if (idActual != null) {
                             favoritoViewModel.toggleFavorito(idActual, mascota)
+
+                            if (!esFav) {
+                                notificacionViewModel.enviarNotificacionFavorito(
+                                    idEmisor = idActual,
+                                    idReceptor = mascota.idUsuario,
+                                    idMascota = mascota.id,
+                                    nombreMascota = mascota.nombre,
+                                    onSuccess = { idGenerado ->
+                                        val datos = androidx.work.workDataOf(
+                                            "titulo" to "¡A alguien le gusta tu mascota!",
+                                            "descripcion" to mascota.nombre+" fue agregado a favoritos.",
+                                            "notificacionId" to idGenerado
+                                        )
+                                        val peticion = androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()
+                                            .setInputData(datos)
+                                            .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
+                                            .build()
+                                        androidx.work.WorkManager.getInstance(contexto).enqueue(peticion)
+                                    }
+                                )
+                            }
                         } else {
                             // Es un usuario Invitado
                             mostrarModalLogin = true

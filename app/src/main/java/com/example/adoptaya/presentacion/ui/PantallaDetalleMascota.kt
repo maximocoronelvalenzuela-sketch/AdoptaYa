@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.adoptaya.data.model.Enums
+import com.example.adoptaya.data.servicios.NotificacionWorker
 import com.example.adoptaya.presentacion.componentes.ModalRequiereLogin
 import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
@@ -47,6 +49,10 @@ fun PantallaDetalleMascota(
     alVolver: () -> Unit,
     alNavegarLogin: () -> Unit
 ) {
+    LaunchedEffect(mascotaId) {
+        mascotaViewModel.cargarMascotas()
+    }
+
     val mascota = mascotaViewModel.mascotas.find { it.id == mascotaId }
     val idActual = authViewModel.idUsuarioActual
 
@@ -72,8 +78,21 @@ fun PantallaDetalleMascota(
                            idReceptor = mascota.idUsuario, // U2
                            idMascota = mascota.id,
                            nombreMascota = mascota.nombre,
-                           onSuccess = {
+                           onSuccess = { idGenerado ->
                                android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
+
+                               // Se genera la notificacion
+                               val datos = androidx.work.workDataOf(
+                                   "titulo" to "Nueva solicitud de contacto",
+                                   "descripcion" to "Alguien está interesado en adoptar a "+mascota.nombre+".",
+                                   "notificacionId" to idGenerado
+                               )
+                               val peticionNoti = androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()
+                                   .setInputData(datos)
+                                   .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
+                                   .build()
+
+                               androidx.work.WorkManager.getInstance(contexto).enqueue(peticionNoti)
                            }
                        )
                     } else {

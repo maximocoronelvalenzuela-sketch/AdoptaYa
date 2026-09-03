@@ -1,5 +1,8 @@
 package com.example.adoptaya.presentacion.ui
 
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,13 +24,19 @@ import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 fun PantallaRegistro(
     authViewModel: AuthViewModel,
     alNavegarLogin: () -> Unit,
-    alRegistrar: (String, String, String, String) -> Unit // Recibe nombre, email, contraseña y telefono
+    alRegistroExitoso: () -> Unit
 ) {
     var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        alRegistroExitoso()
+    }
 
     Column(
         modifier = Modifier
@@ -133,7 +142,13 @@ fun PantallaRegistro(
 
         Button(
             onClick = {
-                alRegistrar(nombre, email, password, telefono)
+                authViewModel.registrar(nombre, email, password, telefono) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        alRegistroExitoso()
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             enabled = !authViewModel.estaCargando,

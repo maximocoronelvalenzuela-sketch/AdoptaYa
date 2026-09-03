@@ -45,6 +45,7 @@ fun Navegacion(
                 favoritoViewModel = favoritoViewModel,
                 authViewModel = authViewModel,
                 usuarioViewModel = usuarioViewModel,
+                notificacionViewModel = notificacionViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
@@ -99,6 +100,7 @@ fun Navegacion(
                 favoritoViewModel = favoritoViewModel,
                 usuarioViewModel = usuarioViewModel,
                 authViewModel = authViewModel,
+                notificacionViewModel = notificacionViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)
@@ -137,6 +139,7 @@ fun Navegacion(
                 mascotaViewModel = mascotaViewModel,
                 favoritoViewModel = favoritoViewModel,
                 authViewModel = authViewModel,
+                notificacionViewModel = notificacionViewModel,
                 alClickearInicio = {
                     navController.navigate(Pantallas.Mascotas.ruta) { launchSingleTop = true }
                 },
@@ -202,11 +205,23 @@ fun Navegacion(
             )
         }
 
-        composable(Pantallas.Notificaciones.ruta) {
+        composable(
+            Pantallas.Notificaciones.ruta,
+            // Escuchador del Deep Link
+            deepLinks = listOf(
+                androidx.navigation.navDeepLink {
+                    uriPattern = "adoptaya://notificaciones/{id}"
+                }
+            )
+        ) { backStackEntry ->
+            // Se obtiene el ID si entra por la notificación
+            val idNotiInicial = backStackEntry.arguments?.getString("id")
+
             PantallaNotificaciones(
                 notificacionViewModel = notificacionViewModel,
                 usuarioViewModel = usuarioViewModel,
                 authViewModel = authViewModel,
+                notificacionIdInicial = idNotiInicial,
                 alVolver = {
                     navController.popBackStack()
                 },
@@ -226,6 +241,8 @@ fun Navegacion(
         composable(Pantallas.Publicar.ruta) {
             PantallaPublicarMascota(
                 publicarMascotaViewModel = publicarMascotaViewModel,
+                authViewModel = authViewModel,
+                notificacionViewModel = notificacionViewModel,
                 onVolver = { navController.popBackStack() }
             )
         }
@@ -244,16 +261,10 @@ fun Navegacion(
                         }
                     )
                 },
-                alIniciarSesion = { email, password ->
-                    authViewModel.iniciarSesion(
-                        email = email,
-                        password = password,
-                        onExito = {
-                            navController.navigate(Pantallas.Mascotas.ruta) {
-                                popUpTo(Pantallas.Login.ruta) { inclusive = true }
-                            }
-                        }
-                    )
+                alLoginExitoso = {
+                    navController.navigate(Pantallas.Mascotas.ruta) {
+                        popUpTo(Pantallas.Login.ruta) { inclusive = true }
+                    }
                 }
             )
         }
@@ -266,19 +277,10 @@ fun Navegacion(
                         popUpTo(Pantallas.Registro.ruta) { inclusive = true }
                     }
                 },
-                alRegistrar = { nombre, email, password, telefono ->
-                    authViewModel.registrar(
-                        nombre = nombre,
-                        email = email,
-                        password = password,
-                        telefono = telefono,
-                        onExito = {
-                            navController.navigate(Pantallas.Mascotas.ruta) {
-                                popUpTo(Pantallas.Login.ruta) { inclusive = true }
-                                popUpTo(Pantallas.Registro.ruta) { inclusive = true }
-                            }
-                        }
-                    )
+                alRegistroExitoso = {
+                    navController.navigate(Pantallas.Mascotas.ruta) {
+                        popUpTo(Pantallas.Login.ruta) { inclusive = true }
+                    }
                 }
             )
         }

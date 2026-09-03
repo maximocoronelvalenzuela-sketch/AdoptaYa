@@ -28,6 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.adoptaya.data.model.Enums
+import com.example.adoptaya.data.servicios.NotificacionWorker
+import com.example.adoptaya.presentacion.componentes.TopBar
+import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
+import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 import com.example.adoptaya.presentacion.viewmodel.PublicarMascotaViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -37,6 +41,8 @@ import com.google.maps.android.compose.*
 @Composable
 fun PantallaPublicarMascota(
     publicarMascotaViewModel: PublicarMascotaViewModel,
+    authViewModel: AuthViewModel,
+    notificacionViewModel: NotificacionViewModel,
     onVolver: () -> Unit
 ) {
     val colorNaranja = Color(0xFFF28B2A)
@@ -44,19 +50,10 @@ fun PantallaPublicarMascota(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Nueva Publicación", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onVolver) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar")
-                    }
-                },
-                actions = {
-                    TextButton(onClick = { publicarMascotaViewModel.guardarMascota { onVolver() } }) {
-                        Text("Publicar", color = colorNaranja, fontWeight = FontWeight.Bold)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            TopBar(
+                titulo = "Nueva Publicación",
+                mostrarBotonVolver = true,
+                alVolver = onVolver
             )
         },
         containerColor = colorFondoPantalla
@@ -677,13 +674,48 @@ fun PantallaPublicarMascota(
 
 
             // Boton de Publicar
+            val nombreCapturado = publicarMascotaViewModel.nombre
             Button(
-                onClick = { publicarMascotaViewModel.guardarMascota { onVolver() } },
+                onClick = {
+                    publicarMascotaViewModel.guardarMascota { idMascotaGenerado ->
+                        val idDueño = authViewModel.idUsuarioActual ?: ""
+
+                        notificacionViewModel.enviarNotificacionNuevaMascota(
+                            idDueño = idDueño,
+                            idMascota = idMascotaGenerado,
+                            nombreMascota = nombreCapturado,
+                            onSuccess = { idGenerado ->
+                                // Se genera la notificacion
+                                val datos = androidx.work.workDataOf(
+                                    "titulo" to "¡Nueva mascota publicada!",
+                                    "descripcion" to nombreCapturado+" está buscando hogar.",
+                                    "notificacionId" to idGenerado
+                                )
+                                // Se arma una solicitud de trabajo nativa para que Android la ejecute una vez.
+                                val peticion = androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>() // Usa NotificacionWorker como molde
+                                    .setInputData(datos) // Le enviamos los datos
+                                    .build()
+
+                                // Se llama al gestor de tareas de Android para que ejecute la tarea
+                                androidx.work.WorkManager.getInstance(contexto).enqueue(peticion)
+                            }
+                        )
+                        onVolver()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = colorNaranja),
+                enabled = !publicarMascotaViewModel.estaPublicando,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorNaranja,
+                    disabledContainerColor = Color.LightGray
+                ),
                 shape = RoundedCornerShape(24.dp)
             ) {
-                Text("Crear Perfil", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                if (publicarMascotaViewModel.estaPublicando) {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                } else {
+                    Text("Crear Perfil", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
