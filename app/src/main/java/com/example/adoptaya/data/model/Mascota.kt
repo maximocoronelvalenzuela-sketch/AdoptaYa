@@ -28,5 +28,6 @@ data class Mascota(
     val numero: String,
     val imagenes: List<String>, // Lista de links. Requiere Converter
     val fechaHoraAlta: String,
-    val idUsuario: String
+    val idUsuario: String,
+    val activa: Boolean = true
 )

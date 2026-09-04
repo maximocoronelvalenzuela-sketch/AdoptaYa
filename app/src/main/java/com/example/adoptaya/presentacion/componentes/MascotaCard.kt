@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Female
@@ -54,7 +55,9 @@ fun MascotaCard(
     alClickearMascota: () -> Unit,
     alClickearPerfilDueño: () -> Unit,
     alClickearFavorito: () -> Unit,
-    esFavorito: Boolean = false
+    alClickearBorrar: () -> Unit = {},
+    esFavorito: Boolean = false,
+    esMiMascota: Boolean = false,
 ) {
 
     ElevatedCard(
@@ -129,18 +132,30 @@ fun MascotaCard(
                                 )
                             }
                         }
-
-                        // Botón de Favoritos (Corazón)
-                        IconButton(
-                            onClick = { alClickearFavorito() },
-                            modifier = Modifier.size(32.dp),
-                            colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
-                        ) {
-                            Icon(
-                                imageVector = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = "Agregar a favoritos",
-                                tint = Color.White
-                            )
+                        // Botones Favorito + Borrar
+                        Row {
+                            // Borrar
+                            if (esMiMascota) {
+                                IconButton(
+                                    onClick = { alClickearBorrar() },
+                                    modifier = Modifier.size(32.dp).padding(end = 8.dp),
+                                    colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
+                                ) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Borrar publicación", tint = Color.White)
+                                }
+                            }
+                            // Favoritos (Corazón)
+                            IconButton(
+                                onClick = { alClickearFavorito() },
+                                modifier = Modifier.size(32.dp),
+                                colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
+                            ) {
+                                Icon(
+                                    imageVector = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                    contentDescription = "Agregar a favoritos",
+                                    tint = Color.White
+                                )
+                            }
                         }
                     }
                 }

@@ -65,6 +65,8 @@ fun PantallaPerfil(
     val esMiPerfil = usuarioId == authViewModel.idUsuarioActual
     val usuario = if (esMiPerfil) usuarioViewModel.usuarioSeleccionado else usuarioViewModel.usuarioVisitado
     var mostrarModalLogin by remember { mutableStateOf(false) }
+    var mostrarModalBorrar by remember { mutableStateOf(false) }
+    var mascotaABorrar by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(usuarioId) {
         usuarioViewModel.cargarUsuarioPorId(usuarioId, esMiPerfil)
@@ -318,7 +320,12 @@ fun PantallaPerfil(
                                             mostrarModalLogin = true
                                         }
                                     },
-                                    esFavorito = esFav
+                                    alClickearBorrar = {
+                                        mascotaABorrar = mascota.id
+                                        mostrarModalBorrar = true
+                                    },
+                                    esFavorito = esFav,
+                                    esMiMascota = esMiPerfil
                                 )
                             }
                         }
@@ -329,15 +336,39 @@ fun PantallaPerfil(
                 }
             }
         }
+    }
 
-        if (mostrarModalLogin) {
-            ModalRequiereLogin(
-                onDismiss = { mostrarModalLogin = false },
-                onConfirmar = {
-                    mostrarModalLogin = false
-                    alNavegarLogin()
+    if (mostrarModalLogin) {
+        ModalRequiereLogin(
+            onDismiss = { mostrarModalLogin = false },
+            onConfirmar = {
+                mostrarModalLogin = false
+                alNavegarLogin()
+            }
+        )
+    }
+
+    if (mostrarModalBorrar && mascotaABorrar != null) {
+        AlertDialog(
+            onDismissRequest = { mostrarModalBorrar = false },
+            title = { Text("¿Borrar publicación?", fontWeight = FontWeight.Bold) },
+            text = { Text("Esta acción borrará la publicación de tu mascota. ¿Estás seguro?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mascotaViewModel.borrarPublicacion(mascotaABorrar!!)
+                        mostrarModalBorrar = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("Borrar")
                 }
-            )
-        }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarModalBorrar = false }) {
+                    Text("Cancelar", color = Color.Gray)
+                }
+            }
+        )
     }
 }

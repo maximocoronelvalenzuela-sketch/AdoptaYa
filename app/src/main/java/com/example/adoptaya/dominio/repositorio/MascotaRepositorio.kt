@@ -12,4 +12,6 @@ interface MascotaRepositorio {
     suspend fun filtrarMascotasPorSexo(sexo: String): List<Mascota>
 
     suspend fun guardarMascota(mascota: Mascota)
+
+    suspend fun darDeBajaMascota(idMascota: String)
 }

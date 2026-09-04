@@ -6,13 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.adoptaya.data.model.Mascota
+import com.example.adoptaya.dominio.usecase.mascota.DarDeBajaMascotaUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotasUseCase
 import kotlinx.coroutines.launch
 
 class MascotaViewModel (
     private val obtenerMascotasUseCase: ObtenerMascotasUseCase,
-    private val obtenerMascotaPorIdUseCase: ObtenerMascotaPorIdUseCase
+    private val obtenerMascotaPorIdUseCase: ObtenerMascotaPorIdUseCase,
+    private val darDeBajaMascotaUseCase: DarDeBajaMascotaUseCase
 ) : ViewModel() {
     var mascotas by mutableStateOf<List<Mascota>>(emptyList())
         private set // Propiedad con getter público y setter privado para gestionar el estado de Compose.
@@ -47,6 +49,13 @@ class MascotaViewModel (
             }
         } catch (e: Exception) {
             "hace un momento"
+        }
+    }
+
+    fun borrarPublicacion(idMascota: String) {
+        viewModelScope.launch {
+            darDeBajaMascotaUseCase(idMascota)
+            cargarMascotas()
         }
     }
 }

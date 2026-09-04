@@ -27,4 +27,8 @@ class MascotaRepositorioImpl(
     override suspend fun guardarMascota(mascota: Mascota) {
         mascotaDao.insertarMascota(mascota)
     }
+
+    override suspend fun darDeBajaMascota(idMascota: String) {
+        mascotaDao.darDeBajaMascota(idMascota)
+    }
 }
