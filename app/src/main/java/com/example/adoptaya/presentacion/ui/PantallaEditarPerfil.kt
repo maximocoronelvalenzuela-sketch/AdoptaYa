@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
+import com.example.adoptaya.util.hayConexionAInternet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,17 +43,30 @@ fun PantallaEditarPerfil(
     val contexto = LocalContext.current
     val usuario = usuarioViewModel.usuarioSeleccionado
 
+    var sinInternet by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        val noHayRed = !hayConexionAInternet(contexto)
+        sinInternet = noHayRed
+
+        // Si hay internet y todavía no se tienen las provincias, se piden
+        if (!noHayRed && usuarioViewModel.listaProvincias.isEmpty()) {
+            usuarioViewModel.cargarProvincias(hayInternet = true)
+        } else if (noHayRed && usuarioViewModel.listaProvincias.isEmpty()) {
+            // Fuerza el mensaje de error si se entra sin red
+            usuarioViewModel.cargarProvincias(hayInternet = false)
+        }
+    }
+
     var nombre by remember { mutableStateOf(usuario?.nombre ?: "") }
     var provincia by remember { mutableStateOf(usuario?.provincia ?: "") }
     var ciudad by remember { mutableStateOf(usuario?.ciudad ?: "") }
     var imagenSeleccionada by remember { mutableStateOf(usuario?.imagen) }
+    var mostrarDialogoDescarte by remember { mutableStateOf(false) }
 
     val hayCambiosSinGuardar = nombre != (usuario?.nombre ?: "") ||
             provincia != (usuario?.provincia ?: "") ||
             ciudad != (usuario?.ciudad ?: "") ||
             imagenSeleccionada != usuario?.imagen
-
-    var mostrarDialogoDescarte by remember { mutableStateOf(false) }
 
     // Launcher de la galería (para 1 sola imagen)
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -124,7 +139,7 @@ fun PantallaEditarPerfil(
                     ciudad = ""
                     // Buscamos el objeto (Provincia) original de la API para buscar sus localidades
                     val provAPI = usuarioViewModel.listaProvincias.find { it.nombre == nombreProvincia }
-                    if (provAPI != null) usuarioViewModel.cargarLocalidadesPorProvincia(provAPI)
+                    if (provAPI != null) usuarioViewModel.cargarLocalidadesPorProvincia(provAPI, hayInternet = !sinInternet)
                 }
             )
 
@@ -166,7 +181,7 @@ fun PantallaEditarPerfil(
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = !usuarioViewModel.estaGuardandoPerfil && hayCambiosSinGuardar && nombre.isNotBlank() && ciudad.isNotBlank(),
+                enabled = !usuarioViewModel.estaGuardandoPerfil && hayCambiosSinGuardar && nombre.isNotBlank() && ciudad.isNotBlank() && !sinInternet,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFE85A13),
                     disabledContainerColor = Color.LightGray

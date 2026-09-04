@@ -36,10 +36,6 @@ class UsuarioViewModel (
     var errorApiGeoref by mutableStateOf<String?>(null)
         private set
 
-    init {
-        cargarProvincias()
-    }
-
     fun cargarUsuarioPorId(id: String, esMiPerfil: Boolean) {
         viewModelScope.launch {
             val resultado = obtenerUsuarioPorIdUseCase(id)
@@ -114,7 +110,14 @@ class UsuarioViewModel (
     }
 
     // Ubicacion
-    private fun cargarProvincias() {
+    fun cargarProvincias(hayInternet: Boolean) {
+        if (!hayInternet) {
+            errorApiGeoref = "No hay conexión a internet para cargar las provincias."
+            return
+        }
+
+        errorApiGeoref = null
+
         viewModelScope.launch {
             try {
                 val respuesta = apiGeoref.obtenerProvincias()
@@ -125,7 +128,14 @@ class UsuarioViewModel (
         }
     }
 
-    fun cargarLocalidadesPorProvincia(provincia: ProvinciaGeoref) {
+    fun cargarLocalidadesPorProvincia(provincia: ProvinciaGeoref, hayInternet: Boolean) {
+        if (!hayInternet) {
+            errorApiGeoref = "No hay conexión a internet para cargar las ciudades."
+            return
+        }
+
+        errorApiGeoref = null
+
         viewModelScope.launch {
             try {
                 val respuesta = apiGeoref.obtenerLocalidades(provincia.id)

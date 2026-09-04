@@ -28,6 +28,7 @@ import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
+import com.example.adoptaya.util.hayConexionAInternet
 
 @Composable
 fun PantallaMascotas(

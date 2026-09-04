@@ -52,7 +52,12 @@ class AuthViewModel(
         idUsuarioActual = obtenerIdUsuarioActualUseCase()
     }
 
-    fun iniciarSesion(email: String, password: String, onExito: () -> Unit) {
+    fun iniciarSesion(email: String, password: String, hayInternet: Boolean, onExito: () -> Unit) {
+        if (!hayInternet) {
+            mensajeError = "No hay conexión a internet para iniciar sesión."
+            return
+        }
+
         viewModelScope.launch {
             estaCargando = true
             mensajeError = null
@@ -69,13 +74,14 @@ class AuthViewModel(
         }
     }
 
-    fun registrar(nombre: String, email: String, password: String, telefono: String, onExito: () -> Unit) {
+    fun registrar(nombre: String, email: String, password: String, telefono: String, hayInternet: Boolean, onExito: () -> Unit) {
+        if (!hayInternet) {
+            mensajeError = "No hay conexión a internet para registrarte."
+            return
+        }
+
         viewModelScope.launch {
-            estaCargando = true
-            mensajeErrorNombre = null
-            mensajeErrorEmail = null
-            mensajeErrorPassword = null
-            mensajeErrorTelefono = null
+            limpiarTodosLosErrores()
 
             var todoValido = true
             if (nombre.isBlank()) {
@@ -99,9 +105,10 @@ class AuthViewModel(
             }
 
             if (todoValido) {
+                estaCargando = true
+
                 val telefonoCompleto = "549$telefono"
 
-                estaCargando = true
                 val resultado = registrarUseCase(nombre, email, password, telefonoCompleto)
 
                 resultado.onSuccess { uid ->
@@ -168,11 +175,20 @@ class AuthViewModel(
         }
     }
 
-    fun enviarCorreoRecuperacion(
-        email: String,
-        onExito: () -> Unit,
-        onError: (String) -> Unit
-    ) {
+    fun limpiarTodosLosErrores() {
+        mensajeError = null
+        mensajeErrorNombre = null
+        mensajeErrorEmail = null
+        mensajeErrorPassword = null
+        mensajeErrorTelefono = null
+    }
+
+    fun enviarCorreoRecuperacion(email: String, hayInternet: Boolean, onExito: () -> Unit, onError: (String) -> Unit) {
+        if (!hayInternet) {
+            onError("Revisá tu conexión a internet para recuperar la contraseña.")
+            return
+        }
+
         viewModelScope.launch {
             estaCargando = true
 

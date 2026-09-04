@@ -44,6 +44,12 @@ fun PantallaMapa(
     var mostrarModalLogin by remember { mutableStateOf(false) }
     val idActual = authViewModel.idUsuarioActual
     val alertaPerfil = usuarioViewModel.perfilEstaIncompleto
+    val santiago = LatLng(-27.7951, -64.2615)
+    val cameraPositionState =
+        rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(santiago, 12f)
+        }
+    val usuario = usuarioViewModel.usuarioSeleccionado
 
     LaunchedEffect(idActual) {
         mascotaViewModel.cargarMascotas()
@@ -53,18 +59,16 @@ fun PantallaMapa(
         }
     }
 
-    val santiago = LatLng(
-        -27.7951,
-        -64.2615
-    )
+    LaunchedEffect(usuario?.latitud, usuario?.longitud) {
+        if (usuario != null && usuario.latitud != 0.0 && usuario.longitud != 0.0) {
+            val ciudadUsuario = LatLng(usuario.latitud, usuario.longitud)
 
-    val cameraPositionState =
-        rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(
-                santiago,
-                12f
+            cameraPositionState.animate(
+                update = com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom(ciudadUsuario, 12f),
+                durationMs = 1500 // 1,5 segundos
             )
         }
+    }
 
     Scaffold(
         topBar = {
