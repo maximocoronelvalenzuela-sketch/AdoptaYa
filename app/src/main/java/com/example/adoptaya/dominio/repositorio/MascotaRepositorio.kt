@@ -1,5 +1,6 @@
 package com.example.adoptaya.dominio.repositorio
 
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Mascota
 
 interface MascotaRepositorio {
@@ -14,4 +15,6 @@ interface MascotaRepositorio {
     suspend fun guardarMascota(mascota: Mascota)
 
     suspend fun darDeBajaMascota(idMascota: String)
+
+    suspend fun actualizarEstadoMascota(idMascota: String, nuevoEstado: Enums.EstadoMascota)
 }

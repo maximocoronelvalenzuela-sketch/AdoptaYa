@@ -1,6 +1,7 @@
 package com.example.adoptaya.data.repositorio
 
 import com.example.adoptaya.data.local.dao.MascotaDao
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Mascota
 import com.example.adoptaya.dominio.repositorio.MascotaRepositorio
 
@@ -30,5 +31,9 @@ class MascotaRepositorioImpl(
 
     override suspend fun darDeBajaMascota(idMascota: String) {
         mascotaDao.darDeBajaMascota(idMascota)
+    }
+
+    override suspend fun actualizarEstadoMascota(idMascota: String, nuevoEstado: Enums.EstadoMascota) {
+        mascotaDao.actualizarEstadoMascota(idMascota, nuevoEstado)
     }
 }

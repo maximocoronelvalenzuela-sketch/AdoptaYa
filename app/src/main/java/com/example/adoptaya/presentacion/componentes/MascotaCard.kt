@@ -20,10 +20,13 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Female
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,6 +36,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +63,7 @@ fun MascotaCard(
     alClickearPerfilDueño: () -> Unit,
     alClickearFavorito: () -> Unit,
     alClickearBorrar: () -> Unit = {},
+    alCambiarEstado: (Enums.EstadoMascota) -> Unit = {},
     esFavorito: Boolean = false,
     esMiMascota: Boolean = false,
 ) {
@@ -88,9 +96,8 @@ fun MascotaCard(
                 ) {
                     // La imagen de internet
                     AsyncImage(
-                        // Toma la primera imagen de la lista. Si está vacía o hay error, podrías poner un placeholder
-                        model = mascota.imagenes.firstOrNull()
-                            ?: "https://demofree.sirv.com/nope-not-here.jpg",
+                        // Toma la primera imagen de la lista.
+                        model = mascota.imagenes.firstOrNull() ?: "https://demofree.sirv.com/nope-not-here.jpg",
                         contentDescription = "Foto de " + mascota.nombre,
                         contentScale = ContentScale.Crop, // Recorta la foto para que llene el rectángulo perfecto
                         modifier = Modifier.fillMaxSize()
@@ -104,45 +111,94 @@ fun MascotaCard(
                         horizontalArrangement = Arrangement.SpaceBetween,   // Separa los elementos a los extremos
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Etiqueta de Estado ("DISPONIBLE")
-                        Surface(
-                            color = Color(0xFFE8F5E9),  // Fondo verde muy clarito
-                            shape = RoundedCornerShape(50), // Ovalado
-                            //modifier = Modifier.padding(bottom = 12.dp)
-                        ) {
-                            // Puntito y texto uno al costado del otro
-                            Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                // Puntito
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .background(Color(0xFF4CAF50), shape = CircleShape)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
+                        var menuExpandido by remember { mutableStateOf(false) }
+                        val esDisponible = mascota.estado == Enums.EstadoMascota.DISPONIBLE
+                        val colorFondo = if (esDisponible) Color(0xFFE8F5E9) else Color(0xFFFFF3E0) // Verde / Naranja
+                        val colorTexto = if (esDisponible) Color(0xFF2E7D32) else Color(0xFFE65100)
+                        val colorPunto = if (esDisponible) Color(0xFF4CAF50) else Color(0xFFFF9800)
 
-                                Text(
-                                    text = "DISPONIBLE",
-                                    color = Color(0xFF2E7D32), // Verde oscuro
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 0.5.sp
+                        Box {
+                            // Etiqueta de Estado (DISPONIBLE o ADOPTADO)
+                            Surface(
+                                color = colorFondo,
+                                shape = RoundedCornerShape(50), // Ovalado
+                                modifier = if (esMiMascota) {
+                                    Modifier.clickable { menuExpandido = true }
+                                } else Modifier
+                            ) {
+                                // Puntito y texto uno al costado del otro
+                                Row(
+                                    modifier = Modifier.padding(
+                                        horizontal = 10.dp,
+                                        vertical = 6.dp
+                                    ),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Puntito
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .background(colorPunto, shape = CircleShape)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+
+                                    Text(
+                                        text = mascota.estado.name,
+                                        color = colorTexto, // Verde oscuro
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 0.5.sp
+                                    )
+
+                                    if (esMiMascota) {
+                                        Icon(
+                                            imageVector = Icons.Default.KeyboardArrowDown,
+                                            contentDescription = "Cambiar estado",
+                                            tint = colorTexto,
+                                            modifier = Modifier.size(20.dp).padding(start = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            DropdownMenu(
+                                expanded = menuExpandido,
+                                onDismissRequest = { menuExpandido = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text("DISPONIBLE", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                    },
+                                    onClick = {
+                                        alCambiarEstado(Enums.EstadoMascota.DISPONIBLE)
+                                        menuExpandido = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = {
+                                        Text("ADOPTADO", fontWeight = FontWeight.Bold, color = Color(0xFFE65100))
+                                    },
+                                    onClick = {
+                                        alCambiarEstado(Enums.EstadoMascota.ADOPTADO)
+                                        menuExpandido = false
+                                    }
                                 )
                             }
                         }
+
                         // Botones Favorito + Borrar
                         Row {
                             // Borrar
                             if (esMiMascota) {
                                 IconButton(
                                     onClick = { alClickearBorrar() },
-                                    modifier = Modifier.size(32.dp).padding(end = 8.dp),
+                                    modifier = Modifier.size(32.dp),
                                     colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
                                 ) {
                                     Icon(Icons.Default.Delete, contentDescription = "Borrar publicación", tint = Color.White)
                                 }
+
+                                Spacer(modifier = Modifier.width(8.dp))
                             }
                             // Favoritos (Corazón)
                             IconButton(

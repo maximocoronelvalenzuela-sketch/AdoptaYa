@@ -324,8 +324,11 @@ fun PantallaPerfil(
                                         mascotaABorrar = mascota.id
                                         mostrarModalBorrar = true
                                     },
+                                    alCambiarEstado = {
+                                        mascotaViewModel.cambiarEstadoPublicacion(mascota.id, it)
+                                    },
                                     esFavorito = esFav,
-                                    esMiMascota = esMiPerfil
+                                    esMiMascota = esMiPerfil,
                                 )
                             }
                         }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
 import com.example.adoptaya.presentacion.componentes.ModalRequiereLogin
 import com.example.adoptaya.presentacion.componentes.TopBar
@@ -104,8 +105,8 @@ fun PantallaMapa(
                 .padding(paddingValues),
             cameraPositionState = cameraPositionState,
         ) {
-
-            mascotas.forEach { mascota ->
+            val mascotasVisibles = mascotas.filter { it.estado == Enums.EstadoMascota.DISPONIBLE }
+            mascotasVisibles.forEach { mascota ->
 
                 Marker(
                     state = MarkerState(

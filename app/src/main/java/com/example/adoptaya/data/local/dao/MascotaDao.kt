@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Mascota
 
 @Dao
@@ -26,6 +27,9 @@ interface MascotaDao {
 
     @Query("UPDATE mascotas SET activa = 0 WHERE id = :mascotaId")
     suspend fun darDeBajaMascota(mascotaId: String)
+
+    @Query("UPDATE mascotas SET estado = :nuevoEstado WHERE id = :mascotaId")
+    suspend fun actualizarEstadoMascota(mascotaId: String, nuevoEstado: Enums.EstadoMascota)
 
     @Delete
     suspend fun eliminarMascota(mascota: Mascota)
