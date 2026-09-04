@@ -79,7 +79,7 @@ fun PantallaDetalleMascota(
                                 idReceptor = mascota.idUsuario, // U2
                                 idMascota = mascota.id,
                                 nombreMascota = mascota.nombre,
-                                imagenMascota = mascota.imagenes[0],
+                                imagenMascota = mascota.imagenes.firstOrNull(),
                                 onSuccess = { idGenerado ->
                                     android.widget.Toast.makeText(
                                         contexto,
@@ -142,7 +142,7 @@ fun PantallaDetalleMascota(
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp, vertical = 32.dp)
                     ) {
-                        // Nombre, Raza (Tipo, por ahora), Genero
+                        // Nombre, Raza (Tipo, en su defecto), Genero
                         val tipoFormateado = mascota.tipo.name.lowercase().replaceFirstChar { it.uppercase() }
 
                         Row(
@@ -158,7 +158,7 @@ fun PantallaDetalleMascota(
                                     color = Color.Black
                                 )
                                 Text(
-                                    text = mascota.raza ?: tipoFormateado,
+                                    text = mascota.raza ?: "",
                                     color = Color.Gray,
                                     fontSize = 16.sp
                                 )

@@ -101,6 +101,7 @@ fun Navegacion(
                 usuarioViewModel = usuarioViewModel,
                 authViewModel = authViewModel,
                 notificacionViewModel = notificacionViewModel,
+                mascotaViewModel = mascotaViewModel,
                 alClickearMascota = { mascotaId ->
                     navController.navigate(
                         Pantallas.DetalleMascota.crearRuta(mascotaId)

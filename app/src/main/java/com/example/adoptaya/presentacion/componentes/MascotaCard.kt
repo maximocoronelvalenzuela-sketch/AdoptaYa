@@ -48,6 +48,9 @@ import com.example.adoptaya.data.model.Mascota
 @Composable
 fun MascotaCard(
     mascota: Mascota,
+    nombreDueño: String,
+    fotoDueño: String?,
+    tiempoTranscurrido: String,
     alClickearMascota: () -> Unit,
     alClickearPerfilDueño: () -> Unit,
     alClickearFavorito: () -> Unit,
@@ -187,8 +190,14 @@ fun MascotaCard(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     // Formato "Raza • Edad • Barrio"
+                    val textoDetalles = if (!mascota.raza.isNullOrBlank()) {
+                        mascota.raza + " • " + mascota.edad + " años • " + mascota.barrio
+                    } else {
+                        mascota.edad + " años • " + mascota.barrio
+                    }
+
                     Text(
-                        text = if (mascota.raza != null) mascota.raza + " • " + mascota.edad + " años • " + mascota.barrio else mascota.edad + " años • " + mascota.barrio,
+                        text = textoDetalles,
                         color = Color(0xFF666666),  // Gris mas claro que el nombre
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
@@ -216,12 +225,21 @@ fun MascotaCard(
                     shape = CircleShape,
                     color = Color.LightGray
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person, // TODO: Reemplazar en el futuro por su respectiva foto
-                        contentDescription = "Foto de perfil del usuario",
-                        modifier = Modifier.padding(8.dp),
-                        tint = Color.DarkGray
-                    )
+                    if (!fotoDueño.isNullOrEmpty()) {
+                        coil.compose.AsyncImage(
+                            model = fotoDueño,
+                            contentDescription = "Foto de perfil de $nombreDueño",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Foto por defecto",
+                            modifier = Modifier.padding(8.dp),
+                            tint = Color.DarkGray
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -230,14 +248,14 @@ fun MascotaCard(
                 Column(modifier = Modifier.weight(1f)) {
                     // Nombre del Usuario
                     Text(
-                        text = "Maximo Coronel",    // TODO: HARDCODEADO por ahora
+                        text = nombreDueño,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
 
                     // Tiempo transcurrido
                     Text(
-                        text = "Subido hace 3 horas",   // TODO: HARDCODEADO por ahora
+                        text = "Subido $tiempoTranscurrido",
                         fontSize = 12.sp,
                         color = Color.Gray
                     )

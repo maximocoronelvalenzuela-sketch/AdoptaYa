@@ -53,6 +53,10 @@ class UsuarioViewModel (
         }
     }
 
+    suspend fun obtenerUsuarioPorIdDirecto(id: String): Usuario? {
+        return obtenerUsuarioPorIdUseCase(id)
+    }
+
     fun limpiarUsuario() {
         usuarioSeleccionado = null
         perfilEstaIncompleto = false

@@ -33,4 +33,20 @@ class MascotaViewModel (
             mascotaSeleccionada = obtenerMascotaPorIdUseCase(id)
         }
     }
+
+    fun obtenerTiempoTranscurrido(fechaHoraString: String): String {
+        return try {
+            val fechaAlta = java.time.LocalDateTime.parse(fechaHoraString, java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+            val ahora = java.time.LocalDateTime.now()
+            val minutos = java.time.Duration.between(fechaAlta, ahora).toMinutes()
+
+            when {
+                minutos < 60 -> "hace $minutos min"
+                minutos < 1440 -> "hace ${minutos / 60} h"
+                else -> "hace ${minutos / 1440} d"
+            }
+        } catch (e: Exception) {
+            "hace un momento"
+        }
+    }
 }
