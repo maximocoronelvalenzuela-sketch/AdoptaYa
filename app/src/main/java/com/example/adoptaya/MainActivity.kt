@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
         val publicarMascotaViewModel = PublicarMascotaViewModel(guardarMascotaUC, obtenerIdUsuarioActualUC)
         val authViewModel = AuthViewModel(iniciarSesionUC, registrarUC, obtenerIdUsuarioActualUC, crearUsuarioUC, cerrarSesionUC, recuperarPasswordUC)
 
-        val inicializarDatosPruebaUC = InicializarDatosPruebaUseCase(mascotaRepositorio, usuarioRepositorio)
+        val inicializarDatosPruebaUC = InicializarDatosPruebaUseCase(mascotaRepositorio, usuarioRepositorio, this)
 
         enableEdgeToEdge()
         setContent {

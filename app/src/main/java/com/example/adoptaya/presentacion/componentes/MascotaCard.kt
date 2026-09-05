@@ -1,5 +1,6 @@
 package com.example.adoptaya.presentacion.componentes
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,11 +46,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.adoptaya.R
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Mascota
 
@@ -97,10 +100,12 @@ fun MascotaCard(
                     // La imagen de internet
                     AsyncImage(
                         // Toma la primera imagen de la lista.
-                        model = mascota.imagenes.firstOrNull() ?: "https://demofree.sirv.com/nope-not-here.jpg",
+                        model = mascota.imagenes.firstOrNull(),
                         contentDescription = "Foto de " + mascota.nombre,
                         contentScale = ContentScale.Crop, // Recorta la foto para que llene el rectángulo perfecto
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        error = painterResource(id = R.drawable.placeholder_mascota),
+                        fallback = painterResource(id = R.drawable.placeholder_mascota)
                     )
 
                     // Estado y Boton de Favoritos
