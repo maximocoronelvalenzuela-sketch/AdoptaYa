@@ -306,7 +306,8 @@ fun PantallaPerfil(
                                                         val datos = androidx.work.workDataOf(
                                                             "titulo" to "¡A alguien le gusta tu mascota!",
                                                             "descripcion" to mascota.nombre+" fue agregado a favoritos.",
-                                                            "notificacionId" to idGenerado
+                                                            "notificacionId" to idGenerado,
+                                                            "idReceptor" to mascota.idUsuario
                                                         )
                                                         val peticion = androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()
                                                             .setInputData(datos)

@@ -687,15 +687,19 @@ fun PantallaPublicarMascota(
                             nombreMascota = nombreCapturado,
                             imagenMascota = primeraImagen,
                             onSuccess = { idGenerado ->
+                                val idDueño = authViewModel.idUsuarioActual ?: ""
+
                                 // Se genera la notificacion
                                 val datos = androidx.work.workDataOf(
                                     "titulo" to "¡Nueva mascota publicada!",
                                     "descripcion" to nombreCapturado+" está buscando hogar.",
-                                    "notificacionId" to idGenerado
+                                    "notificacionId" to idGenerado,
+                                    "idDueñoExcluido" to idDueño
                                 )
                                 // Se arma una solicitud de trabajo nativa para que Android la ejecute una vez.
                                 val peticion = androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>() // Usa NotificacionWorker como molde
                                     .setInputData(datos) // Le enviamos los datos
+                                    .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
                                     .build()
 
                                 // Se llama al gestor de tareas de Android para que ejecute la tarea
@@ -716,7 +720,7 @@ fun PantallaPublicarMascota(
                 if (publicarMascotaViewModel.estaPublicando) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                 } else {
-                    Text("Crear Perfil", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text("Publicar Mascota", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
             }
 

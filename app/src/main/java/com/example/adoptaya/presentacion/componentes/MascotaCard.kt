@@ -260,11 +260,11 @@ fun MascotaCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // Formato "Raza • Edad • Barrio"
+                    // Formato "Raza • Edad • Ciudad, Barrio"
                     val textoDetalles = if (!mascota.raza.isNullOrBlank()) {
-                        mascota.raza + " • " + mascota.edad + " años • " + mascota.barrio
+                        mascota.raza + " • " + mascota.edad + " años • " + mascota.ciudad+", "+mascota.barrio
                     } else {
-                        mascota.edad + " años • " + mascota.barrio
+                        mascota.edad + " años • " + mascota.ciudad+", "+mascota.barrio
                     }
 
                     Text(

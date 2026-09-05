@@ -91,7 +91,8 @@ fun PantallaDetalleMascota(
                                     val datos = androidx.work.workDataOf(
                                         "titulo" to "Nueva solicitud de contacto",
                                         "descripcion" to "Alguien está interesado en adoptar a " + mascota.nombre + ".",
-                                        "notificacionId" to idGenerado
+                                        "notificacionId" to idGenerado,
+                                        "idReceptor" to mascota.idUsuario
                                     )
                                     val peticion =
                                         androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()

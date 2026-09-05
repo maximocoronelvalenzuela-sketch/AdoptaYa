@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.google.firebase.auth.FirebaseAuth
 
 // Extiende de CoroutineWorker para que Android ejecute la tarea en un hilo secundario sin trabar la UI
 class NotificacionWorker(
@@ -16,7 +17,28 @@ class NotificacionWorker(
 
     // Funcion obligatoria que WorkManager ejecuta automaticamente cuando llega el turno de esta tarea
     override suspend fun doWork(): Result {
-        mostrarNotificacion()
+        // Consulta la sesion actual justo antes de enviar la notificacion
+        val idActual = FirebaseAuth.getInstance().currentUser?.uid
+
+        val idReceptor = inputData.getString("idReceptor")
+        val idDueñoExcluido = inputData.getString("idDueñoExcluido")
+
+        var debeMostrarse = false
+
+        if (idReceptor != null) {
+            // Regla para notificaciones de tipo Favoritos/Contacto: Solo se muestra si el logueado es el receptor
+            if (idActual == idReceptor) debeMostrarse = true
+        } else if (idDueñoExcluido != null) {
+            // Regla para notificaciones de tipo Nueva Mascota: Se muestra a cualquiera MENOS al dueño
+            if (idActual != null && idActual != idDueñoExcluido) debeMostrarse = true
+        } else {
+            debeMostrarse = true
+        }
+
+        if (debeMostrarse) {
+            mostrarNotificacion()
+        }
+
         return Result.success() // Le avisa a Android que la tarea terminó bien
     }
 
