@@ -33,6 +33,7 @@ import com.example.adoptaya.presentacion.componentes.TopBar
 import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 import com.example.adoptaya.presentacion.viewmodel.PublicarMascotaViewModel
+import com.example.adoptaya.util.hayConexionAInternet
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
@@ -47,6 +48,22 @@ fun PantallaPublicarMascota(
 ) {
     val colorNaranja = Color(0xFFF28B2A)
     val colorFondoPantalla = Color(0xFFF3F3F3)
+    val contexto = LocalContext.current
+    var sinInternet by remember { mutableStateOf(false) }
+
+    // Reacciona al abrir la pantalla para cargar las provincias
+    LaunchedEffect(Unit) {
+        val noHayRed = !hayConexionAInternet(contexto)
+        sinInternet = noHayRed
+
+        // Si hay internet y todavía no se tienen las provincias, se piden
+        if (!noHayRed && publicarMascotaViewModel.listaProvincias.isEmpty()) {
+            publicarMascotaViewModel.cargarProvincias(hayInternet = true)
+        } else if (noHayRed && publicarMascotaViewModel.listaProvincias.isEmpty()) {
+            // Fuerza el mensaje de error si se entra sin red
+            publicarMascotaViewModel.cargarProvincias(hayInternet = false)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -490,7 +507,7 @@ fun PantallaPublicarMascota(
                                     text = { Text(provincia.nombre) },
                                     onClick = {
                                         publicarMascotaViewModel.provinciaSeleccionada = provincia
-                                        publicarMascotaViewModel.cargarLocalidadesPorProvincia(provincia) // Carga las ciudades!
+                                        publicarMascotaViewModel.cargarLocalidadesPorProvincia(provincia, !sinInternet) // Carga las ciudades!
                                         expandidoProvincia = false
                                     }
                                 )
@@ -585,12 +602,20 @@ fun PantallaPublicarMascota(
 
                     // Boton para generar el mapa
                     Button(
-                        onClick = { publicarMascotaViewModel.generarCoordenadasDesdeDireccion(contexto) },
+                        onClick = { publicarMascotaViewModel.generarCoordenadasDesdeDireccion(contexto, !sinInternet) },
                         modifier = Modifier.fillMaxWidth().height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = colorNaranja),
+                        enabled = !sinInternet && !publicarMascotaViewModel.estaCargandoMapa,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorNaranja,
+                            disabledContainerColor = Color.LightGray
+                        ),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("GENERAR UBICACIÓN EN EL MAPA", fontWeight = FontWeight.Bold)
+                        if (publicarMascotaViewModel.estaCargandoMapa) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        } else {
+                            Text("GENERAR UBICACIÓN EN EL MAPA", fontWeight = FontWeight.Bold)
+                        }
                     }
 
                     // Mensaje de error de ubicacion (si falla el Geocoder o se olvida de mapear)
@@ -710,7 +735,7 @@ fun PantallaPublicarMascota(
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = !publicarMascotaViewModel.estaPublicando,
+                enabled = !publicarMascotaViewModel.estaPublicando && !sinInternet,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorNaranja,
                     disabledContainerColor = Color.LightGray

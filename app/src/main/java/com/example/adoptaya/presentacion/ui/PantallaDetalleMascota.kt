@@ -37,6 +37,7 @@ import com.example.adoptaya.presentacion.viewmodel.AuthViewModel
 import com.example.adoptaya.presentacion.viewmodel.FavoritoViewModel
 import com.example.adoptaya.presentacion.viewmodel.MascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
+import com.example.adoptaya.util.hayConexionAInternet
 import kotlinx.coroutines.launch
 
 @Composable
@@ -74,18 +75,18 @@ fun PantallaDetalleMascota(
                 alClickearContactar = {
                     if (idActual != null) {
                         if (idActual != mascota.idUsuario) {
+                            // Evaluamos la conexión justo en el momento del click
+                            val hayRed = hayConexionAInternet(contexto)
+
                             notificacionViewModel.enviarSolicitudDeContacto(
                                 idEmisor = idActual, // U1
                                 idReceptor = mascota.idUsuario, // U2
                                 idMascota = mascota.id,
                                 nombreMascota = mascota.nombre,
                                 imagenMascota = mascota.imagenes.firstOrNull(),
+                                hayInternet = hayRed,
                                 onSuccess = { idGenerado ->
-                                    android.widget.Toast.makeText(
-                                        contexto,
-                                        "Solicitud de contacto enviada al dueño",
-                                        android.widget.Toast.LENGTH_LONG
-                                    ).show()
+                                    android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
 
                                     // Se genera la notificacion
                                     val datos = androidx.work.workDataOf(
@@ -102,6 +103,9 @@ fun PantallaDetalleMascota(
 
                                     androidx.work.WorkManager.getInstance(contexto)
                                         .enqueue(peticion)
+                                },
+                                onError = { mensajeError ->
+                                    android.widget.Toast.makeText(contexto, mensajeError, android.widget.Toast.LENGTH_LONG).show()
                                 }
                             )
                         } else {

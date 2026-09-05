@@ -76,19 +76,22 @@ class PublicarMascotaViewModel(
 
     var estaPublicando by mutableStateOf(false)
         private set
+    var estaCargandoMapa by mutableStateOf(false)
+        private set
 
+    fun cargarProvincias(hayInternet: Boolean) {
+        if (!hayInternet) {
+            ubicacionError = "No hay conexión a internet para cargar provincias."
+            return
+        }
+        ubicacionError = null
 
-    init {
-        cargarProvincias()
-    }
-
-    private fun cargarProvincias() {
         viewModelScope.launch {
             try {
                 val respuesta = apiGeoref.obtenerProvincias()
                 listaProvincias = respuesta.provincias
             } catch (e: Exception) {
-                ubicacionError = "Error al cargar provincias. Revisá tu conexión."
+                ubicacionError = "Error al cargar provincias. Revisa tu conexión."
             }
         }
     }
@@ -182,7 +185,13 @@ class PublicarMascotaViewModel(
         return archivoLocal.absolutePath
     }
 
-    fun cargarLocalidadesPorProvincia(provincia: ProvinciaGeoref) {
+    fun cargarLocalidadesPorProvincia(provincia: ProvinciaGeoref, hayInternet: Boolean) {
+        if (!hayInternet) {
+            ubicacionError = "No hay conexión a internet para cargar las ciudades."
+            return
+        }
+        ubicacionError = null
+
         viewModelScope.launch {
             try {
                 val respuesta = apiGeoref.obtenerLocalidades(provincia.id)
@@ -194,7 +203,14 @@ class PublicarMascotaViewModel(
         }
     }
 
-    fun generarCoordenadasDesdeDireccion(context: android.content.Context) {
+    fun generarCoordenadasDesdeDireccion(context: android.content.Context, hayInternet: Boolean) {
+        if (!hayInternet) {
+            ubicacionError = "No hay conexión a internet para buscar en el mapa."
+            return
+        }
+        ubicacionError = null
+        estaCargandoMapa = true
+
         val direccionCompleta = "$calle $numero, $barrio, ${localidadSeleccionada?.nombre}, ${provinciaSeleccionada?.nombre}, Argentina"
 
         // Dispatchers.IO para que la busqueda no congele la pantalla
@@ -204,18 +220,17 @@ class PublicarMascotaViewModel(
                 // Pedimos máximo 1 resultado
                 val direcciones = geocoder.getFromLocationName(direccionCompleta, 1)
 
-                if (!direcciones.isNullOrEmpty()) {
-                    val ubicacionReal = direcciones[0]
-                    // Se vuelve al hilo principal para actualizar la UI
-                    launch(Dispatchers.Main) {
+                // Vuelve al hilo principal para actualizar la UI y APAGAR LA CARGA
+                launch(Dispatchers.Main) {
+                    if (!direcciones.isNullOrEmpty()) {
+                        val ubicacionReal = direcciones[0]
                         latitud = ubicacionReal.latitude
                         longitud = ubicacionReal.longitude
                         ubicacionError = null
-                    }
-                } else {
-                    launch(Dispatchers.Main) {
+                    } else {
                         ubicacionError = "No pudimos encontrar la dirección exacta en el mapa."
                     }
+                    estaCargandoMapa = false
                 }
             } catch (e: Exception) {
                 launch(Dispatchers.Main) {

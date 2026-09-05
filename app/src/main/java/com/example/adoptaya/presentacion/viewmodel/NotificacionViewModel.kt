@@ -35,8 +35,15 @@ class NotificacionViewModel (
         idMascota: String,
         nombreMascota: String,
         imagenMascota: String?,
-        onSuccess: (String) -> Unit
+        hayInternet: Boolean,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
     ) {
+        if (!hayInternet) {
+            onError("No hay conexión a internet para enviar la solicitud.")
+            return
+        }
+
         val idNoti = UUID.randomUUID().toString()
         val nuevaNotificacion = Notificacion(
             id = idNoti,
