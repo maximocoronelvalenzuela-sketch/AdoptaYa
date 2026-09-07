@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.adoptaya.R
 import com.google.firebase.auth.FirebaseAuth
 
 // Extiende de CoroutineWorker para que Android ejecute la tarea en un hilo secundario sin trabar la UI
@@ -77,7 +78,8 @@ class NotificacionWorker(
 
         // Diseño visual de la notificacion
         val builder = NotificationCompat.Builder(contexto, canalId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(R.drawable.ic_notificacion_silueta)
+            .setColor(android.graphics.Color.parseColor("#F28B2A"))
             .setContentTitle(titulo)
             .setContentText(descripcion)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
