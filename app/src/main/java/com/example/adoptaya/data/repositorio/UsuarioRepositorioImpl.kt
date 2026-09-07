@@ -14,6 +14,9 @@ class UsuarioRepositorioImpl(
     private val TAG = "API_ADOPTAYA_USUARIOS"
 
     override suspend fun obtenerUsuarioPorId(id: String): Usuario? {
+        val usuarioLocal = usuarioDao.obtenerPorId(id)
+        if (usuarioLocal != null) return usuarioLocal
+
         try {
             val response = api.obtenerUsuarioPorId(id)
             if (response.isSuccessful && response.body() != null) {

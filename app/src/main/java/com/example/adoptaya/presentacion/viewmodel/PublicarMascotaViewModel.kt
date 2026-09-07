@@ -13,6 +13,7 @@ import com.example.adoptaya.data.remoto.model.LocalidadGeoref
 import com.example.adoptaya.data.remoto.model.ProvinciaGeoref
 import com.example.adoptaya.dominio.usecase.auth.ObtenerIdUsuarioActualUseCase
 import com.example.adoptaya.dominio.usecase.mascota.GuardarMascotaUseCase
+import com.example.adoptaya.util.subirFotoAImgBB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -172,17 +173,33 @@ class PublicarMascotaViewModel(
     }
 
     fun guardarImagenEnLocal(context: android.content.Context, uri: android.net.Uri): String {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        // Se crea un nombre unico para el archivo
-        val archivoLocal = java.io.File(context.filesDir, "mascota_${UUID.randomUUID()}.jpg")
-        val outputStream = java.io.FileOutputStream(archivoLocal)
+        val archivoLocal = java.io.File(context.filesDir, "img_${java.util.UUID.randomUUID()}.jpg")
+        try {
+            val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                val source = android.graphics.ImageDecoder.createSource(context.contentResolver, uri)
+                android.graphics.ImageDecoder.decodeBitmap(source)
+            } else {
+                @Suppress("DEPRECATION")
+                android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            }
 
-        inputStream?.copyTo(outputStream)
+            // Compresión nivel demostración: 200px de ancho máximo
+            val maxWidth = 200
+            val ancho = if (bitmap.width > maxWidth) maxWidth else bitmap.width
+            val alto = if (bitmap.width > maxWidth) (bitmap.height * (maxWidth.toFloat() / bitmap.width)).toInt() else bitmap.height
+            val bitmapRedimensionado = android.graphics.Bitmap.createScaledBitmap(bitmap, ancho, alto, true)
 
-        inputStream?.close()
-        outputStream.close()
+            val outputStream = java.io.FileOutputStream(archivoLocal)
+            // Calidad al 10% (pesará apenas unos pocos kilobytes)
+            bitmapRedimensionado.compress(android.graphics.Bitmap.CompressFormat.JPEG, 10, outputStream)
+            outputStream.flush()
+            outputStream.close()
 
-        return archivoLocal.absolutePath
+            return archivoLocal.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return ""
+        }
     }
 
     fun cargarLocalidadesPorProvincia(provincia: ProvinciaGeoref, hayInternet: Boolean) {
@@ -248,35 +265,43 @@ class PublicarMascotaViewModel(
         if(idActual == null) return
 
         val idGenerado = UUID.randomUUID().toString()
-        val nuevaMascota = Mascota(
-            id = idGenerado,
-            nombre = nombre,
-            tipo = tipo,
-            edad = edad,
-            tiempo = tiempo,
-            sexo = sexo,
-            raza = raza,
-            tamaño = tamaño,
-            esterilizado = esterilizado,
-            vacunado = vacunado,
-            desparasitado = desparasitado,
-            descripcionPersonalidad = rasgosSeleccionados,
-            descripcionAdicional = descripcionAdicional,
-            estado = Enums.EstadoMascota.DISPONIBLE,
-            latitud = latitud ?: 0.0,
-            longitud = longitud ?: 0.0,
-            provincia = provinciaSeleccionada?.nombre ?: "",
-            ciudad = localidadSeleccionada?.nombre ?: "",
-            barrio = barrio,
-            calle = calle,
-            numero = numero,
-            imagenes = imagenesSeleccionadas,
-            fechaHoraAlta = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-            idUsuario = idActual
-        )
 
         viewModelScope.launch {
             estaPublicando = true
+
+            // Sube las fotos locales a ImgBB de forma asíncrona y obtiene las URLs públicas
+            val urlsPublicas = imagenesSeleccionadas.mapNotNull { rutaLocal ->
+                subirFotoAImgBB(rutaLocal)
+            }
+
+            val nuevaMascota = Mascota(
+                id = idGenerado,
+                nombre = nombre,
+                tipo = tipo,
+                edad = edad,
+                tiempo = tiempo,
+                sexo = sexo,
+                raza = raza,
+                tamaño = tamaño,
+                esterilizado = esterilizado,
+                vacunado = vacunado,
+                desparasitado = desparasitado,
+                descripcionPersonalidad = rasgosSeleccionados,
+                descripcionAdicional = descripcionAdicional,
+                estado = Enums.EstadoMascota.DISPONIBLE,
+                latitud = latitud ?: 0.0,
+                longitud = longitud ?: 0.0,
+                provincia = provinciaSeleccionada?.nombre ?: "",
+                ciudad = localidadSeleccionada?.nombre ?: "",
+                barrio = barrio,
+                calle = calle,
+                numero = numero,
+                imagenes = urlsPublicas,
+                fechaHoraAlta = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                idUsuario = idActual
+            )
+
+            // Guarda en Room y en el backend
             guardarMascotaUseCase(nuevaMascota)
             limpiarFormulario()
             onSuccess(idGenerado)

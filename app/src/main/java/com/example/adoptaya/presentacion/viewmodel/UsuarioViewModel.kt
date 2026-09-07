@@ -12,6 +12,7 @@ import com.example.adoptaya.data.remoto.model.ProvinciaGeoref
 import com.example.adoptaya.dominio.usecase.usuario.ActualizarUsuarioUseCase
 import com.example.adoptaya.dominio.usecase.usuario.ObtenerUsuarioPorIdUseCase
 import com.example.adoptaya.dominio.usecase.usuario.VerificarPerfilIncompletoUseCase
+import com.example.adoptaya.util.subirFotoAImgBB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -90,13 +91,19 @@ class UsuarioViewModel (
                 }
             }
 
+            val urlFinal = if (imagenNueva != null && !imagenNueva.startsWith("http")) {
+                subirFotoAImgBB(imagenNueva) ?: imagenNueva
+            } else {
+                imagenNueva
+            }
+
             val usuarioActualizado = usuarioActual.copy(
                 nombre = nombreNuevo.capitalizarPalabras(),
                 provincia = provinciaNueva,
                 ciudad = ciudadNueva,
                 latitud = lat,
                 longitud = lng,
-                imagen = imagenNueva
+                imagen = urlFinal
             )
 
             actualizarUsuarioUseCase(usuarioActualizado)
@@ -149,15 +156,33 @@ class UsuarioViewModel (
     // Foto de perfil
     // Recibe una URI de una imagen, la guarda en el almacenamiento local y devuelve la ruta del nuevo archivo.
     fun guardarImagenEnLocal(context: android.content.Context, uri: android.net.Uri): String {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val archivoLocal = java.io.File(context.filesDir, "perfil_${java.util.UUID.randomUUID()}.jpg")
-        val outputStream = java.io.FileOutputStream(archivoLocal)
+        val archivoLocal = java.io.File(context.filesDir, "img_${java.util.UUID.randomUUID()}.jpg")
+        try {
+            val bitmap = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                val source = android.graphics.ImageDecoder.createSource(context.contentResolver, uri)
+                android.graphics.ImageDecoder.decodeBitmap(source)
+            } else {
+                @Suppress("DEPRECATION")
+                android.provider.MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+            }
 
-        inputStream?.copyTo(outputStream)
-        inputStream?.close()
-        outputStream.close()
+            // Compresión nivel demostración: 200px de ancho máximo
+            val maxWidth = 200
+            val ancho = if (bitmap.width > maxWidth) maxWidth else bitmap.width
+            val alto = if (bitmap.width > maxWidth) (bitmap.height * (maxWidth.toFloat() / bitmap.width)).toInt() else bitmap.height
+            val bitmapRedimensionado = android.graphics.Bitmap.createScaledBitmap(bitmap, ancho, alto, true)
 
-        return archivoLocal.absolutePath
+            val outputStream = java.io.FileOutputStream(archivoLocal)
+            // Calidad al 10% (pesará apenas unos pocos kilobytes)
+            bitmapRedimensionado.compress(android.graphics.Bitmap.CompressFormat.JPEG, 10, outputStream)
+            outputStream.flush()
+            outputStream.close()
+
+            return archivoLocal.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return ""
+        }
     }
 
     fun String.capitalizarPalabras(): String {
