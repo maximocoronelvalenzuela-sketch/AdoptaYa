@@ -1,5 +1,6 @@
 package com.example.adoptaya.data.repositorio
 
+import android.util.Log
 import com.example.adoptaya.data.local.dao.MascotaDao
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Mascota
@@ -11,6 +12,7 @@ class MascotaRepositorioImpl(
 ) : MascotaRepositorio {
 
     private val api = RetrofitClient.apiService
+    private val TAG = "API_ADOPTAYA_MASCOTAS"
 
     override suspend fun obtenerMascotas(): List<Mascota> {
         try {
@@ -24,7 +26,7 @@ class MascotaRepositorioImpl(
                 }
             }
         } catch (e: Exception) {
-            // Si no hay internet, la app no se rompe y usa la caché local de Room
+            Log.e(TAG, "Falla de red en obtenerMascotas, usando caché local de Room: ${e.message}", e)
         }
         return mascotaDao.obtenerTodas()
     }
@@ -38,7 +40,7 @@ class MascotaRepositorioImpl(
                 return mascota
             }
         } catch (e: Exception) {
-            // Fallback a local si falla la red
+            Log.e(TAG, "Falla de red en obtenerMascotaPorId: ${e.message}", e)
         }
         return mascotaDao.obtenerPorId(id)
     }
@@ -58,7 +60,7 @@ class MascotaRepositorioImpl(
             // Sincroniza con el backend en la nube para que otros celulares la vean
             api.publicarMascota(mascota)
         } catch (e: Exception) {
-            // Manejo silencioso o log si falla la red en el momento
+            Log.e(TAG, "No se pudo sincronizar la mascota con el backend: ${e.message}", e)
         }
     }
 
@@ -69,7 +71,9 @@ class MascotaRepositorioImpl(
             if (mascotaLocal != null) {
                 api.actualizarMascota(idMascota, mascotaLocal)
             }
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al dar de baja en backend: ${e.message}", e)
+        }
     }
 
     override suspend fun actualizarEstadoMascota(idMascota: String, nuevoEstado: Enums.EstadoMascota) {
@@ -79,6 +83,8 @@ class MascotaRepositorioImpl(
             if (mascotaLocal != null) {
                 api.actualizarMascota(idMascota, mascotaLocal)
             }
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al actualizar estado en backend: ${e.message}", e)
+        }
     }
 }

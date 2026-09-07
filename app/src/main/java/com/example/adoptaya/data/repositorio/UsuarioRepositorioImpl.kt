@@ -1,5 +1,6 @@
 package com.example.adoptaya.data.repositorio
 
+import android.util.Log
 import com.example.adoptaya.data.local.dao.UsuarioDao
 import com.example.adoptaya.data.model.Usuario
 import com.example.adoptaya.data.remoto.RetrofitClient
@@ -10,6 +11,7 @@ class UsuarioRepositorioImpl(
 ) : UsuarioRepositorio {
 
     private val api = RetrofitClient.apiService
+    private val TAG = "API_ADOPTAYA_USUARIOS"
 
     override suspend fun obtenerUsuarioPorId(id: String): Usuario? {
         try {
@@ -21,7 +23,7 @@ class UsuarioRepositorioImpl(
                 return usuarioRemoto
             }
         } catch (e: Exception) {
-            // Si no hay red, busca en el Room local
+            Log.e(TAG, "Falla de red en obtenerUsuarioPorId: ${e.message}", e)
         }
         return usuarioDao.obtenerPorId(id)
     }
@@ -33,7 +35,7 @@ class UsuarioRepositorioImpl(
             // Envia el usuario al backend en la nube
             api.guardarUsuario(usuario)
         } catch (e: Exception) {
-            // Si no hay red, queda guardado localmente
+            Log.e(TAG, "No se pudo sincronizar el usuario con el backend: ${e.message}", e)
         }
     }
 }
