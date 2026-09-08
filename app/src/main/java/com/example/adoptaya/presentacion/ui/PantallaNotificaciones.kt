@@ -204,11 +204,26 @@ fun ItemNotificacion(notificacion: Notificacion, tiempoTranscurrido: String, alC
                     }
                     else -> { // MASCOTA_NUEVA o CONTACTO
                         if (!notificacion.imagen.isNullOrEmpty()) {
-                            coil.compose.AsyncImage(
-                                model = notificacion.imagen,
+                            val contexto = LocalContext.current
+                            coil.compose.SubcomposeAsyncImage(
+                                model = coil.request.ImageRequest.Builder(contexto)
+                                    .data(notificacion.imagen)
+                                    .addHeader("User-Agent", "Mozilla/5.0 (Android; Mobile)")
+                                    .crossfade(true)
+                                    .build(),
                                 contentDescription = "Foto mascota",
                                 contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier.fillMaxSize(),
+                                loading = {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.padding(12.dp),
+                                        color = Color(0xFFE85A13),
+                                        strokeWidth = 2.dp
+                                    )
+                                },
+                                error = {
+                                    Icon(Icons.Default.Pets, contentDescription = null, tint = Color.Red, modifier = Modifier.padding(12.dp))
+                                }
                             )
                         } else { // Si no hay foto
                             Icon(Icons.Default.Pets, contentDescription = null, tint = Color(0xFFE85A13), modifier = Modifier.padding(12.dp))
@@ -303,11 +318,26 @@ fun DialogoDetalleNotificacion(
                     modifier = Modifier.size(80.dp)
                 ) {
                     if (!fotoEmisor.isNullOrEmpty()) {
-                        coil.compose.AsyncImage(
-                            model = fotoEmisor,
+                        val contexto = LocalContext.current
+                        coil.compose.SubcomposeAsyncImage(
+                            model = coil.request.ImageRequest.Builder(contexto)
+                                .data(fotoEmisor)
+                                .addHeader("User-Agent", "Mozilla/5.0 (Android; Mobile)")
+                                .crossfade(true)
+                                .build(),
                             contentDescription = "Foto del usuario",
                             contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            loading = {
+                                androidx.compose.material3.CircularProgressIndicator(
+                                    modifier = Modifier.padding(24.dp),
+                                    color = Color(0xFFE85A13),
+                                    strokeWidth = 2.dp
+                                )
+                            },
+                            error = {
+                                Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.padding(16.dp), tint = Color.Red)
+                            }
                         )
                     } else {
                         Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.padding(16.dp), tint = Color.DarkGray)

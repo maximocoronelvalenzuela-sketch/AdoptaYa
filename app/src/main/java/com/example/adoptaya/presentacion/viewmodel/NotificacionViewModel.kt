@@ -95,7 +95,7 @@ class NotificacionViewModel (
             tipo = Enums.TipoNotificacion.NUEVA_MASCOTA,
             leida = false,
             fechaHora = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-            idUsuario = idDueño,
+            idUsuario = "", // Todos los usuarios reciben la notificación
             idMascota = idMascota,
             idUsuarioEmisor = idDueño
         )

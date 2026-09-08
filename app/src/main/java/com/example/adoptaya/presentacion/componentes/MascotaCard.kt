@@ -1,6 +1,7 @@
 package com.example.adoptaya.presentacion.componentes
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -98,15 +99,50 @@ fun MascotaCard(
                         .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                 ) {
                     // La imagen de internet
-                    AsyncImage(
-                        // Toma la primera imagen de la lista.
-                        model = mascota.imagenes.firstOrNull(),
-                        contentDescription = "Foto de " + mascota.nombre,
-                        contentScale = ContentScale.Crop, // Recorta la foto para que llene el rectángulo perfecto
-                        modifier = Modifier.fillMaxSize(),
-                        error = painterResource(id = R.drawable.placeholder_mascota),
-                        fallback = painterResource(id = R.drawable.placeholder_mascota)
-                    )
+                    val primeraImagen = mascota.imagenes.firstOrNull()
+
+                    if (!primeraImagen.isNullOrEmpty()) {
+                        val contexto = androidx.compose.ui.platform.LocalContext.current
+                        coil.compose.SubcomposeAsyncImage(
+                            model = coil.request.ImageRequest.Builder(contexto)
+                                .data(primeraImagen)
+                                .addHeader("User-Agent", "Mozilla/5.0 (Android; Mobile)")
+                                .crossfade(true)
+                                .listener(
+                                    onError = { _, result ->
+                                        android.util.Log.e("COIL_MASCOTA_ERROR", "Error cargando foto mascota: $primeraImagen", result.throwable)
+                                    }
+                                )
+                                .build(),
+                            contentDescription = "Foto de ${mascota.nombre}",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                            loading = {
+                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    androidx.compose.material3.CircularProgressIndicator(
+                                        modifier = Modifier.size(28.dp),
+                                        color = Color(0xFFE85A13),
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                            },
+                            error = {
+                                Image(
+                                    painter = painterResource(id = R.drawable.placeholder_mascota),
+                                    contentDescription = "Fallback",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.placeholder_mascota),
+                            contentDescription = "Sin imagen",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
 
                     // Estado y Boton de Favoritos
                     Row(
@@ -302,21 +338,58 @@ fun MascotaCard(
                     color = Color.LightGray
                 ) {
                     if (!fotoDueño.isNullOrEmpty()) {
-                        coil.compose.AsyncImage(
-                            model = fotoDueño,
+                        coil.compose.SubcomposeAsyncImage(
+                            model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                                .data(fotoDueño)
+                                .addHeader("User-Agent", "Mozilla/5.0 (Android; Mobile)")
+                                .crossfade(true)
+                                .listener(
+                                    onError = { _, result ->
+                                        android.util.Log.e("COIL_ERROR", "Error cargando foto: $fotoDueño", result.throwable)
+                                    }
+                                )
+                                .build(),
                             contentDescription = "Foto de perfil de $nombreDueño",
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            loading = {
+                                androidx.compose.material3.CircularProgressIndicator(modifier = Modifier.padding(8.dp), color = Color(0xFFE85A13), strokeWidth = 2.dp)
+                            },
+                            error = {
+                                Icon(imageVector = Icons.Default.Person, contentDescription = "Error de carga", modifier = Modifier.padding(8.dp), tint = Color.Red)
+                            }
                         )
                     } else {
-                        Icon(
-                            imageVector = Icons.Default.Person,
+                        androidx.compose.material3.Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Person,
                             contentDescription = "Foto por defecto",
                             modifier = Modifier.padding(8.dp),
                             tint = Color.DarkGray
                         )
                     }
                 }
+
+//                Surface(
+//                    modifier = Modifier.size(36.dp),
+//                    shape = CircleShape,
+//                    color = Color.LightGray
+//                ) {
+//                    if (!fotoDueño.isNullOrEmpty()) {
+//                        coil.compose.AsyncImage(
+//                            model = fotoDueño,
+//                            contentDescription = "Foto de perfil de $nombreDueño",
+//                            contentScale = ContentScale.Crop,
+//                            modifier = Modifier.fillMaxSize()
+//                        )
+//                    } else {
+//                        Icon(
+//                            imageVector = Icons.Default.Person,
+//                            contentDescription = "Foto por defecto",
+//                            modifier = Modifier.padding(8.dp),
+//                            tint = Color.DarkGray
+//                        )
+//                    }
+//                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 

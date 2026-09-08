@@ -14,20 +14,19 @@ class UsuarioRepositorioImpl(
     private val TAG = "API_ADOPTAYA_USUARIOS"
 
     override suspend fun obtenerUsuarioPorId(id: String): Usuario? {
-        val usuarioLocal = usuarioDao.obtenerPorId(id)
-        if (usuarioLocal != null) return usuarioLocal
-
         try {
+            // Siempre consulta la nube para tener la versión actualizada
             val response = api.obtenerUsuarioPorId(id)
             if (response.isSuccessful && response.body() != null) {
                 val usuarioRemoto = response.body()!!
-                // Guarda en local para cachear y evitar crashes
+                // Actualiza la base local con lo último que tiene Render
                 usuarioDao.insertarUsuario(usuarioRemoto)
                 return usuarioRemoto
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Falla de red en obtenerUsuarioPorId: ${e.message}", e)
+            Log.e(TAG, "Sin conexión o timeout con Render: ${e.message}")
         }
+        // Si falló la red o no hay internet, devuelve la versión local
         return usuarioDao.obtenerPorId(id)
     }
 
