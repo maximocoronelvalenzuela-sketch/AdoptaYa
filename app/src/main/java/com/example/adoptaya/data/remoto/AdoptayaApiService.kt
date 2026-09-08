@@ -52,4 +52,7 @@ interface AdoptayaApiService {
 
     @POST("notificaciones")
     suspend fun guardarNotificacion(@Body notificacion: Notificacion): Response<Notificacion>
+
+    @GET("notificaciones/sincronizar/{idUsuario}")
+    suspend fun sincronizarNotificaciones(@Path("idUsuario") idUsuario: String): Response<List<Notificacion>>
 }

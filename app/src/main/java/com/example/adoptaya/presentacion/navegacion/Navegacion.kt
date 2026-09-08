@@ -1,6 +1,7 @@
 package com.example.adoptaya.presentacion.navegacion
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,10 +30,21 @@ fun Navegacion(
     usuarioViewModel: UsuarioViewModel,
     notificacionViewModel: NotificacionViewModel,
     publicarMascotaViewModel: PublicarMascotaViewModel,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    irANotificaciones: Boolean = false,
+    onNavegacionConsumida: () -> Unit = {}
 ) {
 
     val navController = rememberNavController()
+
+    LaunchedEffect(irANotificaciones) {
+        if (irANotificaciones) {
+            navController.navigate(Pantallas.Notificaciones.ruta) {
+                launchSingleTop = true // No duplica la pantalla si ya estás ahí
+            }
+            onNavegacionConsumida()
+        }
+    }
 
     NavHost(
         navController = navController,

@@ -1,5 +1,9 @@
 package com.example.adoptaya
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,7 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.app.NotificationCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.adoptaya.data.model.Notificacion
+import com.example.adoptaya.data.remoto.RetrofitClient
 import com.example.adoptaya.data.repositorio.AuthRepositorioImpl
 import com.example.adoptaya.data.repositorio.FavoritoRepositorioImpl
 import com.example.adoptaya.data.repositorio.MascotaRepositorioImpl
@@ -55,11 +64,16 @@ import com.example.adoptaya.presentacion.viewmodel.NotificacionViewModel
 import com.example.adoptaya.presentacion.viewmodel.PublicarMascotaViewModel
 import com.example.adoptaya.presentacion.viewmodel.UsuarioViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private var irANotificaciones by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        irANotificaciones = intent?.getBooleanExtra("abrir_notificaciones", false) ?: false
 
         val app = application as AdoptayaApplication
         val firebaseAuth = FirebaseAuth.getInstance()
@@ -107,10 +121,41 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             var datosInicializados by remember { mutableStateOf(false) }
+            val idActual = authViewModel.idUsuarioActual
 
             LaunchedEffect(Unit) {
                 inicializarDatosPruebaUC()
                 datosInicializados = true
+            }
+
+            // BUCLE DE POLLING ATADO AL CICLO DE VIDA
+            LaunchedEffect(idActual) {
+                if (idActual != null) {
+                    lifecycleScope.launch {
+                        repeatOnLifecycle(Lifecycle.State.STARTED) {
+                            while (true) {
+                                try {
+                                    val response = RetrofitClient.apiService.sincronizarNotificaciones(idActual)
+                                    if (response.isSuccessful && response.body() != null) {
+                                        val notifsRemotas = response.body()!!
+                                        for (noti in notifsRemotas) {
+                                            if (!notificacionDao.existeNotificacion(noti.id)) {
+                                                notificacionDao.insertarNotificacion(noti)
+                                                // Refresca la lista visual
+                                                notificacionViewModel.cargarNotificacionesDeUsuario(idActual)
+                                                // Dispara la alerta en el celular
+                                                mostrarNotificacionSO(this@MainActivity, noti)
+                                            }
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    // Silencioso: si falla el internet, vuelve a intentar en 10s
+                                }
+                                delay(10000) // 10 segundos
+                            }
+                        }
+                    }
+                }
             }
 
             // Para solucionar la condicion de carrera
@@ -128,11 +173,71 @@ class MainActivity : ComponentActivity() {
                     usuarioViewModel = usuarioViewModel,
                     notificacionViewModel = notificacionViewModel,
                     publicarMascotaViewModel = publicarMascotaViewModel,
-                    authViewModel = authViewModel
+                    authViewModel = authViewModel,
+                    irANotificaciones = irANotificaciones,
+                    onNavegacionConsumida = { irANotificaciones = true }
                 )
             }
         }
     }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra("abrir_notificaciones", true)) {
+            irANotificaciones = true
+        }
+    }
+}
+
+private fun mostrarNotificacionSO(contexto: Context, notificacion: Notificacion) {
+    val canalId = "canal_adoptaya_defecto"
+    val notificationManager = contexto.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val canal = NotificationChannel(canalId, "Notificaciones Generales", NotificationManager.IMPORTANCE_HIGH)
+        notificationManager.createNotificationChannel(canal)
+    }
+
+    val intent = android.content.Intent(contexto, MainActivity::class.java).apply {
+        flags = android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP or android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+        putExtra("abrir_notificaciones", true)
+    }
+
+    val pendingIntent = android.app.PendingIntent.getActivity(
+        contexto,
+        0, // No necesitamos el ID aquí para que no abra el modal
+        intent,
+        android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT
+    )
+
+//    val intent = android.content.Intent(
+//        android.content.Intent.ACTION_VIEW,
+//        android.net.Uri.parse("adoptaya://notificaciones/${notificacion.id}")
+//    ).apply {
+////        flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+////        setClassName(contexto, "com.example.adoptaya.MainActivity") // Cambia a tu paquete real
+////
+////        putExtra("abrir_notificaciones", true)
+//        setPackage(contexto.packageName)
+//    }
+//
+//    val pendingIntent = android.app.PendingIntent.getActivity(
+//        contexto,
+//        notificacion.id.hashCode(),
+//        intent,
+//        android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT
+//    )
+
+    val builder = NotificationCompat.Builder(contexto, canalId)
+        .setSmallIcon(R.drawable.ic_notificacion_silueta) // Asegúrate de tener este ícono
+        .setColor(android.graphics.Color.parseColor("#F28B2A"))
+        .setContentTitle(notificacion.titulo)
+        .setContentText(notificacion.descripcion)
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(true)
+        .setContentIntent(pendingIntent)
+
+    notificationManager.notify(notificacion.id.hashCode(), builder.build())
 }
 
 @Composable

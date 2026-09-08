@@ -303,17 +303,17 @@ fun PantallaPerfil(
                                                     nombreMascota = mascota.nombre,
                                                     imagenMascota = mascota.imagenes.firstOrNull(),
                                                     onSuccess = { idGenerado ->
-                                                        val datos = androidx.work.workDataOf(
-                                                            "titulo" to "¡A alguien le gusta tu mascota!",
-                                                            "descripcion" to mascota.nombre+" fue agregado a favoritos.",
-                                                            "notificacionId" to idGenerado,
-                                                            "idReceptor" to mascota.idUsuario
-                                                        )
-                                                        val peticion = androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()
-                                                            .setInputData(datos)
-                                                            .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
-                                                            .build()
-                                                        androidx.work.WorkManager.getInstance(contexto).enqueue(peticion)
+//                                                        val datos = androidx.work.workDataOf(
+//                                                            "titulo" to "¡A alguien le gusta tu mascota!",
+//                                                            "descripcion" to mascota.nombre+" fue agregado a favoritos.",
+//                                                            "notificacionId" to idGenerado,
+//                                                            "idReceptor" to mascota.idUsuario
+//                                                        )
+//                                                        val peticion = androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()
+//                                                            .setInputData(datos)
+//                                                            .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
+//                                                            .build()
+//                                                        androidx.work.WorkManager.getInstance(contexto).enqueue(peticion)
                                                     }
                                                 )
                                             }

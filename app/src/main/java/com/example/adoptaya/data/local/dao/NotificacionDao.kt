@@ -14,4 +14,7 @@ interface NotificacionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertarNotificacion(notificacion: Notificacion)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM notificaciones WHERE id = :id)")
+    suspend fun existeNotificacion(id: String): Boolean
 }
