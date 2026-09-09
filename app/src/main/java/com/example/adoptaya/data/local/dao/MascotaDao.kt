@@ -13,7 +13,7 @@ interface MascotaDao {
     @Query("SELECT * FROM mascotas WHERE activa = 1 ORDER BY fechaHoraAlta DESC")
     suspend fun obtenerTodas(): List<Mascota>
 
-    @Query("SELECT * FROM mascotas WHERE id = :mascotaId AND activa = 1")
+    @Query("SELECT * FROM mascotas WHERE id = :mascotaId")
     suspend fun obtenerPorId(mascotaId: String): Mascota?
 
     @Query("SELECT * FROM mascotas WHERE tipo = :tipo AND activa = 1 ORDER BY fechaHoraAlta DESC")

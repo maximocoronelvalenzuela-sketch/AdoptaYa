@@ -210,26 +210,8 @@ private fun mostrarNotificacionSO(contexto: Context, notificacion: Notificacion)
         android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT
     )
 
-//    val intent = android.content.Intent(
-//        android.content.Intent.ACTION_VIEW,
-//        android.net.Uri.parse("adoptaya://notificaciones/${notificacion.id}")
-//    ).apply {
-////        flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-////        setClassName(contexto, "com.example.adoptaya.MainActivity") // Cambia a tu paquete real
-////
-////        putExtra("abrir_notificaciones", true)
-//        setPackage(contexto.packageName)
-//    }
-//
-//    val pendingIntent = android.app.PendingIntent.getActivity(
-//        contexto,
-//        notificacion.id.hashCode(),
-//        intent,
-//        android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT
-//    )
-
     val builder = NotificationCompat.Builder(contexto, canalId)
-        .setSmallIcon(R.drawable.ic_notificacion_silueta) // Asegúrate de tener este ícono
+        .setSmallIcon(R.drawable.ic_notificacion_silueta)
         .setColor(android.graphics.Color.parseColor("#F28B2A"))
         .setContentTitle(notificacion.titulo)
         .setContentText(notificacion.descripcion)
