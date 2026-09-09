@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Female
@@ -68,6 +69,7 @@ fun MascotaCard(
     alClickearFavorito: () -> Unit,
     alClickearBorrar: () -> Unit = {},
     alCambiarEstado: (Enums.EstadoMascota) -> Unit = {},
+    alClickearEditar: () -> Unit = {},
     esFavorito: Boolean = false,
     esMiMascota: Boolean = false,
 ) {
@@ -227,10 +229,10 @@ fun MascotaCard(
                             }
                         }
 
-                        // Botones Favorito + Borrar
+                        // Botones Favorito o Borrar/Editar
                         Row {
-                            // Borrar
                             if (esMiMascota) {
+                                // Borrar
                                 IconButton(
                                     onClick = { alClickearBorrar() },
                                     modifier = Modifier.size(32.dp),
@@ -240,19 +242,30 @@ fun MascotaCard(
                                 }
 
                                 Spacer(modifier = Modifier.width(8.dp))
+
+                                // Editar (reemplaza al Favorito en Mi perfil)
+                                IconButton(
+                                    onClick = { alClickearEditar() },
+                                    modifier = Modifier.size(32.dp),
+                                    colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
+                                ) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Editar publicación", tint = Color.White)
+                                }
+                            } else {
+                                // Favorito (Solo se muestra si no está en Mi perfil)
+                                IconButton(
+                                    onClick = { alClickearFavorito() },
+                                    modifier = Modifier.size(32.dp),
+                                    colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
+                                ) {
+                                    Icon(
+                                        imageVector = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                        contentDescription = "Agregar a favoritos",
+                                        tint = Color.White
+                                    )
+                                }
                             }
-                            // Favoritos (Corazón)
-                            IconButton(
-                                onClick = { alClickearFavorito() },
-                                modifier = Modifier.size(32.dp),
-                                colors = IconButtonDefaults.iconButtonColors(Color.Black.copy(alpha = 0.3f))
-                            ) {
-                                Icon(
-                                    imageVector = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                    contentDescription = "Agregar a favoritos",
-                                    tint = Color.White
-                                )
-                            }
+
                         }
                     }
                 }
@@ -303,9 +316,9 @@ fun MascotaCard(
 
                     // Formato "Raza • Edad • Ciudad, Barrio"
                     val textoDetalles = if (!mascota.raza.isNullOrBlank()) {
-                        mascota.raza + " • " + mascota.edad + " años • " + mascota.ciudad+", "+mascota.barrio
+                        mascota.raza + " • " + mascota.edad + " años • " + mascota.provincia+", "+ mascota.ciudad+", "+mascota.barrio
                     } else {
-                        mascota.edad + " años • " + mascota.ciudad+", "+mascota.barrio
+                        mascota.edad + " años • " + mascota.provincia+", "+ mascota.ciudad+", "+mascota.barrio
                     }
 
                     Text(

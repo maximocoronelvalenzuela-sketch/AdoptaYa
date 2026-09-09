@@ -87,4 +87,13 @@ class MascotaRepositorioImpl(
             Log.e(TAG, "Error al actualizar estado en backend: ${e.message}", e)
         }
     }
+
+    override suspend fun editarMascota(mascota: Mascota) {
+        mascotaDao.insertarMascota(mascota)
+        try {
+            api.actualizarMascota(mascota.id, mascota)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error editando en backend: ${e.message}", e)
+        }
+    }
 }

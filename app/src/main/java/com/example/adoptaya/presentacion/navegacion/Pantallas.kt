@@ -33,4 +33,11 @@ sealed class Pantallas(val ruta: String) {
     object RecuperarPassword : Pantallas("recuperar_password")
 
     object EditarPerfil : Pantallas("editar_perfil")
+
+    object EditarMascota : Pantallas("editar_mascota/{mascotaId}") {
+
+        fun crearRuta(mascotaId: String): String {
+            return "editar_mascota/$mascotaId"
+        }
+    }
 }

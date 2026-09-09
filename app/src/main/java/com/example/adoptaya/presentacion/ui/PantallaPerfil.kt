@@ -57,7 +57,8 @@ fun PantallaPerfil(
     alCerrarSesion: () -> Unit,
     alClickearMascota: (String) -> Unit,
     alNavegarLogin: () -> Unit,
-    alEditarPerfil: () -> Unit
+    alEditarPerfil: () -> Unit,
+    alEditarMascota: (String) -> Unit
 ) {
 
     val alertaPerfil = usuarioViewModel.perfilEstaIncompleto
@@ -317,6 +318,7 @@ fun PantallaPerfil(
                                     alCambiarEstado = {
                                         mascotaViewModel.cambiarEstadoPublicacion(mascota.id, it)
                                     },
+                                    alClickearEditar = { alEditarMascota(mascota.id) },
                                     esFavorito = esFav,
                                     esMiMascota = esMiPerfil,
                                 )

@@ -12,7 +12,9 @@ import com.example.adoptaya.data.remoto.GeorefApi
 import com.example.adoptaya.data.remoto.model.LocalidadGeoref
 import com.example.adoptaya.data.remoto.model.ProvinciaGeoref
 import com.example.adoptaya.dominio.usecase.auth.ObtenerIdUsuarioActualUseCase
+import com.example.adoptaya.dominio.usecase.mascota.EditarMascotaUseCase
 import com.example.adoptaya.dominio.usecase.mascota.GuardarMascotaUseCase
+import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
 import com.example.adoptaya.util.subirFotoAImgBB
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +25,9 @@ import java.util.UUID
 
 class PublicarMascotaViewModel(
     private val guardarMascotaUseCase: GuardarMascotaUseCase,
-    private val obtenerIdUsuarioActualUseCase: ObtenerIdUsuarioActualUseCase
+    private val obtenerIdUsuarioActualUseCase: ObtenerIdUsuarioActualUseCase,
+    private val obtenerMascotaPorIdUseCase: ObtenerMascotaPorIdUseCase,
+    private val editarMascotaUseCase: EditarMascotaUseCase
 ) : ViewModel() {
     private val apiGeoref = GeorefApi.crear()
 
@@ -69,15 +73,24 @@ class PublicarMascotaViewModel(
     // Mensajes de error
     var nombreError by mutableStateOf<String?>(null)
     var edadError by mutableStateOf<String?>(null)
+    var rasgoError by mutableStateOf<String?>(null)
     var ubicacionError by mutableStateOf<String?>(null)
     var barrioError by mutableStateOf<String?>(null)
     var calleError by mutableStateOf<String?>(null)
     var numeroError by mutableStateOf<String?>(null)
     var descripcionError by mutableStateOf<String?>(null)
 
+    // Para mascota editada
+    var idMascotaEditada by mutableStateOf<String?>(null)
+        private set
+    var fechaHoraOriginal by mutableStateOf("")
+        private set
+
     var estaPublicando by mutableStateOf(false)
         private set
     var estaCargandoMapa by mutableStateOf(false)
+        private set
+    var estaCargandoDatos by mutableStateOf(false)
         private set
 
     fun cargarProvincias(hayInternet: Boolean) {
@@ -131,6 +144,14 @@ class PublicarMascotaViewModel(
             esValido = false
         } else {
             edadError = null
+        }
+
+        // Validacion de Rasgos
+        if (rasgosSeleccionados.isEmpty()) {
+            rasgoError = "Debe ingresar al menos un Rasgo."
+            esValido = false
+        } else {
+            rasgoError = null
         }
 
         // Validacion de Mapa generado
@@ -259,29 +280,30 @@ class PublicarMascotaViewModel(
 
     fun guardarMascota(onSuccess: (String) -> Unit) {
         if (!validarDatos()) return
-
         val idActual = obtenerIdUsuarioActualUseCase()
-
         if(idActual == null) return
 
-        val idGenerado = UUID.randomUUID().toString()
+        val esEdicion = !idMascotaEditada.isNullOrBlank()
+        val idFinal = if (esEdicion) idMascotaEditada!! else UUID.randomUUID().toString()
+        val fechaAlta = if (esEdicion) fechaHoraOriginal else LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
         viewModelScope.launch {
             estaPublicando = true
 
             // Sube las fotos locales a ImgBB de forma asíncrona y obtiene las URLs públicas
-            val urlsPublicas = imagenesSeleccionadas.mapNotNull { rutaLocal ->
-                subirFotoAImgBB(rutaLocal)
+            val urlsPublicas = imagenesSeleccionadas.filter { it.isNotBlank() }.mapNotNull { rutaLocal ->
+                // Si la URL ya empieza con http (es decir, ya estaba subida y no se modificó), la devuelve directo
+                if (rutaLocal.startsWith("http")) rutaLocal else subirFotoAImgBB(rutaLocal)
             }
 
-            val nuevaMascota = Mascota(
-                id = idGenerado,
-                nombre = nombre,
+            val mascotaFinal = Mascota(
+                id = idFinal,
+                nombre = nombre.capitalizarPalabras(),
                 tipo = tipo,
                 edad = edad,
                 tiempo = tiempo,
                 sexo = sexo,
-                raza = raza,
+                raza = raza.capitalizarPalabras(),
                 tamaño = tamaño,
                 esterilizado = esterilizado,
                 vacunado = vacunado,
@@ -293,23 +315,30 @@ class PublicarMascotaViewModel(
                 longitud = longitud ?: 0.0,
                 provincia = provinciaSeleccionada?.nombre ?: "",
                 ciudad = localidadSeleccionada?.nombre ?: "",
-                barrio = barrio,
-                calle = calle,
+                barrio = barrio.capitalizarPalabras(),
+                calle = calle.capitalizarPalabras(),
                 numero = numero,
                 imagenes = urlsPublicas,
-                fechaHoraAlta = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                fechaHoraAlta = fechaAlta,
                 idUsuario = idActual
             )
 
             // Guarda en Room y en el backend
-            guardarMascotaUseCase(nuevaMascota)
+            if (esEdicion) {
+                editarMascotaUseCase(mascotaFinal)
+            } else {
+                guardarMascotaUseCase(mascotaFinal)
+            }
             limpiarFormulario()
-            onSuccess(idGenerado)
+            onSuccess(idFinal)
             estaPublicando = false
         }
     }
 
     fun limpiarFormulario() {
+        idMascotaEditada = null
+        fechaHoraOriginal = ""
+        imagenesSeleccionadas = emptyList()
         nombre = ""
         tipo = Enums.TipoMascota.PERRO
         raza = ""
@@ -335,10 +364,96 @@ class PublicarMascotaViewModel(
         imagenesSeleccionadas = emptyList()
         nombreError = null
         edadError = null
+        rasgoError = null
         ubicacionError = null
         barrioError = null
         calleError = null
         numeroError = null
         descripcionError = null
+        estaCargandoDatos = false
+    }
+
+    fun cargarMascotaParaEditar(idMascota: String) {
+        viewModelScope.launch {
+            estaCargandoDatos = true
+
+            val mascota = obtenerMascotaPorIdUseCase(idMascota)
+            mascota?.let { m ->
+                idMascotaEditada = m.id
+                fechaHoraOriginal = m.fechaHoraAlta
+                imagenesSeleccionadas = m.imagenes
+                nombre = m.nombre
+                tipo = m.tipo
+                raza = m.raza ?: ""
+                sexo = m.sexo
+                edad = m.edad
+                tiempo = m.tiempo
+                tamaño = m.tamaño
+
+                vacunado = m.vacunado
+                esterilizado = m.esterilizado
+                desparasitado = m.desparasitado
+
+                rasgosSeleccionados = m.descripcionPersonalidad
+                descripcionAdicional = m.descripcionAdicional
+
+                latitud = m.latitud
+                longitud = m.longitud
+                provincia = m.provincia
+                ciudad = m.ciudad
+                barrio = m.barrio
+                calle = m.calle
+                numero = m.numero
+
+                if (listaProvincias.isEmpty()) {
+                    try {
+                        val respuesta = apiGeoref.obtenerProvincias()
+                        listaProvincias = respuesta.provincias
+                    } catch (e: Exception) {
+
+                    }
+                }
+
+                // Busca el objeto Provincia que coincida con el texto guardado
+                provinciaSeleccionada = listaProvincias.find { it.nombre == m.provincia }
+
+                // Si encontra la provincia, obtiene sus ciudades y obtiene la seleccionada
+                if (provinciaSeleccionada != null) {
+                    try {
+                        val respuestaLoc = apiGeoref.obtenerLocalidades(provinciaSeleccionada!!.id)
+                        listaLocalidades = respuestaLoc.localidades
+                        localidadSeleccionada = listaLocalidades.find { it.nombre == m.ciudad }
+                    } catch (e: Exception) { }
+                }
+            }
+            estaCargandoDatos = false
+        }
+    }
+
+    private fun String.capitalizarPalabras(): String {
+        return this.trim().lowercase().split(" ").joinToString(" ") {
+            it.replaceFirstChar { char -> char.uppercase() }
+        }
+    }
+
+    fun actualizarImagenEnIndice(indice: Int, ruta: String) {
+        val nuevaLista = imagenesSeleccionadas.toMutableList()
+        // Rellena con vacíos si el usuario toca la foto 3 antes que la 2
+        while (nuevaLista.size <= indice) {
+            nuevaLista.add("")
+        }
+        nuevaLista[indice] = ruta
+        imagenesSeleccionadas = nuevaLista.toList()
+    }
+
+    fun limpiarDetallesUbicacion() {
+        barrio = ""
+        calle = ""
+        numero = ""
+        barrioError = null
+        calleError = null
+        numeroError = null
+        latitud = null
+        longitud = null
     }
 }

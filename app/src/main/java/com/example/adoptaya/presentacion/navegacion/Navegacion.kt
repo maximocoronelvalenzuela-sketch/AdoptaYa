@@ -182,6 +182,9 @@ fun Navegacion(
                 },
                 alEditarPerfil = {
                     navController.navigate(Pantallas.EditarPerfil.ruta)
+                },
+                alEditarMascota = { mascotaId ->
+                    navController.navigate(Pantallas.EditarMascota.crearRuta(mascotaId))
                 }
             )
         }
@@ -256,6 +259,20 @@ fun Navegacion(
                 publicarMascotaViewModel = publicarMascotaViewModel,
                 authViewModel = authViewModel,
                 notificacionViewModel = notificacionViewModel,
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            Pantallas.EditarMascota.ruta,
+            arguments = listOf(androidx.navigation.navArgument("mascotaId") { type = androidx.navigation.NavType.StringType })
+        ) { backStackEntry ->
+            val idMascota = backStackEntry.arguments?.getString("mascotaId")
+            PantallaPublicarMascota(
+                publicarMascotaViewModel = publicarMascotaViewModel,
+                authViewModel = authViewModel,
+                notificacionViewModel = notificacionViewModel,
+                mascotaIdParaEditar = idMascota,
                 onVolver = { navController.popBackStack() }
             )
         }

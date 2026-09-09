@@ -87,23 +87,6 @@ fun PantallaDetalleMascota(
                                 hayInternet = hayRed,
                                 onSuccess = { idGenerado ->
                                     android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada", android.widget.Toast.LENGTH_LONG).show()
-//                                    android.widget.Toast.makeText(contexto, "Solicitud de contacto enviada al dueño", android.widget.Toast.LENGTH_LONG).show()
-//
-//                                    // Se genera la notificacion
-//                                    val datos = androidx.work.workDataOf(
-//                                        "titulo" to "Nueva solicitud de contacto",
-//                                        "descripcion" to "Alguien está interesado en adoptar a " + mascota.nombre + ".",
-//                                        "notificacionId" to idGenerado,
-//                                        "idReceptor" to mascota.idUsuario
-//                                    )
-//                                    val peticion =
-//                                        androidx.work.OneTimeWorkRequestBuilder<NotificacionWorker>()
-//                                            .setInputData(datos)
-//                                            .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
-//                                            .build()
-//
-//                                    androidx.work.WorkManager.getInstance(contexto)
-//                                        .enqueue(peticion)
                                 },
                                 onError = { mensajeError ->
                                     android.widget.Toast.makeText(contexto, mensajeError, android.widget.Toast.LENGTH_LONG).show()
@@ -284,7 +267,7 @@ fun PantallaDetalleMascota(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
                                         Text(mascota.barrio, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Bold)
-                                        Text(mascota.ciudad, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                        Text(mascota.provincia+", "+mascota.ciudad, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }

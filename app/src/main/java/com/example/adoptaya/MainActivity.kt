@@ -46,6 +46,7 @@ import com.example.adoptaya.dominio.usecase.favorito.EliminarFavoritoUseCase
 import com.example.adoptaya.dominio.usecase.favorito.ObtenerFavoritosPorUsuarioUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ActualizarEstadoPublicacionUseCase
 import com.example.adoptaya.dominio.usecase.mascota.DarDeBajaMascotaUseCase
+import com.example.adoptaya.dominio.usecase.mascota.EditarMascotaUseCase
 import com.example.adoptaya.dominio.usecase.mascota.GuardarMascotaUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotaPorIdUseCase
 import com.example.adoptaya.dominio.usecase.mascota.ObtenerMascotasUseCase
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
         val authRepositorio = AuthRepositorioImpl(firebaseAuth)
 
         val obtenerMascotasUC = ObtenerMascotasUseCase(mascotaRepositorio)
-        val obtenerPorIdUC = ObtenerMascotaPorIdUseCase(mascotaRepositorio)
+        val obtenerMascotaPorIdUC = ObtenerMascotaPorIdUseCase(mascotaRepositorio)
         val guardarMascotaUC = GuardarMascotaUseCase(mascotaRepositorio)
         val obtenerUsuarioPorIdUC = ObtenerUsuarioPorIdUseCase(usuarioRepositorio)
         val obtenerFavoritosPorUsuarioUC = ObtenerFavoritosPorUsuarioUseCase(favoritoRepositorio, mascotaRepositorio)
@@ -108,12 +109,13 @@ class MainActivity : ComponentActivity() {
         val recuperarPasswordUC = RecuperarPasswordUseCase(authRepositorio)
         val darDeAltaInvitadoUC = DarDeBajaMascotaUseCase(mascotaRepositorio)
         val actualizarEstadoPublicacionUC = ActualizarEstadoPublicacionUseCase(mascotaRepositorio)
+        val editarMascotaUC = EditarMascotaUseCase(mascotaRepositorio)
 
-        val mascotaViewModel = MascotaViewModel(obtenerMascotasUC, obtenerPorIdUC, darDeAltaInvitadoUC, actualizarEstadoPublicacionUC)
+        val mascotaViewModel = MascotaViewModel(obtenerMascotasUC, obtenerMascotaPorIdUC, darDeAltaInvitadoUC, actualizarEstadoPublicacionUC)
         val usuarioViewModel = UsuarioViewModel(obtenerUsuarioPorIdUC, verificarPerfilIncompletoUC, actualizarUsuarioUC)
         val favoritoViewModel = FavoritoViewModel(obtenerFavoritosPorUsuarioUC, agregarFavoritoUC, eliminarFavoritoUC)
         val notificacionViewModel = NotificacionViewModel(obtenerNotificacionesPorUsuarioUC, guardarNotificacionUC)
-        val publicarMascotaViewModel = PublicarMascotaViewModel(guardarMascotaUC, obtenerIdUsuarioActualUC)
+        val publicarMascotaViewModel = PublicarMascotaViewModel(guardarMascotaUC, obtenerIdUsuarioActualUC, obtenerMascotaPorIdUC, editarMascotaUC)
         val authViewModel = AuthViewModel(iniciarSesionUC, registrarUC, obtenerIdUsuarioActualUC, crearUsuarioUC, cerrarSesionUC, recuperarPasswordUC)
 
         val inicializarDatosPruebaUC = InicializarDatosPruebaUseCase(mascotaRepositorio, usuarioRepositorio, this)

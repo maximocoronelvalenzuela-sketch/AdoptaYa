@@ -17,4 +17,6 @@ interface MascotaRepositorio {
     suspend fun darDeBajaMascota(idMascota: String)
 
     suspend fun actualizarEstadoMascota(idMascota: String, nuevoEstado: Enums.EstadoMascota)
+
+    suspend fun editarMascota(mascota: Mascota)
 }
