@@ -34,9 +34,7 @@ import com.example.adoptaya.data.repositorio.FavoritoRepositorioImpl
 import com.example.adoptaya.data.repositorio.MascotaRepositorioImpl
 import com.example.adoptaya.data.repositorio.NotificacionRepositorioImpl
 import com.example.adoptaya.data.repositorio.UsuarioRepositorioImpl
-import com.example.adoptaya.dominio.usecase.InicializarDatosPruebaUseCase
 import com.example.adoptaya.dominio.usecase.auth.CerrarSesionUseCase
-import com.example.adoptaya.dominio.usecase.auth.IngresarComoInvitadoUseCase
 import com.example.adoptaya.dominio.usecase.auth.IniciarSesionUseCase
 import com.example.adoptaya.dominio.usecase.auth.ObtenerIdUsuarioActualUseCase
 import com.example.adoptaya.dominio.usecase.auth.RecuperarPasswordUseCase
@@ -118,17 +116,10 @@ class MainActivity : ComponentActivity() {
         val publicarMascotaViewModel = PublicarMascotaViewModel(guardarMascotaUC, obtenerIdUsuarioActualUC, obtenerMascotaPorIdUC, editarMascotaUC)
         val authViewModel = AuthViewModel(iniciarSesionUC, registrarUC, obtenerIdUsuarioActualUC, crearUsuarioUC, cerrarSesionUC, recuperarPasswordUC)
 
-        val inicializarDatosPruebaUC = InicializarDatosPruebaUseCase(mascotaRepositorio, usuarioRepositorio, this)
 
         enableEdgeToEdge()
         setContent {
-            var datosInicializados by remember { mutableStateOf(false) }
             val idActual = authViewModel.idUsuarioActual
-
-            LaunchedEffect(Unit) {
-                inicializarDatosPruebaUC()
-                datosInicializados = true
-            }
 
             // BUCLE DE POLLING ATADO AL CICLO DE VIDA
             LaunchedEffect(idActual) {
@@ -160,26 +151,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // Para solucionar la condicion de carrera
-            if (!datosInicializados) {
-                Box(
-                    modifier = Modifier.fillMaxSize().background(Color.White),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = Color(0xFFE85A13))
-                }
-            } else {
-                Navegacion(
-                    mascotaViewModel = mascotaViewModel,
-                    favoritoViewModel = favoritoViewModel,
-                    usuarioViewModel = usuarioViewModel,
-                    notificacionViewModel = notificacionViewModel,
-                    publicarMascotaViewModel = publicarMascotaViewModel,
-                    authViewModel = authViewModel,
-                    irANotificaciones = irANotificaciones,
-                    onNavegacionConsumida = { irANotificaciones = true }
-                )
-            }
+            Navegacion(
+                mascotaViewModel = mascotaViewModel,
+                favoritoViewModel = favoritoViewModel,
+                usuarioViewModel = usuarioViewModel,
+                notificacionViewModel = notificacionViewModel,
+                publicarMascotaViewModel = publicarMascotaViewModel,
+                authViewModel = authViewModel,
+                irANotificaciones = irANotificaciones,
+                onNavegacionConsumida = { irANotificaciones = true }
+            )
         }
     }
 
