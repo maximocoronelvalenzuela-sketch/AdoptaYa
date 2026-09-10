@@ -288,16 +288,18 @@ fun PantallaDetalleMascota(
 
                 val esFavorito = favoritoViewModel.esFavorito(mascota.id)
 
-                IconButtonFlotante(
-                    icono = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    onClick = {
-                        if (idActual != null) {
-                            favoritoViewModel.toggleFavorito(idActual, mascota)
-                        } else {
-                            mostrarModalLogin = true
+                if (idActual != mascota.idUsuario) {
+                    IconButtonFlotante(
+                        icono = if (esFavorito) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        onClick = {
+                            if (idActual != null) {
+                                favoritoViewModel.toggleFavorito(idActual, mascota)
+                            } else {
+                                mostrarModalLogin = true
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
 

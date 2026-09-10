@@ -1,7 +1,9 @@
 package com.example.adoptaya.presentacion.ui
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -29,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.checkSelfPermission
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Notificacion
 import com.example.adoptaya.presentacion.componentes.TopBar
@@ -58,13 +61,16 @@ fun PantallaNotificaciones(
     // Estado para controlar si el deep link ya fue consumido
     var deepLinkConsumido by rememberSaveable { mutableStateOf(false) }
 
+    val contexto = LocalContext.current
+    var tienePermisoNotis by remember { mutableStateOf(true) }
+
     LaunchedEffect(idActual) {
         if (idActual != null) {
             notificacionViewModel.cargarNotificacionesDeUsuario(idActual)
         }
     }
 
-    // Efecto para abrir el modal automáticamente si llegamos desde el toque de la notificación
+    // Efecto para abrir el modal automáticamente si el usuario llega desde el toque de la notificación
     LaunchedEffect(notificaciones, notificacionIdInicial) {
         if (notificacionIdInicial != null && notificaciones.isNotEmpty() && notificacionSeleccionada == null && !deepLinkConsumido) {
             val notiEncontrada = notificaciones.find { it.id == notificacionIdInicial }
@@ -72,6 +78,13 @@ fun PantallaNotificaciones(
                 notificacionSeleccionada = notiEncontrada
                 deepLinkConsumido = true
             }
+        }
+    }
+
+    // Evaluamos si tiene el permiso dado cada vez que se carga esta pantalla
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            tienePermisoNotis = checkSelfPermission(contexto, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -89,6 +102,35 @@ fun PantallaNotificaciones(
             .padding(paddingValues)
             .background(Color(0xFFF3F3F3))
         ) {
+
+            if (!tienePermisoNotis) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            // Si lo toca, lo lleva directo a la pantalla para darle permiso
+                            val intent = Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, contexto.packageName)
+                            }
+                            contexto.startActivity(intent)
+                        },
+                    color = Color(0xFFFFF6ED)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(imageVector = Icons.Default.NotificationsOff, contentDescription = null, tint = Color(0xFFE85A13), modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Notificaciones desactivadas. Toca aquí para habilitarlas en Ajustes y no perderte nada.",
+                            color = Color(0xFFE85A13),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
 
             // Filtros rapidos
             Row(
@@ -108,22 +150,33 @@ fun PantallaNotificaciones(
                 }
             }
 
+            if (notificaciones.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize().weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Todavía no tienes notificaciones.", color = Color.Gray, fontSize = 16.sp)
+                }
+            } else {
 
-            // Lista de Notificaciones
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(notificaciones) { noti ->
-                    ItemNotificacion(
-                        notificacion = noti,
-                        tiempoTranscurrido = notificacionViewModel.obtenerTiempoTranscurrido(noti.fechaHora),
-                        alClickear = {
-                            notificacionViewModel.marcarComoLeida(noti)
-                            notificacionSeleccionada = noti
-                        }
-                    )
+                // Lista de Notificaciones
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(notificaciones) { noti ->
+                        ItemNotificacion(
+                            notificacion = noti,
+                            tiempoTranscurrido = notificacionViewModel.obtenerTiempoTranscurrido(
+                                noti.fechaHora
+                            ),
+                            alClickear = {
+                                notificacionViewModel.marcarComoLeida(noti)
+                                notificacionSeleccionada = noti
+                            }
+                        )
+                    }
                 }
             }
         }

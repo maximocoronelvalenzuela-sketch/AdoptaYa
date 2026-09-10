@@ -138,9 +138,13 @@ fun PantallaLogin(
                     authViewModel.iniciarSesion(email, password, !sinInternet) {
                         // Si el login fue exitoso, comprobamos la versión de Android
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            // Si es Android 13 o superior, pedimos el permiso.
-                            // Al responder, el permissionLauncher ejecutará alLoginExitoso()
-                            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                            val estadoPermiso = androidx.core.content.ContextCompat.checkSelfPermission(contexto, android.Manifest.permission.POST_NOTIFICATIONS)
+                            if (estadoPermiso == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                                alLoginExitoso()
+                            } else {
+                                // Si no está otorgado, lanzamos el cartel nativo
+                                permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                            }
                         } else {
                             // En Android 12 o inferior, el permiso se otorga al instalar. Pasa directo al Home
                             alLoginExitoso()

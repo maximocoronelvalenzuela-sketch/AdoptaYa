@@ -1,18 +1,23 @@
 package com.example.adoptaya.presentacion.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
 import com.example.adoptaya.data.model.Usuario
 import com.example.adoptaya.data.servicios.NotificacionWorker
 import com.example.adoptaya.presentacion.componentes.BarraNavegacion
@@ -76,40 +81,56 @@ fun PantallaFavoritos(
             )
         }
     ) { paddingValues ->
-        LazyColumn (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .background(Color(0xFFF3F3F3))
-        ){
+        if (mascotas.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(Color(0xFFF3F3F3)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Aún no hay mascotas favoritas para mostrar.", color = Color.Gray, fontSize = 16.sp)
+            }
+        } else {
 
-            items(mascotas) { mascota ->
-                val esFav = favoritoViewModel.esFavorito(mascota.id)
-                val dueño by produceState<Usuario?>(initialValue = null, key1 = mascota.idUsuario) {
-                    value = usuarioViewModel.obtenerUsuarioPorIdDirecto(mascota.idUsuario)
-                }
-                val tiempoTranscurrido = mascotaViewModel.obtenerTiempoTranscurrido(mascota.fechaHoraAlta)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues)
+                    .background(Color(0xFFF3F3F3))
+            ) {
 
-                MascotaCard(
-                    mascota = mascota,
-                    nombreDueño = dueño?.nombre ?: "Cargando...",
-                    fotoDueño = dueño?.imagen,
-                    tiempoTranscurrido = tiempoTranscurrido,
-                    alClickearMascota = {
-                        alClickearMascota(mascota.id)
-                    },
-                    alClickearFavorito = {
-                        if (idActual != null) {
-                            favoritoViewModel.toggleFavorito(idActual, mascota)
+                items(mascotas) { mascota ->
+                    val esFav = favoritoViewModel.esFavorito(mascota.id)
+                    val dueño by produceState<Usuario?>(
+                        initialValue = null,
+                        key1 = mascota.idUsuario
+                    ) {
+                        value = usuarioViewModel.obtenerUsuarioPorIdDirecto(mascota.idUsuario)
+                    }
+                    val tiempoTranscurrido =
+                        mascotaViewModel.obtenerTiempoTranscurrido(mascota.fechaHoraAlta)
 
-                            if (!esFav && idActual != mascota.idUsuario) {
-                                notificacionViewModel.enviarNotificacionFavorito(
-                                    idEmisor = idActual,
-                                    idReceptor = mascota.idUsuario,
-                                    idMascota = mascota.id,
-                                    nombreMascota = mascota.nombre,
-                                    imagenMascota = mascota.imagenes.firstOrNull(),
-                                    onSuccess = { idGenerado ->
+                    MascotaCard(
+                        mascota = mascota,
+                        nombreDueño = dueño?.nombre ?: "Cargando...",
+                        fotoDueño = dueño?.imagen,
+                        tiempoTranscurrido = tiempoTranscurrido,
+                        alClickearMascota = {
+                            alClickearMascota(mascota.id)
+                        },
+                        alClickearFavorito = {
+                            if (idActual != null) {
+                                favoritoViewModel.toggleFavorito(idActual, mascota)
+
+                                if (!esFav && idActual != mascota.idUsuario) {
+                                    notificacionViewModel.enviarNotificacionFavorito(
+                                        idEmisor = idActual,
+                                        idReceptor = mascota.idUsuario,
+                                        idMascota = mascota.id,
+                                        nombreMascota = mascota.nombre,
+                                        imagenMascota = mascota.imagenes.firstOrNull(),
+                                        onSuccess = { idGenerado ->
 //                                        val datos = androidx.work.workDataOf(
 //                                            "titulo" to "¡A alguien le gusta tu mascota!",
 //                                            "descripcion" to mascota.nombre+" fue agregado a favoritos.",
@@ -121,16 +142,17 @@ fun PantallaFavoritos(
 //                                            .setInitialDelay(40, java.util.concurrent.TimeUnit.SECONDS)
 //                                            .build()
 //                                        androidx.work.WorkManager.getInstance(contexto).enqueue(peticion)
-                                    }
-                                )
+                                        }
+                                    )
+                                }
                             }
-                        }
-                    },
-                    alClickearPerfilDueño = {
-                        alClickearPerfilDueño(mascota.idUsuario)
-                    },
-                    esFavorito = favoritoViewModel.esFavorito(mascota.id)
-                )
+                        },
+                        alClickearPerfilDueño = {
+                            alClickearPerfilDueño(mascota.idUsuario)
+                        },
+                        esFavorito = favoritoViewModel.esFavorito(mascota.id)
+                    )
+                }
             }
         }
     }

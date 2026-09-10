@@ -113,7 +113,7 @@ fun PantallaMapa(
         topBar = {
             TopBar(
                 titulo = "Mapa",
-                mostrarBotonNotificaciones = true,
+                mostrarBotonNotificaciones = idActual != null,
                 alClickearNotificaciones = {
                     if(idActual != null) alClickearNotificaciones() else mostrarModalLogin = true
                 },
@@ -151,8 +151,7 @@ fun PantallaMapa(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
             ) {
-                val mascotasVisibles =
-                    mascotas.filter { it.estado == Enums.EstadoMascota.DISPONIBLE }
+                val mascotasVisibles = mascotas.filter { it.estado == Enums.EstadoMascota.DISPONIBLE && it.idUsuario != idActual }
                 mascotasVisibles.forEach { mascota ->
 
                     Marker(

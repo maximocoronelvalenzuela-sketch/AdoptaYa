@@ -57,6 +57,7 @@ import coil.compose.AsyncImage
 import com.example.adoptaya.R
 import com.example.adoptaya.data.model.Enums
 import com.example.adoptaya.data.model.Mascota
+import kotlin.text.lowercase
 
 @Composable
 fun MascotaCard(
@@ -315,10 +316,12 @@ fun MascotaCard(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     // Formato "Raza • Edad • Ciudad, Barrio"
+                    val tiempoFormateado = mascota.tiempo.name.lowercase().replaceFirstChar { it.uppercase() }
+
                     val textoDetalles = if (!mascota.raza.isNullOrBlank()) {
-                        mascota.raza + " • " + mascota.edad + " años • " + mascota.provincia+", "+ mascota.ciudad+", "+mascota.barrio
+                        mascota.raza + " • " + mascota.edad + " "+tiempoFormateado+" • " + mascota.provincia+", "+ mascota.ciudad+", "+mascota.barrio
                     } else {
-                        mascota.edad + " años • " + mascota.provincia+", "+ mascota.ciudad+", "+mascota.barrio
+                        mascota.edad + " "+tiempoFormateado+" • " + mascota.provincia+", "+ mascota.ciudad+", "+mascota.barrio
                     }
 
                     Text(

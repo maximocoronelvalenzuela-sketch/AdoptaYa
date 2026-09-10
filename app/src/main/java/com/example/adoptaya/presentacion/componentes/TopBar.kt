@@ -1,5 +1,8 @@
 package com.example.adoptaya.presentacion.componentes
 
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +42,14 @@ fun TopBar(
     val contexto = LocalContext.current
     var sinInternet by remember { mutableStateOf(false) }
 
+    // Launcher para pedir permiso desde la campanita
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        // Si acepta o rechaza, de todas formas lo dejamos entrar a ver la pantalla vacía/lista
+        alClickearNotificaciones()
+    }
+
     // Evaluamos la conexión al dibujar la barra
     LaunchedEffect(Unit) {
         sinInternet = !hayConexionAInternet(contexto)
@@ -57,10 +68,7 @@ fun TopBar(
             navigationIcon = {
                 if (mostrarBotonVolver) {
                     IconButton(onClick = alVolver) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 }
             },
@@ -80,12 +88,24 @@ fun TopBar(
                 }
 
                 if (mostrarBotonNotificaciones) {
-                    IconButton(onClick = alClickearNotificaciones) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notificaciones",
-                            tint = Color.Black
-                        )
+                    IconButton(
+                        onClick = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                val estadoPermiso = androidx.core.content.ContextCompat.checkSelfPermission(
+                                    contexto,
+                                    android.Manifest.permission.POST_NOTIFICATIONS
+                                )
+                                if (estadoPermiso == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                                    alClickearNotificaciones()
+                                } else {
+                                    permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                }
+                            } else {
+                                alClickearNotificaciones()
+                            }
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notificaciones", tint = Color.Black)
                     }
                 }
             }
